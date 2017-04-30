@@ -46,6 +46,12 @@ var GitHubComp = (function() {
       });
     }
 
+    // info click event handler
+    var ele_info = document.getElementById("mg-info");
+    ele_info.onclick = function() {
+      chrome.tabs.create({url: this.href});
+    }
+
     // render UI
     this.render();
   };

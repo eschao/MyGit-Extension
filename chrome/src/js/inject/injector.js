@@ -23,7 +23,8 @@ var MyGitInjector = (function() {
     var self = this;
     chrome.storage.sync.get(MYGIT_SETTINGS_KEY, function(item) {
       var settings = item[MYGIT_SETTINGS_KEY];
-      if (settings.enable_issue_export != null &&
+      if (settings != null &&
+          settings.enable_issue_export != null &&
           settings.enable_issue_export == false) {
         self.issue_export = null;
       }

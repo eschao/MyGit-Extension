@@ -1,0 +1,45 @@
+{
+  "author": "eschao",
+  "name": "MyGit",
+  "permissions": ["storage", "tabs"],
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "description": "MyGit - Plugin for GitHub",
+  "icons": {
+    "128": "img/icon/mygit_128.png",
+    "48": "img/icon/mygit_48.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "img/icon/mygit_19.png",
+      "38": "img/icon/mygit_38.png"
+    },
+    "default_popup": "popup.html",
+    "default_title": "MyGit"
+  },
+  "background": {
+    "scripts": [
+      "src/js/config.js",
+      "src/js/background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.github.com/*",
+        "https://github.ibm.com/*"
+      ],
+      "css": ["css/inject.css"],
+      "js": [
+        "src/js/config.js",
+        "src/js/inject/FileSaver.min.js",
+        "src/js/inject/drag_drop.js",
+        "src/js/inject/issue_export_dialog.js",
+        "src/js/inject/issue_export.js",
+        "src/js/inject/injector.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [ "js/*", "templates/*", "img/*", "fonts/*" ]
+}

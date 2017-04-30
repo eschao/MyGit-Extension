@@ -1,0 +1,260 @@
+div.mg-export-dialog-center {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 1px solid rgba(27,31,35,0.2);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  z-index: 999;
+  padding: 10px 10px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  display: none;
+  flex-direction: column;
+}
+
+/* put in menu div */
+div.mg-export-win {
+  position: absolute;
+  width: 600px;
+  height: 300px;
+  margin-top: 40px;
+  background-color: #fff;
+  border: 1px solid rgba(27,31,35,0.2);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  z-index: 999
+}
+
+.hidden {
+  display: none !important;
+}
+
+.show {
+  display: block;
+}
+
+.mg-section {
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.mg-section-header {
+  margin: 0;
+  align-items: center;
+}
+
+.mg-section-bottom {
+  margin-bottom: 0;
+}
+
+.mg-section-annotate {
+  display: inline-flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+  margin-left: 2px;
+}
+
+.mg-section-op {
+  margin: 0 5px;
+}
+
+.mg-flex-spc-b {
+  justify-content: space-between;
+}
+
+.mg-flex-s {
+  justify-content: flex-start;
+}
+
+.mg-flex-e {
+  justify-content: flex-end;
+}
+
+.mg-flex-v-m {
+  align-items: center
+}
+
+.mg-middle-l {
+  width: 50%;
+  text-align: left;
+}
+
+.mg-annotation {
+  font-size: 12px;
+  color: gray;
+}
+
+.mg-header {
+  cursor: pointer;
+}
+
+.mg-a {
+  color: black;
+  text-decoration: none;
+}
+
+.mg-a:hover {
+  text-decoration: none;
+}
+
+.mg-checkbox {
+  margin: 2px 8px 0 0;
+  veritcial-align: middle;
+  color: #586069;
+}
+
+.mg-input-box {
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px #d1d5da solid;
+  box-shadow:inset 0 1px 2px rgba(27,31,35,0.075);
+  margin-left: 10px;
+}
+
+.mg-input {
+  height: 22px;
+  width: 26px;
+  vertical-align: middle;
+  background-color: #fafafa;
+}
+
+.mg-input-delimiter {
+  padding: 8px 8px;
+}
+
+.mg-header-disable {
+  color: lightgrey !important;
+}
+
+.mg-delimiter-l {
+  line-height: 22px;
+  vertical-align: middle;
+}
+
+.mg-btn {
+  display: inline-block;
+  font-size: 1em;
+  font-weight: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  vertical-align: middle;
+  border-radius: 3px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  border-color: rgba(27,31,35,0.5);
+  padding: 0.5em 1em;
+  color: #000000;
+  background-color: #aab2bd;
+}
+
+.mg-btn-dark {
+  color: #ffffff;
+  background-color: #656d78;
+}
+
+.mg-left-20m {
+  margin-left: 20px;
+}
+
+.mg-right-20m {
+  margin-right: 20px;
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="mg-icon-"],
+[class*=" mg-icon-"] {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+[class^="mg-icon-"]:before,
+[class*=" mg-icon-"]:before {
+  text-decoration: inherit;
+  speak: none;
+  margin-right: 0.25em;
+}
+
+.mg-icon-close:before {
+  content: "\f00d";
+}
+
+.mg-icon-o-close:before {
+  content: "\f05c";
+}
+
+.mg-icon-check:before {
+  content: "\f00c";
+}
+
+.mg-icon-c-check:before {
+  content: "\f058";
+}
+
+.mg-icon-github:before {
+  content: "\f09b";
+}
+
+.mg-icon-reorder:before {
+  content: "\f0c9";
+}
+
+.mg-icon-asterisk:before {
+  content: "\f069";
+}
+
+.mg-icon-th-list:before {
+  content: "\f00b";
+}
+
+.mg-icon-paperclip:before {
+  content: "\f0c6";
+}
+
+.mg-icon-dot-c-o:before {
+  content: "\f192";
+}
+
+.mg-icon-info-c:before {
+  content: "\f05a";
+}
+
+.mg-m-icon {
+  font-size: 18px;
+}
+
+.mg-s-icon {
+  font-size: 12px;
+}
+
+.mg-dd-move-div {
+  position: absolute !important;
+  background-color: #f6f8fa !important;
+  z-index: 999;
+}
+/*
+.mg-close {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/img/svg/x.svg");
+}*/
+

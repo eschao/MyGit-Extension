@@ -1,0 +1,344 @@
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: #24292e;
+  font-size: 14px;
+  background-color: #fff;
+  max-height: 800px;
+}
+
+section {
+  display: block;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+a {
+  text-decoration:none;
+  color: #24292e;
+}
+
+.mg-input-box {
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px #d1d5da solid;
+  box-shadow:inset 0 1px 2px rgba(27,31,35,0.075);
+}
+
+.mg-input {
+  font-size: 1em;
+  height: 34px;
+  min-width: 220px;
+  vertical-align: middle;
+  background-color: #fafafa;
+  padding: 4px 10px 4px 32px;
+}
+
+.mg-select-btn {
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px #d1d5da solid;
+  box-shadow:inset 0 1px 2px rgba(27,31,35,0.075);
+  font-size: 1em;
+  line-height: 34px;
+  width: 220px;
+  vertical-align: middle;
+  text-align: left;
+  background-color: #eff3f6;
+}
+
+.mg-select-text {
+  margin-left: 32px;
+}
+
+input:focus {
+  background-color: #fff;
+}
+
+.mg-input-icon {
+  position: absolute;
+  display: block;
+  color: #c6cbd1;
+  font-size: 1.1em;
+  margin-top: -23px;
+  margin-left: 10px;
+}
+
+.mg-select-l-svg {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  margin-top: 8px;
+}
+
+.mg-menu-check, .mg-select-i-show-menu {
+  float: right;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.mg-select-menu-modal {
+  position: absolute;
+  width: 220px;
+  margin-top: 2px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #586069;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(27,31,35,0.15);
+  border-radius: 3px;
+  box-shadow: 0 3px 12px rgba(27,31,35,0.15);
+  z-index: 999;
+  display: none;
+}
+
+.mg-select-menu-header {
+  text-align: left;
+  padding: 4px 10px;
+  line-height: 16px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.mg-select-menu-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mg-select-menu-close {
+  float: right;
+}
+
+.mg-select-menu-close:hover {
+  cursor: pointer;
+}
+
+.mg-select-menu-list {
+  text-align: left;
+}
+
+.mg-select-menu-item {
+  cursor: pointer;
+  vertical-align: middle;
+  border-bottom: 1px solid #eaecef;
+  line-height: 34px;
+}
+
+.mg-select-menu-item:hover {
+  background: #0366d6;
+}
+
+.mg-select-menu-item:hover * {
+  color: #fff;
+}
+
+.mg-select-menu-text {
+  display: block;
+}
+
+.mg-select-menu-heading {
+  color: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mg-select-menu-desc {
+  font-size: 12px;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.hidden {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.h-center {
+  text-align: center;
+}
+
+.v-center {
+  vertical-align: middle;
+}
+
+.mg-title-section {
+  height: 30px;
+  border-bottom: 1px #e1e4e8 solid;
+}
+
+.mg-title {
+  font-size: 1.2em;
+  color: #1a1a1a;
+  border: none;
+  vertical-align: middle;
+}
+
+.mg-btn {
+  display: inline-block;
+  font-size: 1em;
+  font-weight: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  vertical-align: middle;
+  border-radius: 3px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  border-color: rgba(27,31,35,0.5);
+}
+
+.mg-github-btn {
+  padding: 0.7em 1em;
+  color: #000000;
+  background-color: #aab2bd;
+}
+
+.mg-github-e-btn {
+  padding: 0.7em 0em;
+  width: 220px;
+  color: #ffffff;
+  background-color: #656d78;
+}
+
+.mg-icon {
+  vertical-align: middle;
+  padding-right: 0.5em;
+}
+
+.mg-menu-logo {
+  vertical-align: middle;
+  margin: 6px;
+  font-size: 18px;
+}
+
+.mg-box {
+  display: block;
+  margin: 5px 20px;
+  border: 1px solid #ededed;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.mg-message-box {
+  text-align: center;
+  min-width: 220px;
+}
+
+.mg-message {
+  text-align: left;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: red;
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('../fonts/fontawesome-webfont.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FontLogo';
+  src: url('../fonts/logo.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="mg-icon-"],
+[class*=" mg-icon-"] {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+[class^="mg-icon-"]:before,
+[class*=" mg-icon-"]:before {
+  text-decoration: inherit;
+  speak: none;
+  margin-right: 0.25em;
+}
+
+[class^="mg-logo-"],
+[class*=" mg-logo-"] {
+  font-family: 'FontLogo';
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+[class^="mg-logo-"]:before,
+[class*=" mg-logo-"]:before {
+  text-decoration: inherit;
+  speak: none;
+  margin-right: 0.25em;
+}
+
+.mg-btn-icon {
+  font-size: 1.1em;
+}
+
+.mg-icon-size-m {
+  font-size: 1.5em;
+}
+
+.mg-white-icon {
+  color: white;
+}
+
+.mg-icon-github:before {
+  content: "\f09b";
+}
+
+.mg-icon-link:before {
+  content: "\f0c1";
+}
+
+.mg-icon-home:before {
+  content: "\f015";
+}
+
+.mg-icon-info:before {
+  content: "\f05a";
+}
+
+.mg-icon-question:before {
+  content: "\f059";
+}
+
+.mg-icon-label:before {
+  content: "\f02b";
+}
+
+.mg-icon-caret-down:before {
+  content: "\f0d7";
+}
+
+.mg-icon-close:before {
+  content: "\f00d";
+}
+
+.mg-icon-check:before {
+  content: "\f00c";
+}
+
+.mg-logo-ibm:before {
+  content: "\004d";
+}
+
+

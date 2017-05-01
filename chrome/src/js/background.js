@@ -50,7 +50,7 @@ chrome.tabs.onUpdated.addListener(function(id, changeInfo, tab) {
         if (token != undefined && token != null) {
           g_oauth_tab = null;
           var data = {};
-          data [MYGIT_GITHUB_KEY] =  {"token" : token};
+          data[MYGIT_GITHUB_KEY] =  {"token" : token};
           chrome.storage.sync.set(data, function(){ });
         }
     }

@@ -36,6 +36,7 @@
         "src/js/inject/drag_drop.js",
         "src/js/inject/issue_export_dialog.js",
         "src/js/inject/issue_export.js",
+        "src/js/inject/favorite_repos.js",
         "src/js/inject/injector.js"
       ],
       "run_at": "document_end"

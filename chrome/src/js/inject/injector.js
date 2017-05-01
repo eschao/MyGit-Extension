@@ -19,14 +19,21 @@ var MyGitInjector = (function() {
 
   function MyGitInjector() {
     this.issue_export = new IssueExport();
+    this.favorite_repos = new FavoriteRepos();
 
     var self = this;
     chrome.storage.sync.get(MYGIT_SETTINGS_KEY, function(item) {
       var settings = item[MYGIT_SETTINGS_KEY];
-      if (settings != null &&
-          settings.enable_issue_export != null &&
-          settings.enable_issue_export == false) {
-        self.issue_export = null;
+      if (settings != null) {
+        if (settings.enable_issue_export != null &&
+            settings.enable_issue_export == false) {
+          self.issue_export = null;
+        }
+
+        if (settings.enable_favorite_repos != null &&
+            settings.enable_favorite_repos == false) {
+          self.favorite_repos = null;
+        }
       }
     });
   }
@@ -41,6 +48,10 @@ var MyGitInjector = (function() {
     window.addEventListener("load", function() {
       if (self.issue_export != null) {
         self.issue_export.inject(window.location.href);
+      }
+
+      if (self.favorite_repos != null) {
+        self.favorite_repos.inject(window.location.href);
       }
     }, false);
 

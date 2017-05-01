@@ -19,6 +19,7 @@ const MYGIT_GITHUB_KEY        = "mygit-github-key";
 const MYGIT_GITHUB_E_KEY      = "mygit-github-e-key";
 const MYGIT_GITHUB_CONFIG_KEY = "mygit-github-config-key";
 const MYGIT_SETTINGS_KEY      = "mygit-settings-key";
+const MYGIT_FAVORITE_REPOS_KEY= "mygit-favorite-repos-key";
 const CLIENT_ID               = "cf0ec09e8a65db31a4d7";
 const REDIRECT_URI            = "http://mgit.chaozh.net:9080/github-oauth-cb";
 const GITHUB_TOKEN_Q          = "github_token=";

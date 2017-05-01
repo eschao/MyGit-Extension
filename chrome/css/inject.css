@@ -78,7 +78,11 @@ div.mg-export-win {
 }
 
 .mg-flex-v-m {
-  align-items: center
+  align-items: center;
+}
+
+.mg-right {
+  float: right;
 }
 
 .mg-middle-l {
@@ -168,6 +172,36 @@ div.mg-export-win {
   margin-right: 20px;
 }
 
+.mg-r-25em {
+  margin-right: 0.25em;
+}
+
+.mg-dropdown-item {
+  display: flex !important;
+  justify-content: space-between;
+  padding-left: 15px !important;
+  align-items: center;
+}
+
+.mg-dropdown-item-text {
+  color: inherit;
+  padding-right: 6px;
+  text-decoration: none;
+}
+
+.mg-dropdown-item-text:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mg-dropdown-item-del {
+  margin-top: 2px;
+}
+
+.mg-dropdown-item-del:hover {
+  cursor: pointer;
+}
+
 @font-face {
   font-family: 'FontAwesome';
   src: url('chrome-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
@@ -188,7 +222,6 @@ div.mg-export-win {
 [class*=" mg-icon-"]:before {
   text-decoration: inherit;
   speak: none;
-  margin-right: 0.25em;
 }
 
 .mg-icon-close:before {
@@ -235,6 +268,14 @@ div.mg-export-win {
   content: "\f05a";
 }
 
+.mg-icon-star:before {
+  content: "\f005";
+}
+
+.mg-icon-heart:before {
+  content: "\f004";
+}
+
 .mg-m-icon {
   font-size: 18px;
 }
@@ -243,11 +284,16 @@ div.mg-export-win {
   font-size: 12px;
 }
 
+.mg-l-icon {
+  font-size: 24px;
+}
+
 .mg-dd-move-div {
   position: absolute !important;
   background-color: #f6f8fa !important;
   z-index: 999;
 }
+
 /*
 .mg-close {
   display: inline-block;

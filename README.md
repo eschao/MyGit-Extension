@@ -51,9 +51,9 @@ The below functions for convenient user are planned to provide in the extension:
  
 ## Usage
 
-The extension can support public GitHub and enterpise GitHub. Due to the limitation from browser extension, there is only one enterprise GitHub -**IBM**- to be available now. If a new GitHub enterpise need to support, please tell me to add.
+The extension can support public GitHub and enterpise GitHub. Due to the limitation of browser extension, there is only one enterprise GitHub -**IBM**- to be available now. If a new GitHub enterpise need to support, please tell me the name and uri to add.
 
-The extension only needs **```repo```** and **```user:email```** permission. More details about GitHub permission, please see **[scopes](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
+The extension only needs **```repo```** and **```user:email```** scopse. More details about GitHub scopes, please see **[here](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
 
   ![mygit](https://cloud.githubusercontent.com/assets/20178358/25611701/a4e7464c-2f5a-11e7-87b9-000c98adc2c1.png)
 

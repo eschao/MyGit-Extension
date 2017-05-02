@@ -38,7 +38,7 @@ Initially, we plan to provides the below functions for convenient user:
     - For **Chrome**: 
     - For **Firefox**:
     
-  * Install from release
+  * Install from [release](https://github.com/eschao/MyGit-Extension/releases)
   
     - Download the latest relase from release page
     - For **Chrome**: Open chrome extension page by clicking **```Settings -> Extensions```**, drag the downloaded crx file into this page, Chrome will ask you and click **```Yes```** to install.
@@ -46,7 +46,7 @@ Initially, we plan to provides the below functions for convenient user:
  
 ## Usage
 
-The extension can support public GitHub and enterpise GitHub. Due to the limitation from browser extension, there is only one enterprise GitHub -**IBM**- to be available now. If a new GitHub enterpise need to be supported, please tell me to add.
+The extension can support public GitHub and enterpise GitHub. Due to the limitation from browser extension, there is only one enterprise GitHub -**IBM**- to be available now. If a new GitHub enterpise need to support, please tell me to add.
 
 The extension only needs **```repo```** and **```user:email```** permission. More details about GitHub permission, please see **[scopes](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
 

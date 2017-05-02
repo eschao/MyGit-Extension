@@ -10,7 +10,7 @@
 ## Introduction
 
 The aim of **MyGit-Extension** project is to extend GitHub functions by injecting html/javascript codes into GitHub page through browser extension. 
-Initially, we plan to provides the below functions for convenient user:
+The below functions for convenient user are planned to provide in the extension:
  - **Export issues as CSV**
  
    ![export](https://cloud.githubusercontent.com/assets/20178358/25611688/9a133744-2f5a-11e7-93de-7ac651b8d9d6.png)
@@ -62,7 +62,7 @@ The extension only needs **```repo```** and **```user:email```** permission. Mor
   
   * **Sign in GitHub enterprise**
   
-    Before signing in GitHub enterpise, you need to follow the below steps to generate a **[```Personal access tokens```](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)** 
+    Before signning in GitHub enterpise, you need to follow the below steps to generate a **[```Personal access tokens```](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)** 
     - Login GitHub and goto **```Settings```** page
     - Click **```Personal access tokens```** to open it
     - Click **```Generate new token```** 
@@ -72,7 +72,7 @@ The extension only needs **```repo```** and **```user:email```** permission. Mor
       * Scope: **```user:email```**
     - Click **```Generate token```** button at the bottom of the page
     
-    And now, you can get a token for our extension, copy and paste it in token input box, click **```Sign In GitHub Enterprise```** to login.
+    And now, you have a token for our extension, copy and paste it into token input box, click **```Sign In GitHub Enterprise```** to login.
 
 ## License
 

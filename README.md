@@ -13,6 +13,8 @@ The aim of **MyGit-Extension** project is to extend GitHub functions by injectin
 Initially, we plan to provides the below functions for convenient user:
  - **Export issues as CSV**
  
+   ![export](https://cloud.githubusercontent.com/assets/20178358/25611688/9a133744-2f5a-11e7-93de-7ac651b8d9d6.png)
+   
    Injects an **```Export```** button next to **```Milestones```** in issue page. User can launch the **```Export```** wizard dialog by it and customize the the below settings to generate CSV format file:
    - Enable/disable exporting issue fields
    - Adjust issue fields order
@@ -25,6 +27,8 @@ Initially, we plan to provides the below functions for convenient user:
    
  - **Favorite repositories**
  
+   ![fr](https://cloud.githubusercontent.com/assets/20178358/25611698/9fce49ee-2f5a-11e7-8b86-c7c76893a8e7.png)
+   
    Injects a **Favorite Repos** in GitHub top banner. User can save the current repository as favorite one or quickly jump to favorite repository by it.
    
  - **More colors for label creation**
@@ -49,6 +53,8 @@ Initially, we plan to provides the below functions for convenient user:
 The extension can support public GitHub and enterpise GitHub. Due to the limitation from browser extension, there is only one enterprise GitHub -**IBM**- to be available now. If a new GitHub enterpise need to support, please tell me to add.
 
 The extension only needs **```repo```** and **```user:email```** permission. More details about GitHub permission, please see **[scopes](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
+
+  ![mygit](https://cloud.githubusercontent.com/assets/20178358/25611701/a4e7464c-2f5a-11e7-87b9-000c98adc2c1.png)
 
   * **Signin public GitHub**
   

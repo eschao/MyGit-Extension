@@ -56,11 +56,11 @@ The extension only needs **```repo```** and **```user:email```** permission. Mor
 
   ![mygit](https://cloud.githubusercontent.com/assets/20178358/25611701/a4e7464c-2f5a-11e7-87b9-000c98adc2c1.png)
 
-  * **Signin public GitHub**
+  * **Sign in public GitHub**
   
     Click **```Signin GitHub```**, it will jump to GitHub authroization page to let you assign special permissions for extenstion to access your repository.
   
-  * **Signin GitHub enterprise**
+  * **Sign in GitHub enterprise**
   
     Before signing in GitHub enterpise, you need to follow the below steps to generate a **[```Personal access tokens```](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)** 
     - Login GitHub and goto **```Settings```** page

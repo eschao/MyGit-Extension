@@ -10,6 +10,7 @@
 ## Introduction
 
 The aim of **MyGit-Extension** project is to extend GitHub functions by injecting html/javascript codes into GitHub page through browser extension. 
+
 The below functions for convenient user are planned to provide in the extension:
  - **Export issues as CSV**
  

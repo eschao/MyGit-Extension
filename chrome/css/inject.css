@@ -200,6 +200,7 @@ div.mg-export-win {
 
 .mg-dropdown-item-del:hover {
   cursor: pointer;
+  color: red;
 }
 
 @font-face {
@@ -278,6 +279,10 @@ div.mg-export-win {
 
 .mg-m-icon {
   font-size: 18px;
+}
+
+.mg-ms-icon {
+  font-size: 16px;
 }
 
 .mg-s-icon {

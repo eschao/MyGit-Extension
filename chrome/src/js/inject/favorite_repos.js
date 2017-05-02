@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
+/**
+ * Favorite repositories class
+ */
 var FavoriteRepos = (function() {
+
   /**
+   * storage data structure of favorite repository
    * { "github url" : [
    *    {
    *      "name" : "repo name",
@@ -29,15 +34,25 @@ var FavoriteRepos = (function() {
    * }
    */
 
+  /**
+   * Constructor
+   */
   function FavoriteRepos() {
     this.repos = {};
 
+    // read favorite repositories from chrom storage
     var self = this;
     chrome.storage.sync.get(MYGIT_FAVORITE_REPOS_KEY, function(item) {
       self.repos = item[MYGIT_FAVORITE_REPOS_KEY];
+      if (self.repos == null ) {
+        self.repos = {};
+      }
     });
   }
 
+  /**
+   * Inject favorite repos icon in github top bar
+   */
   FavoriteRepos.prototype.inject = function(url) {
     var el_favorite_nav = document.getElementById("mg-favorite-repos-nav-item");
     if (el_favorite_nav == null) {
@@ -46,6 +61,7 @@ var FavoriteRepos = (function() {
       el_favorite_nav = document.createElement("li");
       el_favorite_nav.className = "header-nav-item dropdown js-menu-container";
 
+      // initiate html template
       var self = this;
       var xhr = new XMLHttpRequest();
       xhr.open("GET",
@@ -55,12 +71,19 @@ var FavoriteRepos = (function() {
         if (this.readyState == 4 && this.status == 200) {
           el_favorite_nav.innerHTML = this.responseText;
           el_nav_item.parentNode.insertBefore(el_favorite_nav, el_nav_item);
+          self._init(el_favorite_nav);
         }
       };
       xhr.send();
     }
   }
 
+  /**
+   * Create dropdown item element for repoisotry
+   *
+   * @param item repository item
+   * @return a html element for repository item
+   */
   FavoriteRepos.prototype._createItem = function(item) {
     var el_item = document.createElement("div");
     el_item.className = "dropdown-item mg-dropdown-item";
@@ -69,19 +92,57 @@ var FavoriteRepos = (function() {
       item.name + '</a>\n' +
       '<span class="mg-dropdown-item-del"><i class="mg-icon-close"></i></span>'
       + '\n';
+
+    // del event handler for removing current item from favorite repos dropdown
+    // list
+    var self = this;
     el_item.getElementsByTagName("span")[0].onclick = function(e) {
+      var origin = el_item.getElementsByTagName("a")[0].origin;
+      self.repos[origin].forEach(function(it, i) {
+        if (it.name == item.name) {
+          // remove from data cache
+          self.repos[origin].splice(i, 1);
+
+          // remove from dropdown DOM
+          el_item.parentNode.removeChild(el_item);
+
+          // save to storage
+          var data = {};
+          data[MYGIT_FAVORITE_REPOS_KEY] = self.repos;
+          chrome.storage.sync.set(data, function() {} );
+          return;
+        }
+      });
     }
+
+    return el_item;
   }
 
+  /**
+   * Init favorite repos dropdown DOM
+   *
+   * @param root root element(<li>) of dropdown DOM
+   */
   FavoriteRepos.prototype._init = function(root) {
     var self = this;
+    var origin = window.location.origin;
+    var el_divider = document.getElementById("mg-fr-divider");
     var el_add = document.getElementById("mg-fr-add");
+    var el_ul = document.getElementById("mg-fr-dropdown-menu");
+
+    // add repository event handler
     el_add.onclick = function() {
       var repo_name = self._getRepoName();
       if (repo_name != null) {
         // new repo item
-        var item = { name: repo_name, url: window.origin + '/' + repo_name };
-        self.repos[window.origin].push(item);
+        var item = {
+          name: repo_name,
+          url: origin + '/' + repo_name
+        };
+        if (self.repos[origin] == null) {
+          self.repos[origin] = [];
+        }
+        self.repos[origin].push(item);
 
         // save to chrome storage
         var data = {};
@@ -90,26 +151,78 @@ var FavoriteRepos = (function() {
 
         // insert a repo item into dropdown menu DOM
         var el_item = self._createItem(item);
-        var el_ul = document.getElementById("mg-fr-dropdown-menu");
-        var el_items = el_ul.querySelector("mg-dropdown-item-text");
-        el_items.forEach(function(el) {
-          if (el.href.startsWith(window.origin)) {
-            el_ul.insertBefore(el_item, el.parentNode);
+        var el_items = el_ul.querySelectorAll("mg-dropdown-item-text");
+        if (el_items.length < 1) {
+          el_ul.insertBefore(el_item, el_divider);
+        }
+        else {
+          el_items.forEach(function(el) {
+            if (el.href.startsWith(origin)) {
+              el_ul.insertBefore(el_item, el.parentNode);
+              return;
+            }
+          });
+        }
+
+        // hide add button
+        el_divider.style.display = "none";
+        el_add.style.display = "none";
+      }
+    }
+
+    // click event handler to show favorite repos dropdown
+    var el_fr = root.getElementsByTagName("a")[0];
+    var old_click_handler = el_fr.onclick;
+    el_fr.onclick = function(e) {
+      var is_added = false;
+      var repo_name = self._getRepoName();
+      if (self.repos[origin] != null) {
+        self.repos[origin].forEach(function(repo) {
+          if (repo.name == repo_name) {
+            is_added = true;
             return;
           }
         });
       }
+
+      if (is_added || repo_name == null) {
+        el_divider.style.display = "none"
+        el_add.style.display = "none";
+      }
+      else {
+        el_divider.style = null;
+        el_add.style = null;
+      }
     }
 
+    // create elements for all favorite repos and add it into DOM
+    Object.keys(this.repos).forEach(function(key) {
+      if (self.repos[key] != null) {
+        self.repos[key].forEach(function(repo) {
+          var el_item = self._createItem(repo);
+          el_ul.insertBefore(el_item, el_divider);
+        });
+      }
+    });
   }
 
   /**
    * Get repository name
    */
-  IssueExport.prototype._getRepoName = function() {
-    var meta = document.querySelector("meta[property='og:title']");
-    if (meta != null) {
-      return meta.getAttribute("content");
+  FavoriteRepos.prototype._getRepoName = function() {
+    var el_a = document.querySelector(
+      "div[class*='repohead-details-container'] strong[itemprop='name'] a");
+    if (el_a != null && el_a.pathname != null && el_a.pathname.length > 0) {
+      var name = el_a.pathname;
+      if (name[0] == "/") {
+        name = name.slice(1);
+      }
+
+      if (name.slice(0, -1) == "/") {
+        name = name.slice(0, -1);
+      }
+
+      return name;
     }
 
     return null;

@@ -5,6 +5,7 @@
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
+- [License](#license)
 
 ## Introduction
 
@@ -12,7 +13,7 @@ The aim of **MyGit-Extension** project is to extend GitHub functions by injectin
 Initially, we plan to provides the below functions for convenient user:
  - **Export issues as CSV**
  
-   Injects an **```Export```** button next to **```Milestones```** in issue page. User can launch the **```Export```** wizard dialog by it and customize the the following export settings to generate CSV format file:
+   Injects an **```Export```** button next to **```Milestones```** in issue page. User can launch the **```Export```** wizard dialog by it and customize the the below settings to generate CSV format file:
    - Enable/disable exporting issue fields
    - Adjust issue fields order
    - Customize CSV delimiter
@@ -47,7 +48,7 @@ Initially, we plan to provides the below functions for convenient user:
 
 The extension can support public GitHub and enterpise GitHub. Due to the limitation from browser extension, there is only one enterprise GitHub -**IBM**- to be available now. If a new GitHub enterpise need to be supported, please tell me to add.
 
-The extension only needs **```repo```** and **```user:email```** permission. More details about GitHub permission, please see
+The extension only needs **```repo```** and **```user:email```** permission. More details about GitHub permission, please see **[scopes](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
 
   * **Signin public GitHub**
   
@@ -55,7 +56,7 @@ The extension only needs **```repo```** and **```user:email```** permission. Mor
   
   * **Signin GitHub enterprise**
   
-    Before signing in GitHub enterpise, you need to follow the below steps to generate a **```Personal access tokens```**
+    Before signing in GitHub enterpise, you need to follow the below steps to generate a **[```Personal access tokens```](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)** 
     - Login GitHub and goto **```Settings```** page
     - Click **```Personal access tokens```** to open it
     - Click **```Generate new token```** 
@@ -67,4 +68,7 @@ The extension only needs **```repo```** and **```user:email```** permission. Mor
     
     And now, you can get a token for our extension, copy and paste it in token input box, click **```Sign In GitHub Enterprise```** to login.
 
+## License
+
+This project is licensed under the Apache License Version 2.0.
 

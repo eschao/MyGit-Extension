@@ -37,13 +37,17 @@ var IssueExport = (function() {
     this.token = null;
     this.export_dialog = new IssueExportDialog();
 
-    // read configurations from chrome storage
+    // read configurations from browser storage
     var self = this;
-    chrome.storage.sync.get(MYGIT_GITHUB_KEY, function(item) {
-      self.github_token = item[MYGIT_GITHUB_KEY];
+    mg_browser.storage.sync.get(MYGIT_GITHUB_KEY, function(item) {
+      if (item != null) {
+        self.github_token = item[MYGIT_GITHUB_KEY];
+      }
     });
-    chrome.storage.sync.get(MYGIT_GITHUB_E_KEY, function(item) {
-      self.github_e_token = item[MYGIT_GITHUB_E_KEY];
+    mg_browser.storage.sync.get(MYGIT_GITHUB_E_KEY, function(item) {
+      if (item != null) {
+        self.github_e_token = item[MYGIT_GITHUB_E_KEY];
+      }
     });
   }
 
@@ -86,7 +90,7 @@ var IssueExport = (function() {
     var self = this;
     var xhr = new XMLHttpRequest();
     xhr.open("GET",
-             chrome.extension.getURL("templates/issue_export_dialog.html")
+             mg_browser.extension.getURL("templates/issue_export_dialog.html")
              , true);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {

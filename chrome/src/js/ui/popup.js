@@ -32,7 +32,16 @@ var GitHubComp = (function() {
     var signin_btn = document.getElementById("mg-signin-btn");
     signin_btn.onclick = function () {
       signin_btn.disabled = true;
-      chrome.extension.getBackgroundPage().signInGitHub();
+      if (browser_api.isFirefox()) {
+        browser.extension.getBackgroundPage().signInGitHub();
+      }
+      else if (browser_api.isChrome()) {
+        chrome.extension.getBackgroundPage().signInGitHub();
+      }
+      else {
+        document.getElementById("mg-message").textContent =
+          "Browser is not supported!";
+      }
     }
 
     // sign out button event handler
@@ -40,7 +49,7 @@ var GitHubComp = (function() {
     var signout_btn = document.getElementById("mg-signout-btn");
     signout_btn.onclick = function() {
       signout_btn.disabled = true;
-      chrome.storage.sync.remove(MYGIT_GITHUB_KEY, function() {
+      browser_api.storage.remove(MYGIT_GITHUB_KEY, function() {
         signout_btn.disabled = false;
         self.render();
       });
@@ -49,7 +58,7 @@ var GitHubComp = (function() {
     // info click event handler
     var ele_info = document.getElementById("mg-info");
     ele_info.onclick = function() {
-      chrome.tabs.create({url: this.href});
+      browser_api.tabs.create({url: this.href});
     }
 
     // render UI
@@ -65,8 +74,9 @@ var GitHubComp = (function() {
 
     // read configurations from chome storage and render UI according to
     // configurations
-    chrome.storage.sync.get(MYGIT_GITHUB_KEY, function(item) {
-      if (item[MYGIT_GITHUB_KEY] != null &&
+    browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
+      if (item != null &&
+          item[MYGIT_GITHUB_KEY] != null &&
           item[MYGIT_GITHUB_KEY].token != null) {
         signout_div.style.display = "block";
         signin_div.style.display = "none";
@@ -75,7 +85,10 @@ var GitHubComp = (function() {
         signout_div.style.display = "none";
         signin_div.style.display = "block";
       }
-    });
+    },
+    function onError(error) {
+      console.log(`Error: ${error}`);
+      });
   }
 
   return GitHubComp;
@@ -137,9 +150,9 @@ var GitHubEnterpriseComp = (function() {
         "token" : token
       };
 
-      // save github enterprise configs in chrome storage
+      // save github enterprise configs in browser storage
       signin_btn.disabled = true;
-      chrome.storage.sync.set(data, function() {
+      browser_api.storage.set(data, function() {
         signin_btn.disabled = false;
         self.render();
       });
@@ -149,7 +162,7 @@ var GitHubEnterpriseComp = (function() {
     var signout_btn = document.getElementById("mg-e-signout-btn");
     signout_btn.onclick = function() {
       signout_btn.disabled = true;
-      chrome.storage.sync.remove(MYGIT_GITHUB_E_KEY, function() {
+      browser_api.storage.remove(MYGIT_GITHUB_E_KEY, function() {
         signout_btn.disabled = false;
         self.render();
       });
@@ -247,9 +260,10 @@ var GitHubEnterpriseComp = (function() {
     var token_input = document.getElementById("mg-github-e-token");
     var select_btn = document.getElementById("mg-select-github-e");
 
-    chrome.storage.sync.get(MYGIT_GITHUB_E_KEY, function(item) {
+    browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
       var ghe = self.all_github_e[0];
-      if (item[MYGIT_GITHUB_E_KEY] != null &&
+      if (item != null &&
+          item[MYGIT_GITHUB_E_KEY] != null &&
           item[MYGIT_GITHUB_E_KEY].token != null &&
           item[MYGIT_GITHUB_E_KEY].uri != null) {
         signout_div.style.display = "block";

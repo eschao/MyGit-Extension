@@ -40,12 +40,12 @@ var IssueExportDialog = (function() {
   }
 
   /**
-   * Init configuration from chrome storage
+   * Init configuration from browser storage
    */
   IssueExportDialog.prototype._initConfig = function() {
     var self = this;
-    chrome.storage.sync.get(MYGIT_GITHUB_CONFIG_KEY, function(item) {
-      var config = item[MYGIT_GITHUB_CONFIG_KEY];
+    mg_browser.storage.sync.get(MYGIT_GITHUB_CONFIG_KEY, function(item) {
+      var config = (item != null) ? item[MYGIT_GITHUB_CONFIG_KEY] : null;
       if (config != null && config.headers != null) {
         self.config = config;
       }
@@ -238,7 +238,7 @@ var IssueExportDialog = (function() {
   }
 
   /**
-   * Save configurations to chrome storage
+   * Save configurations to browser storage
    */
   IssueExportDialog.prototype.saveConfig = function() {
     var gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
@@ -291,7 +291,7 @@ var IssueExportDialog = (function() {
       this.config = config;
       var data = {};
       data[MYGIT_GITHUB_CONFIG_KEY] = this.config;
-      chrome.storage.sync.set(data, function() {});
+      mg_browser.storage.sync.set(data, function() {});
     }
   }
 

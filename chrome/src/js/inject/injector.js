@@ -22,7 +22,7 @@ var MyGitInjector = (function() {
     this.favorite_repos = new FavoriteRepos();
 
     var self = this;
-    chrome.storage.sync.get(MYGIT_SETTINGS_KEY, function(item) {
+    browser_api.storage.get(MYGIT_SETTINGS_KEY, function(item) {
       var settings = item[MYGIT_SETTINGS_KEY];
       if (settings != null) {
         if (settings.enable_issue_export != null &&

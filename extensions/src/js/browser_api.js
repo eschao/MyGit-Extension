@@ -34,12 +34,12 @@ var BrowserApi = (function() {
     this.type = this.UNKNOWN;
 
     // firefox browser
-    if (browser) {
+    if (typeof browser !== "undefined" && browser != null) {
       this.type = this.FIREFOX;
       this._initFirefox();
     }
     // chrome browser
-    else if (chrome) {
+    else if (typeof chrome !== "undefined" && chrome != null) {
       this.type = this.CHROME;
       this._initChrome();
     }
@@ -135,7 +135,7 @@ var BrowserApi = (function() {
    * Is Firefox browser?
    */
   BrowserApi.prototype.isFirefox = function() {
-    return this.type = this.FIREFOX;
+    return this.type == this.FIREFOX;
   }
 
   return BrowserApi;

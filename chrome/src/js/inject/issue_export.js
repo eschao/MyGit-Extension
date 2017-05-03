@@ -39,12 +39,12 @@ var IssueExport = (function() {
 
     // read configurations from browser storage
     var self = this;
-    mg_browser.storage.sync.get(MYGIT_GITHUB_KEY, function(item) {
+    browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
       if (item != null) {
         self.github_token = item[MYGIT_GITHUB_KEY];
       }
     });
-    mg_browser.storage.sync.get(MYGIT_GITHUB_E_KEY, function(item) {
+    browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
       if (item != null) {
         self.github_e_token = item[MYGIT_GITHUB_E_KEY];
       }
@@ -90,14 +90,15 @@ var IssueExport = (function() {
     var self = this;
     var xhr = new XMLHttpRequest();
     xhr.open("GET",
-             mg_browser.extension.getURL("templates/issue_export_dialog.html")
+             browser_api.extension.getURL("templates/issue_export_dialog.html")
              , true);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         root.innerHTML = this.responseText;
         document.body.appendChild(root);
         self.export_dialog.initDialog(root);
-        document.getElementById("mg-start-export-btn").onclick = function() {
+        document.getElementById("mg-start-export-btn").onclick = function(e) {
+          e.preventDefault();
           self.export_dialog.export(self.token, self.api_uri, self._getRepoName());
         }
       }

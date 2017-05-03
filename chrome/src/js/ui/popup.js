@@ -34,9 +34,11 @@ var GitHubComp = (function() {
       signin_btn.disabled = true;
       if (browser_api.isFirefox()) {
         browser.extension.getBackgroundPage().signInGitHub();
+        window.close();
       }
       else if (browser_api.isChrome()) {
         chrome.extension.getBackgroundPage().signInGitHub();
+        window.close();
       }
       else {
         document.getElementById("mg-message").textContent =

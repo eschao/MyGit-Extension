@@ -14,26 +14,47 @@
  * limitations under the License.
  */
 
+/**
+ * BrowserApi class is used to hide the api differences between Chrome and
+ * Firefox. We only implment a very small subset of APIs what we really use in
+ * our extension.
+ */
 var BrowserApi = (function() {
 
+  /**
+   * Constructor
+   */
   function BrowserApi() {
-    this.type = "unsupported";
+    // constants definition
+    this.UNKNOWN = -1;
+    this.CHROME = 0;
+    this.FIREFOX = 1;
 
-    if (window.browser) {
-      this.type = "firefox";
+    // browser type
+    this.type = this.UNKNOWN;
+
+    // firefox browser
+    if (browser) {
+      this.type = this.FIREFOX;
       this._initFirefox();
     }
-    else if (window.chrome) {
-      this.type = "chrome";
+    // chrome browser
+    else if (chrome) {
+      this.type = this.CHROME;
       this._initChrome();
     }
+    // unsuportted browser
     else {
       console.log("The browser is not supported, " +
         "Only support Chrome and Firefox!");
     }
   }
 
+  /**
+   * Init Chrome related APIs
+   */
   BrowserApi.prototype._initChrome = function() {
+    // storage related APIs
     this.storage = {
       set: function(data, callback) {
         chrome.storage.sync.set(data, callback);
@@ -46,6 +67,7 @@ var BrowserApi = (function() {
       }
     };
 
+    // tabs related APIs
     this.tabs = {
       create: function(props, callback) {
         chrome.tabs.create(props, callback);
@@ -56,9 +78,20 @@ var BrowserApi = (function() {
         }
       }
     };
+
+    // extension related APIs
+    this.extension = {
+      getURL: function(path) {
+        return chrome.extension.getURL(path);
+      }
+    };
   }
 
+  /**
+   * Init Firefox related APIs
+   */
   BrowserApi.prototype._initFirefox = function() {
+    // storage related APIs
     this.storage = {
       set: function(data, callback, error) {
         browser.storage.local.set(data).then(callback, error);
@@ -67,10 +100,11 @@ var BrowserApi = (function() {
         browser.storage.local.get(key).then(callback, error);
       },
       remove: function(key, callback, error) {
-        browser.storage.remove(key).then(callback, error);
+        browser.storage.local.remove(key).then(callback, error);
       }
     };
 
+    // tab related APIs
     this.tabs = {
       create: function(props, callback, error) {
         browser.tabs.create(props).then(callback, error);
@@ -81,17 +115,31 @@ var BrowserApi = (function() {
         }
       }
     };
+
+    // extension related APIs
+    this.extension = {
+      getURL: function(path) {
+        return browser.extension.getURL(path);
+      }
+    };
   }
 
+  /**
+   * Is Chrome browser?
+   */
   BrowserApi.prototype.isChrome = function() {
-    return this.type == "chrome";
+    return this.type == this.CHROME;
   }
 
+  /**
+   * Is Firefox browser?
+   */
   BrowserApi.prototype.isFirefox = function() {
-    return this.type = "firefox";
+    return this.type = this.FIREFOX;
   }
 
   return BrowserApi;
 }());
 
+// global browser api proxy
 var browser_api = new BrowserApi();

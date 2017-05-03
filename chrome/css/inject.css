@@ -205,8 +205,7 @@ div.mg-export-win {
 
 @font-face {
   font-family: 'FontAwesome';
-  src: url('chrome-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
-       url('moz-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
+  src: url('moz-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
   font-weight: normal;
   font-style: normal;
 }

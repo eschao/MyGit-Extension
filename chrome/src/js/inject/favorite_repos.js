@@ -42,7 +42,7 @@ var FavoriteRepos = (function() {
 
     // read favorite repositories from chrom storage
     var self = this;
-    mg_browser.storage.sync.get(MYGIT_FAVORITE_REPOS_KEY, function(item) {
+    browser_api.storage.get(MYGIT_FAVORITE_REPOS_KEY, function(item) {
       if (item != null) {
         self.repos = item[MYGIT_FAVORITE_REPOS_KEY];
         if (self.repos == null ) {
@@ -67,7 +67,7 @@ var FavoriteRepos = (function() {
       var self = this;
       var xhr = new XMLHttpRequest();
       xhr.open("GET",
-               mg_browser.extension.getURL("templates/favorite_repos.html")
+               browser_api.extension.getURL("templates/favorite_repos.html")
                , true);
       xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -111,7 +111,7 @@ var FavoriteRepos = (function() {
           // save to storage
           var data = {};
           data[MYGIT_FAVORITE_REPOS_KEY] = self.repos;
-          mg_browser.storage.sync.set(data, function() {} );
+          browser_api.storage.set(data, function() {} );
           return;
         }
       });
@@ -149,7 +149,7 @@ var FavoriteRepos = (function() {
         // save to browser storage
         var data = {};
         data[MYGIT_FAVORITE_REPOS_KEY] = self.repos;
-        mg_browser.storage.sync.set(data, function() {} );
+        browser_api.storage.set(data, function() {} );
 
         // insert a repo item into dropdown menu DOM
         var el_item = self._createItem(item);

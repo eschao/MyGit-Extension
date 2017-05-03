@@ -44,7 +44,7 @@ var IssueExportDialog = (function() {
    */
   IssueExportDialog.prototype._initConfig = function() {
     var self = this;
-    mg_browser.storage.sync.get(MYGIT_GITHUB_CONFIG_KEY, function(item) {
+    browser_api.storage.get(MYGIT_GITHUB_CONFIG_KEY, function(item) {
       var config = (item != null) ? item[MYGIT_GITHUB_CONFIG_KEY] : null;
       if (config != null && config.headers != null) {
         self.config = config;
@@ -291,7 +291,7 @@ var IssueExportDialog = (function() {
       this.config = config;
       var data = {};
       data[MYGIT_GITHUB_CONFIG_KEY] = this.config;
-      mg_browser.storage.sync.set(data, function() {});
+      browser_api.storage.set(data, function() {});
     }
   }
 

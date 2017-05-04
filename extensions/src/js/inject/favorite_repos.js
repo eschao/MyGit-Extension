@@ -56,12 +56,20 @@ var FavoriteRepos = (function() {
    * Inject favorite repos icon in github top bar
    */
   FavoriteRepos.prototype.inject = function(url) {
+    // check if should inject
+    var repo_name = this._getRepoName();
+    if (repo_name == null && Object.keys(this.repos).length < 1) {
+      return;
+    }
+
+    // inject favorite repos menu
     var el_favorite_nav = document.getElementById("mg-favorite-repos-nav-item");
     if (el_favorite_nav == null) {
       var el_nav_item = document.querySelector(
         "li[class^='header-nav-item dropdown js-menu-container']");
       el_favorite_nav = document.createElement("li");
       el_favorite_nav.className = "header-nav-item dropdown js-menu-container";
+      el_favorite_nav.id = "mg-favorite-repos-nav-item";
 
       // initiate html template
       var self = this;
@@ -102,8 +110,11 @@ var FavoriteRepos = (function() {
       var origin = el_item.getElementsByTagName("a")[0].origin;
       self.repos[origin].forEach(function(it, i) {
         if (it.name == item.name) {
-          // remove from data cache
+          // remove from memory data
           self.repos[origin].splice(i, 1);
+          if (self.repos[origin].length < 1) {
+            delete self.repos[origin];
+          }
 
           // remove from dropdown DOM
           el_item.parentNode.removeChild(el_item);
@@ -112,6 +123,15 @@ var FavoriteRepos = (function() {
           var data = {};
           data[MYGIT_FAVORITE_REPOS_KEY] = self.repos;
           browser_api.storage.set(data, function() {} );
+
+          // remove favorite repos menu from top banner if need
+          if (Object.keys(self.repos).length < 1) {
+            var repo_name = self._getRepoName();
+            if (repo_name == null) {
+              var el_li = document.getElementById("mg-favorite-repos-nav-item");
+              el_li.parentNode.removeChild(el_li);
+            }
+          }
           return;
         }
       });

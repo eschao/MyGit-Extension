@@ -61,6 +61,7 @@ var GitHubComp = (function() {
     var ele_info = document.getElementById("mg-info");
     ele_info.onclick = function() {
       browser_api.tabs.create({url: this.href});
+      window.close();
     }
 
     // render UI
@@ -270,7 +271,7 @@ var GitHubEnterpriseComp = (function() {
           item[MYGIT_GITHUB_E_KEY].uri != null) {
         signout_div.style.display = "block";
         signin_div.style.display = "none";
-        select_btn.cursor = "default";
+        select_btn.style.cursor = "default";
         token_input.value = item[MYGIT_GITHUB_E_KEY].token;
         token_input.disabled = true;
         ghe.token = token_input.value;
@@ -285,9 +286,15 @@ var GitHubEnterpriseComp = (function() {
       else {
         signout_div.style.display = "none";
         signin_div.style.display = "block";
-        select_btn.cursor = "pointer";
-        token_input.value = "";
+        select_btn.style.cursor = "pointer";
+        if (ghe.token != null) {
+          token_input.value = ghe.token;
+        }
+        else {
+          token_input.value = "";
+        }
         token_input.disabled = false;
+        ghe.token = null;
       }
 
       var style = "";

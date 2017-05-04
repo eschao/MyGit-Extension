@@ -60,7 +60,7 @@ The following functions are planned to provide:
 The extension only needs **```repo```** and **```user:email```** scopse. More details about GitHub scopes, please see **[here](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
 
   <p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/20178358/25611701/a4e7464c-2f5a-11e7-87b9-000c98adc2c1.png"/>
+  <img src="https://cloud.githubusercontent.com/assets/20178358/25709862/1e39e8e2-311d-11e7-92bd-af22931d6f22.png"/>
   </p>
 
   * **Sign In Public GitHub**

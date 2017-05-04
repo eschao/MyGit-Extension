@@ -9,11 +9,6 @@
     "128": "img/icon/mygit_128.png",
     "48": "img/icon/mygit_48.png"
   },
-  "applications": {
-    "gecko": {
-      "id": "esc.chao@gmail.com"
-    }
-  },
   "browser_action": {
     "default_icon": {
       "19": "img/icon/mygit_19.png",

@@ -15,7 +15,9 @@
 The following functions are planned to provide:
  - **Export Issues As CSV**
  
-   ![export](https://cloud.githubusercontent.com/assets/20178358/25611688/9a133744-2f5a-11e7-93de-7ac651b8d9d6.png)
+   <p align="center">
+   <img src="https://cloud.githubusercontent.com/assets/20178358/25611688/9a133744-2f5a-11e7-93de-7ac651b8d9d6.png"/>
+   </p>
    
    Injects an **```Export```** button next to **```Milestones```** in issue page. You can launch the **```Export```** wizard dialog by it and customize the the below settings to generate CSV format file:
    - Enable/disable exporting issue fields
@@ -29,7 +31,9 @@ The following functions are planned to provide:
    
  - **Favorite Rpository**
  
-   ![fr](https://cloud.githubusercontent.com/assets/20178358/25611698/9fce49ee-2f5a-11e7-8b86-c7c76893a8e7.png)
+   <p align="center">
+   <img src="https://cloud.githubusercontent.com/assets/20178358/25611698/9fce49ee-2f5a-11e7-8b86-c7c76893a8e7.png"/>
+   </p>
    
    Injects a **Favorite Repos** in GitHub top banner. You can save the current repository as favorite one or quickly jump to a favorite repository by it.
    
@@ -55,7 +59,9 @@ The following functions are planned to provide:
 
 The extension only needs **```repo```** and **```user:email```** scopse. More details about GitHub scopes, please see **[here](https://developer.github.com/enterprise/2.8/v3/oauth/#scopes)**
 
-  ![mygit](https://cloud.githubusercontent.com/assets/20178358/25611701/a4e7464c-2f5a-11e7-87b9-000c98adc2c1.png)
+  <p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/20178358/25611701/a4e7464c-2f5a-11e7-87b9-000c98adc2c1.png"/>
+  </p>
 
   * **Sign In Public GitHub**
   

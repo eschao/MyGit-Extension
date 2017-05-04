@@ -2,6 +2,7 @@
 *.swp
 *.swo
 *.crx
+.DS_Store
 
 
 # Generated files

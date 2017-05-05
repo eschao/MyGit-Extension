@@ -1,4 +1,7 @@
-![icon](https://cloud.githubusercontent.com/assets/20178358/25707981/bf9d977a-3117-11e7-9ad4-1580be79ff13.png)
+<p align="center">
+<img src="https://cloud.githubusercontent.com/assets/20178358/25707981/bf9d977a-3117-11e7-9ad4-1580be79ff13.png"/>
+</p>
+
 ## MyGit-Extension
 
 > A Chrome/Firefox extension for GitHub

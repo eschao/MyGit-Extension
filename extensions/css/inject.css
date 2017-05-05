@@ -203,6 +203,13 @@ div.mg-export-win {
   color: red;
 }
 
+.mg-save-issue-filter {
+  cursor: pointer;
+  float: right;
+  position: relative;
+  left: -24px;
+}
+
 @font-face {
   font-family: 'FontAwesome';
   src: url('moz-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
@@ -275,6 +282,10 @@ div.mg-export-win {
 
 .mg-icon-heart:before {
   content: "\f004";
+}
+
+.mg-icon-bookmark-o:before {
+  content: "\f097";
 }
 
 .mg-m-icon {

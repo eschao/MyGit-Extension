@@ -2,9 +2,9 @@
   "author": "eschao",
   "name": "MyGit",
   "permissions": ["storage", "tabs", "*://*/*"],
-  "version": "0.3.0",
+  "version": "0.3.1",
   "manifest_version": 2,
-  "description": "MyGit - Plugin for GitHub",
+  "description": "MyGit - Extension for GitHub",
   "icons": {
     "128": "img/icon/mygit_128.png",
     "48": "img/icon/mygit_48.png"

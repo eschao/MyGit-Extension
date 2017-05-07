@@ -34,11 +34,13 @@
       "js": [
         "src/js/config.js",
         "src/js/browser_api.js",
+        "src/js/github_api.js",
         "src/js/inject/FileSaver.min.js",
         "src/js/inject/drag_drop.js",
         "src/js/inject/issue_export_dialog.js",
-        "src/js/inject/issue_export.js",
-        "src/js/inject/favorite_repos.js",
+        "src/js/inject/issue_filter.js",
+        "src/js/inject/issue_injector.js",
+        "src/js/inject/favorite_repos_injector.js",
         "src/js/inject/injector.js"
       ],
       "run_at": "document_end"

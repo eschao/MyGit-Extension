@@ -15,9 +15,9 @@
  */
 
 /**
- * Favorite repositories class
+ * Favorite repositories injector class
  */
-var FavoriteRepos = (function() {
+var FavoriteReposInjector = (function() {
 
   /**
    * storage data structure of favorite repository
@@ -37,7 +37,7 @@ var FavoriteRepos = (function() {
   /**
    * Constructor
    */
-  function FavoriteRepos() {
+  function FavoriteReposInjector() {
     this.repos = {};
 
     // read favorite repositories from chrom storage
@@ -55,7 +55,7 @@ var FavoriteRepos = (function() {
   /**
    * Inject favorite repos icon in github top bar
    */
-  FavoriteRepos.prototype.inject = function(url) {
+  FavoriteReposInjector.prototype.inject = function(url) {
     // check if should inject
     var repo_name = this._getRepoName();
     if (repo_name == null && Object.keys(this.repos).length < 1) {
@@ -94,7 +94,7 @@ var FavoriteRepos = (function() {
    * @param item repository item
    * @return a html element for repository item
    */
-  FavoriteRepos.prototype._createItem = function(item) {
+  FavoriteReposInjector.prototype._createItem = function(item) {
     var el_item = document.createElement("div");
     el_item.className = "dropdown-item mg-dropdown-item";
     el_item.innerHTML =
@@ -145,7 +145,7 @@ var FavoriteRepos = (function() {
    *
    * @param root root element(<li>) of dropdown DOM
    */
-  FavoriteRepos.prototype._init = function(root) {
+  FavoriteReposInjector.prototype._init = function(root) {
     var self = this;
     var origin = window.location.origin;
     var el_divider = document.getElementById("mg-fr-divider");
@@ -231,7 +231,7 @@ var FavoriteRepos = (function() {
   /**
    * Get repository name
    */
-  FavoriteRepos.prototype._getRepoName = function() {
+  FavoriteReposInjector.prototype._getRepoName = function() {
     var el_a = document.querySelector(
       "div[class*='repohead-details-container'] strong[itemprop='name'] a");
     if (el_a != null && el_a.pathname != null && el_a.pathname.length > 0) {
@@ -250,5 +250,5 @@ var FavoriteRepos = (function() {
     return null;
   };
 
-  return FavoriteRepos;
+  return FavoriteReposInjector;
 }());

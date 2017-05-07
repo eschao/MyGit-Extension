@@ -356,7 +356,7 @@ var IssueExportDialog = (function() {
   IssueExportDialog.prototype._buildSearchUrlByFilters = function(base_uri, repo) {
     var el_filter = document.querySelector("input[id='js-issues-search']");
     if (el_filter == null) {
-      console.log("Can't find filter input element");
+      console.log("Can't find issue filter input element");
       return null;
     }
 

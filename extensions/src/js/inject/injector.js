@@ -18,48 +18,27 @@ var MyGitInjector = (function() {
   "user strict";
 
   function MyGitInjector() {
-    this.issue_export = new IssueExport();
-    this.favorite_repos = new FavoriteRepos();
-
-    var self = this;
-    browser_api.storage.get(MYGIT_SETTINGS_KEY, function(item) {
-      var settings = item[MYGIT_SETTINGS_KEY];
-      if (settings != null) {
-        if (settings.enable_issue_export != null &&
-            settings.enable_issue_export == false) {
-          self.issue_export = null;
-        }
-
-        if (settings.enable_favorite_repos != null &&
-            settings.enable_favorite_repos == false) {
-          self.favorite_repos = null;
-        }
-      }
-    });
+    this.issue_injector = new IssueInjector();
+    this.favorite_repos = new FavoriteReposInjector();
   }
 
   /**
    * Initialize injector, install neccessary event
    */
   MyGitInjector.prototype.install = function() {
-    var self = this;
+    let self = this;
 
-    // when window is loaded, check if we need to inject export button
+    // when window is loaded, check if we need to inject
     window.addEventListener("load", function() {
-      if (self.issue_export != null) {
-        self.issue_export.inject(window.location.href);
-      }
-
-      if (self.favorite_repos != null) {
-        self.favorite_repos.inject(window.location.href);
-      }
+      self.issue_injector.inject(window.location.href);
+      self.favorite_repos.inject(window.location.href);
     }, false);
 
-    // when window state is changed, check if we need to inject export button
+    // when window state is changed, check if we need to inject
     window.addEventListener("statechange", function() {
-      var state = window.history.state;
-      if (state != null && self.issue_export != null) {
-        self.issue_export.inject(window.location.href);
+      let state = window.history.state;
+      if (state != null) {
+        self.issue_injector.inject(window.location.href);
       }
     }, false);
   };

@@ -1,4 +1,4 @@
-div.mg-export-dialog-center {
+div.mg-dialog-center {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -12,8 +12,8 @@ div.mg-export-dialog-center {
   padding: 10px 10px;
   text-align: center;
   font-size: 14px;
-  font-weight: 600;
-  display: none;
+  /*font-weight: 600;
+  display: none;*/
   flex-direction: column;
 }
 
@@ -30,8 +30,34 @@ div.mg-export-win {
   z-index: 999
 }
 
+.mg-save-filter-dialog {
+  display: flex;
+  width: 300px;
+}
+
+.mg-filter {
+  padding: 10px;
+}
+
+.mg-section-content {
+  margin: 10px 0px 15px 0px;
+  text-align: left;
+}
+
+.mg-filter-name {
+  width: 100%;
+}
+
+.mg-filter-name-label {
+  margin: 10px 1px 5px 1px;
+}
+
+.mg-clear-margin {
+  margin: 0;
+}
+
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 .show {
@@ -63,6 +89,10 @@ div.mg-export-win {
 
 .mg-section-op {
   margin: 0 5px;
+}
+
+.mg-flex {
+  display: flex;
 }
 
 .mg-flex-spc-b {
@@ -97,6 +127,23 @@ div.mg-export-win {
 
 .mg-header {
   cursor: pointer;
+}
+
+.mg-divider {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px #e1e4e8 solid;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
+
+a.mg-disabled {
+  pointer-events: none;
+  cursor: default;
+  color: lightgrey;
 }
 
 .mg-a {
@@ -172,8 +219,8 @@ div.mg-export-win {
   margin-right: 20px;
 }
 
-.mg-r-25em {
-  margin-right: 0.25em;
+.mg-r-3em {
+  margin-right: 0.3em;
 }
 
 .mg-dropdown-item {
@@ -203,9 +250,22 @@ div.mg-export-win {
   color: red;
 }
 
+.mg-save-issue-filter {
+  float: right;
+  position: relative;
+  left: -24px;
+  top: 7px;
+  color: #c6cbd1;
+}
+
+.mg-save-issue-filter:hover {
+  cursor: pointer;
+  color: #24292e;
+}
+
 @font-face {
   font-family: 'FontAwesome';
-  src: url('moz-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -275,6 +335,22 @@ div.mg-export-win {
 
 .mg-icon-heart:before {
   content: "\f004";
+}
+
+.mg-icon-bookmark:before {
+  content: "\f02e";
+}
+
+.mg-icon-bookmark-o:before {
+  content: "\f097";
+}
+
+.mg-icon-floppy-o:before {
+  content: "\f0c7";
+}
+
+.mg-icon-trash-o:before {
+  content: "\f014";
 }
 
 .mg-m-icon {

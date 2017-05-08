@@ -42,18 +42,106 @@ var DragDrop = (function() {
       ele: null // moving element
     };
 
-    var self = this;
+    let self = this;
+
+    // mouse up event handler
+    let onMouseUp = function(event) {
+      let index = self.move_state.index;
+      if (index > -1) {
+        self.elements[index].style.color = null;
+        self.move_state.index = -1;
+
+        if (self.move_state.started) {
+          self.elements[0].parentNode.removeChild(self.move_state.ele);
+        }
+        self.move_state.ele = null;
+      }
+
+      // response onClick event if need
+      if (!self.move_state.started && this.onclick != null) {
+        this.onclick.apply(this);
+      }
+
+      // restore default
+      self.move_state.started = false;
+      document.onmouseup = null;
+      document.onmousemove = null;
+    };
+
+    // mouse move event handler
+    let onMouseMove = function(event) {
+      let index = self.move_state.index;
+      let parent = self.elements[0].parentNode;
+
+      // if moving is started
+      if (self.move_state.started) {
+        // compute offset left of moving element
+        let l = self.move_state.start_left + event.clientX
+                - self.move_state.start_client_x;
+        if (l < parent.offsetLeft) {
+          l = parent.offsetLeft;
+        }
+
+        // compute offset right of moving element
+        let r = l + self.move_state.ele.offsetWidth;
+        let parentRight = parent.offsetWidth + parent.offsetLeft;
+        if (r > parentRight) {
+          l = parentRight - self.move_state.ele.offsetWidth;
+        }
+
+        // set new offset left of moving element
+        self.move_state.ele.style.left = l + 'px';
+
+        // exchange the current selected element with its next element if
+        // over half width of moving element is entering the next element
+        if (index < self.elements.length - 1) {
+          let next = self.elements[index + 1];
+          if (next != self.move_state.ele &&
+              r - next.offsetLeft > next.offsetWidth / 2) {
+            parent.insertBefore(self.elements[index + 1],
+                                self.elements[index]);
+            let t = self.elements[index];
+            self.elements[index] = self.elements[index + 1];
+            self.elements[index + 1] = t;
+            self.move_state.index++;
+            return;
+          }
+        }
+
+        // exchange the current selected element with its pre element if
+        // over half width of moving element is entering the pre element
+        if (index > 0) {
+          let pre = self.elements[index - 1];
+          if (pre != self.move_state.ele &&
+              l - pre.offsetLeft < pre.offsetWidth / 2) {
+            parent.insertBefore(self.elements[index], self.elements[index -1]);
+            let t = self.elements[index];
+            self.elements[index] = self.elements[index - 1];
+            self.elements[index - 1] = t;
+            self.move_state.index--;
+          }
+        }
+      }
+      // moving is started only when movement on x axis is over 5 pixels
+      else if (index > -1 &&
+               Math.abs(event.clientX - self.move_state.start_client_x) > 5) {
+        parent.appendChild(self.move_state.ele);
+        self.move_state.started = true;
+        self.move_state.start_client_x = event.clientX;
+        self.elements[index].style.color = 'transparent';
+      }
+    }
 
     // mouse down event handler
-    var onMouseDown = function(event) {
+    let onMouseDown = function(event) {
       // find out which column is selected?
-      var event_ele = this;
-      elements.forEach(function(ele, i) {
-        if (ele == event_ele) {
+      let event_ele = this;
+      for (let i = 0; i < elements.length; ++i) {
+        if (elements[i] == event_ele) {
           self.move_state.index = i;
-          return;
+          break;
         }
-      });
+      };
 
       if (self.move_state.index < 0) {
         console.log("Can't find clicked element!");
@@ -77,94 +165,6 @@ var DragDrop = (function() {
       document.onmouseup = onMouseUp;
       document.onmousemove = onMouseMove;
     };
-
-    // mouse up event handler
-    var onMouseUp = function(event) {
-      var index = self.move_state.index;
-      if (index > -1) {
-        self.elements[index].style.color = null;
-        self.move_state.index = -1;
-
-        if (self.move_state.started) {
-          self.elements[0].parentNode.removeChild(self.move_state.ele);
-        }
-        self.move_state.ele = null;
-      }
-
-      // response onClick event if need
-      if (!self.move_state.started && this.onclick != null) {
-        this.onclick.apply(this);
-      }
-
-      // restore default
-      self.move_state.started = false;
-      document.onmouseup = null;
-      document.onmousemove = null;
-    };
-
-    // mouse move event handler
-    var onMouseMove = function(event) {
-      var index = self.move_state.index;
-      var parent = self.elements[0].parentNode;
-
-      // if moving is started
-      if (self.move_state.started) {
-        // compute offset left of moving element
-        var l = self.move_state.start_left + event.clientX
-                - self.move_state.start_client_x;
-        if (l < parent.offsetLeft) {
-          l = parent.offsetLeft;
-        }
-
-        // compute offset right of moving element
-        var r = l + self.move_state.ele.offsetWidth;
-        var parentRight = parent.offsetWidth + parent.offsetLeft;
-        if (r > parentRight) {
-          l = parentRight - self.move_state.ele.offsetWidth;
-        }
-
-        // set new offset left of moving element
-        self.move_state.ele.style.left = l + 'px';
-
-        // exchange the current selected element with its next element if
-        // over half width of moving element is entering the next element
-        if (index < self.elements.length - 1) {
-          var next = self.elements[index + 1];
-          if (next != self.move_state.ele &&
-              r - next.offsetLeft > next.offsetWidth / 2) {
-            parent.insertBefore(self.elements[index + 1],
-                                self.elements[index]);
-            var t = self.elements[index];
-            self.elements[index] = self.elements[index + 1];
-            self.elements[index + 1] = t;
-            self.move_state.index++;
-            return;
-          }
-        }
-
-        // exchange the current selected element with its pre element if
-        // over half width of moving element is entering the pre element
-        if (index > 0) {
-          var pre = self.elements[index - 1];
-          if (pre != self.move_state.ele &&
-              l - pre.offsetLeft < pre.offsetWidth / 2) {
-            parent.insertBefore(self.elements[index], self.elements[index -1]);
-            var t = self.elements[index];
-            self.elements[index] = self.elements[index - 1];
-            self.elements[index - 1] = t;
-            self.move_state.index--;
-          }
-        }
-      }
-      // moving is started only when movement on x axis is over 5 pixels
-      else if (index > -1 &&
-               Math.abs(event.clientX - self.move_state.start_client_x) > 5) {
-        parent.appendChild(self.move_state.ele);
-        self.move_state.started = true;
-        self.move_state.start_client_x = event.clientX;
-        self.elements[index].style.color = 'transparent';
-      }
-    }
 
     // set mouse down event handler for each column element
     this.elements.forEach(function(ele) {

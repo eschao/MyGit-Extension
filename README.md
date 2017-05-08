@@ -34,8 +34,12 @@ The following functions are planned to provide:
    <img src="https://cloud.githubusercontent.com/assets/20178358/25797286/183d4d18-340f-11e7-908a-f0c5af3d5dc8.png"/>
    </p>
    
-   Injects a **Save** button in issue filter input box. You can save a customized filter for later using.
-   
+   Injects a **Save** button in issue filter input box. 
+   - Save filter with a customized name
+   - Overwrite an existing filter
+   - Get them in **Filters** dropdown list
+   - Remove them from the **Filters** dropdown list
+   
  - **Favorite Rpository**
  
    <p align="center">

@@ -37,7 +37,7 @@ The following functions are planned to provide:
    Injects a **Save** button in issue filter input box. 
    - Save filter with a customized name
    - Overwrite an existing filter
-   - Get them in **Filters** dropdown list
+   - Get them in **Filters** dropdown list
    - Remove them from the **Filters** dropdown list
    
  - **Favorite Rpository**

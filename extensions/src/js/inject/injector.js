@@ -26,7 +26,7 @@ var MyGitInjector = (function() {
    * Initialize injector, install neccessary event
    */
   MyGitInjector.prototype.install = function() {
-    var self = this;
+    let self = this;
 
     // when window is loaded, check if we need to inject
     window.addEventListener("load", function() {
@@ -36,7 +36,7 @@ var MyGitInjector = (function() {
 
     // when window state is changed, check if we need to inject
     window.addEventListener("statechange", function() {
-      var state = window.history.state;
+      let state = window.history.state;
       if (state != null) {
         self.issue_injector.inject(window.location.href);
       }

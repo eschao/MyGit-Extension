@@ -35,7 +35,7 @@ var IssueExportDialog = (function() {
     this.MESSAGE_ID = "mg-message";
 
     // use drag & drop to adjust issue headers
-    this.drag_drop = new DragDrop();
+    //this.drag_drop = new DragDrop();
     this._initConfig();
   }
 
@@ -43,9 +43,9 @@ var IssueExportDialog = (function() {
    * Init configuration from browser storage
    */
   IssueExportDialog.prototype._initConfig = function() {
-    var self = this;
-    browser_api.storage.get(MYGIT_GITHUB_CONFIG_KEY, function(item) {
-      var config = (item != null) ? item[MYGIT_GITHUB_CONFIG_KEY] : null;
+    let self = this;
+    browser_api.storage.get(MYGIT_GITHUB_ISSUE_EXPORT_KEY, function(item) {
+      let config = (item != null) ? item[MYGIT_GITHUB_ISSUE_EXPORT_KEY] : null;
       if (config != null && config.headers != null) {
         self.config = config;
       }
@@ -82,7 +82,7 @@ var IssueExportDialog = (function() {
       },
       // issue assignee parser
       "assignee": function(item) {
-        var s = "";
+        let s = "";
         if (item.assignees != null) {
           item.assignees.forEach(function(a) {
             s += a.login + ' ';
@@ -114,7 +114,7 @@ var IssueExportDialog = (function() {
             });
           }
 
-          var labels = [];
+          let labels = [];
           Object.keys(exports.labels).forEach(function(l) {
             labels.push(exports.labels[l]);
           });
@@ -126,7 +126,7 @@ var IssueExportDialog = (function() {
             return "";
           }
 
-          var labels = [];
+          let labels = [];
           item.labels.forEach(function(l) {
             labels.push(l.name);
           });
@@ -144,7 +144,7 @@ var IssueExportDialog = (function() {
    * @param is_error True if message is error and will be showed with red color
    */
   IssueExportDialog.prototype.showMessage = function(msg, is_error) {
-    var el_msg = document.getElementById(this.MESSAGE_ID);
+    let el_msg = document.getElementById(this.MESSAGE_ID);
     if (is_error != null && is_error) {
       el_msg.style.color = "red";
     }
@@ -159,36 +159,68 @@ var IssueExportDialog = (function() {
   }
 
   /**
+   * Show export dialog
+   */
+  IssueExportDialog.prototype.show = function(github_info) {
+    let root = document.createElement('div');
+    root.className = "mg-dialog-center mg-flex";
+    root.setAttribute("id", "mg-export-dialog");
+
+    // read export dialog html and initiate
+    let self = this;
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET",
+             browser_api.extension.getURL("templates/issue_export_dialog.html")
+             , true);
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        root.innerHTML = this.responseText;
+        document.body.appendChild(root);
+        self.initDialog(root, github_info);
+      }
+    };
+    xhr.send();
+  }
+
+  /**
    * Init export dialog
    *
    * @param root Root element of dialog
    */
-  IssueExportDialog.prototype.initDialog = function(root) {
+  IssueExportDialog.prototype.initDialog = function(root, github_info) {
     // init generate headers
-    var el_gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
+    let el_gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
     el_gen_headers.checked = this.config.gen_headers;
 
     // init csv delimiter
-    var el_delimiter = document.getElementById(this.CSV_DELIMITER_ID);
+    let el_delimiter = document.getElementById(this.CSV_DELIMITER_ID);
     el_delimiter.value = this.config.delimiter;
 
     // init expand labels
-    var el_expand_labels = document.getElementById(this.EXPAND_LABELS_ID);
+    let el_expand_labels = document.getElementById(this.EXPAND_LABELS_ID);
     el_expand_labels.checked = this.config.label.expand;
 
     // init label delimiter
-    var el_label_delimiter = document.getElementById(this.LABEL_DELIMITER_ID);
+    let el_label_delimiter = document.getElementById(this.LABEL_DELIMITER_ID);
     el_label_delimiter.value = this.config.label.delimiter;
 
     // close export dialog
-    var self = this;
-    document.getElementById("mg-close").onclick = function() {
-      document.getElementById(self.DIALOG_ROOT_ID).style.display = "none";
-      self.saveConfig();
+    let self = this;
+    let el_close = document.getElementById("mg-close");
+    let win_click = function(e) {
+      if (e.target != root && !root.contains(e.target)) {
+        el_close.onclick();
+      }
+    }
+    window.addEventListener("click", win_click, false);
+    el_close.onclick = function() {
+      window.removeEventListener("click", win_click, false);
+      self.storeConfig();
+      document.body.removeChild(root);
     }
 
     // toggle table header
-    var onToggleHeader = function() {
+    let onToggleHeader = function() {
       if (this.className.indexOf("mg-header-disable") != -1) {
         this.className = this.className.replace(" mg-header-disable", "");
         this.setAttribute("enable", "true");
@@ -199,9 +231,9 @@ var IssueExportDialog = (function() {
       }
     }
 
-    var headers = document.getElementById(this.TBL_HEADERS_DIV_ID)
+    let headers = document.getElementById(this.TBL_HEADERS_DIV_ID)
                           .getElementsByTagName("div");
-    for (var i = 0; i < headers.length; ++i) {
+    for (let i = 0; i < headers.length; ++i) {
       headers[i].onclick = onToggleHeader;
       headers[i].setAttribute("name", this.config.headers[i].name);
       headers[i].innerHTML = this.config.headers[i].title;
@@ -212,11 +244,13 @@ var IssueExportDialog = (function() {
       }
     }
 
-    this.drag_drop.init(headers);
+    // init drag & drop
+    let drag_drop = new DragDrop();
+    drag_drop.init(headers);
 
     // onclick of expand label
     el_expand_labels.onclick = function() {
-      var div = document.getElementById("mg-label-delimter-d");
+      let div = document.getElementById("mg-label-delimter-d");
       if (this.checked) {
         div.style.color = "lightgray";
         el_label_delimiter.disabled = true;
@@ -227,35 +261,34 @@ var IssueExportDialog = (function() {
       }
     }
     el_expand_labels.onclick();
-  }
 
-  /**
-   * Show dialog
-   */
-  IssueExportDialog.prototype.show = function() {
-    var root = document.getElementById(this.DIALOG_ROOT_ID)
-    root.style.display = "flex";
+    // click event for export button
+    document.getElementById("mg-start-export-btn").onclick = function(e) {
+      e.preventDefault();
+      self.export(github_info.token, github_info.api_uri,
+                  github_api.getRepoName());
+    }
   }
 
   /**
    * Save configurations to browser storage
    */
-  IssueExportDialog.prototype.saveConfig = function() {
-    var gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
-    var delimiter = document.getElementById(this.CSV_DELIMITER_ID);
-    var expand_labels = document.getElementById(this.EXPAND_LABELS_ID);
-    var label_delimiter = document.getElementById(this.LABEL_DELIMITER_ID);
-    var is_others_changed = (delimiter.value != this.config.delimiter ||
+  IssueExportDialog.prototype.storeConfig = function() {
+    let gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
+    let delimiter = document.getElementById(this.CSV_DELIMITER_ID);
+    let expand_labels = document.getElementById(this.EXPAND_LABELS_ID);
+    let label_delimiter = document.getElementById(this.LABEL_DELIMITER_ID);
+    let is_others_changed = (delimiter.value != this.config.delimiter ||
                            gen_headers.checked != this.config.gen_headers ||
                            expand_labels.checked != this.config.label.expand ||
                            label_delimiter.value != this.config.label.delimiter);
 
-    var headers = document.getElementById(this.TBL_HEADERS_DIV_ID)
+    let headers = document.getElementById(this.TBL_HEADERS_DIV_ID)
                           .getElementsByTagName("div");
-    var is_headers_changed = false;
-    for (var i = 0; i < headers.length; ++i) {
-      var name = headers[i].getAttribute("name");
-      var enable = headers[i].getAttribute("enable");
+    let is_headers_changed = false;
+    for (let i = 0; i < headers.length; ++i) {
+      let name = headers[i].getAttribute("name");
+      let enable = headers[i].getAttribute("enable");
       if (name != this.config.headers[i].name ||
           enable != this.config.headers[i].enable.toString()) {
         is_headers_changed = true;
@@ -264,7 +297,7 @@ var IssueExportDialog = (function() {
     }
 
     if (is_others_changed || is_headers_changed) {
-      var config = {
+      let config = {
         "delimiter": delimiter.value,
         "gen_headers": gen_headers.checked,
         "label": {
@@ -274,7 +307,7 @@ var IssueExportDialog = (function() {
       };
 
       if (is_headers_changed) {
-        var values = [];
+        let values = [];
         headers.forEach(function(header) {
           values.push({
             "name": header.getAttribute("name"),
@@ -289,8 +322,8 @@ var IssueExportDialog = (function() {
       }
 
       this.config = config;
-      var data = {};
-      data[MYGIT_GITHUB_CONFIG_KEY] = this.config;
+      let data = {};
+      data[MYGIT_GITHUB_ISSUE_EXPORT_KEY] = this.config;
       browser_api.storage.set(data, function() {});
     }
   }
@@ -301,15 +334,15 @@ var IssueExportDialog = (function() {
    * @param exports Export state
    */
   IssueExportDialog.prototype._exportIssues = function(exports) {
-    var self = this;
-    var xhr = new XMLHttpRequest();
+    let self = this;
+    let xhr = new XMLHttpRequest();
     xhr.open("GET", exports.url, true);
     xhr.setRequestHeader("Accept", "application/vnd.github.mercy-preview+json");
     xhr.setRequestHeader("Authorization", "token " + exports.token);
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
         if (xhr.status == 200) {
-          var json = JSON.parse(xhr.responseText);
+          let json = JSON.parse(xhr.responseText);
           if (json != null) {
             if (exports.total_count < 1) {
               exports.total_count = json.total_count;
@@ -317,21 +350,21 @@ var IssueExportDialog = (function() {
             self._buildIssues(json, exports);
           }
 
-          var link = xhr.getResponseHeader("Link");
+          let link = xhr.getResponseHeader("Link");
           if (link == null) {
             self._saveIssues(exports);
           }
           else {
-            var items = link.split(',');
-            var next_url = null;
-            items.forEach(function(item) {
-              if (item.includes('rel="next"')) {
-                var hrefs = item.split(';');
+            let items = link.split(',');
+            let next_url = null;
+            for (let i = 0; i < items.length; ++i) {
+              if (items[i].includes('rel="next"')) {
+                let hrefs = items[i].split(';');
                 if (hrefs[0] != null) {
                   next_url = hrefs[0].trim().slice(1, -1);
                 }
               }
-            });
+            }
 
             if (next_url != null) {
               exports.url = next_url;
@@ -354,13 +387,13 @@ var IssueExportDialog = (function() {
    * Build issue search url by filters
    */
   IssueExportDialog.prototype._buildSearchUrlByFilters = function(base_uri, repo) {
-    var el_filter = document.querySelector("input[id='js-issues-search']");
+    let el_filter = document.querySelector("input[id='js-issues-search']");
     if (el_filter == null) {
       console.log("Can't find issue filter input element");
       return null;
     }
 
-    var filters = el_filter.getAttribute("value");
+    let filters = el_filter.getAttribute("value");
     if (filters == null || filters.trim().length < 1) {
       return base_uri + "?q=" + encodeURI("repo:" + repo + " state:open is:issue");
     }
@@ -381,16 +414,17 @@ var IssueExportDialog = (function() {
    * Build issue result
    */
   IssueExportDialog.prototype._buildIssues = function(json, exports) {
-    var self = this;
-    var expanded = this.config.label.expand;
-    var delimiter = this.config.label.delimiter;
+    let self = this;
+    let expanded = this.config.label.expand;
+    let delimiter = this.config.label.delimiter;
 
-    json.items.forEach(function(item) {
+    for (let i = 0; i < json.items.length; ++i) {
+      let item = json.items[i];
       if (item == null) {
         return;
       }
 
-      var issue = [];
+      let issue = [];
       Object.keys(exports.parser).forEach(function(prop) {
         if (prop == "labels") {
           issue.push(exports.parser[prop](item, delimiter, expanded, exports));
@@ -403,16 +437,16 @@ var IssueExportDialog = (function() {
       exports.issues.push(issue);
       self.showMessage("Exporting issues " + exports.issues.length + " of " +
         exports.total_count + " ...");
-    });
+    }
   };
 
   /**
    * Save issues to local disk
    */
   IssueExportDialog.prototype._saveIssues = function(exports) {
-    var data = "";
-    var label_index = -1;
-    var headers = [];
+    let data = "";
+    let label_index = -1;
+    let headers = [];
 
     this.config.headers.forEach(function(e) {
       if (exports.parser[e.name] != null) {
@@ -423,9 +457,9 @@ var IssueExportDialog = (function() {
       }
     });
 
-    var is_expand = this.config.label.expand;
-    var labels = Object.keys(exports.labels);
-    var delimiter = this.config.delimiter;
+    let is_expand = this.config.label.expand;
+    let labels = Object.keys(exports.labels);
+    let delimiter = this.config.delimiter;
     if (this.config.gen_headers) {
       if (is_expand && label_index > -1 && labels.length > 0) {
         headers[label_index] = labels.join(delimiter);
@@ -436,7 +470,7 @@ var IssueExportDialog = (function() {
 
     exports.issues.forEach(function(issue) {
       if (label_index > -1 && is_expand) {
-        var l = issue[label_index].join(delimiter);
+        let l = issue[label_index].join(delimiter);
         issue[label_index].forEach(function(o) {
           l += delimiter;
         });
@@ -446,7 +480,7 @@ var IssueExportDialog = (function() {
       data += issue.join(delimiter) + "\n";
     });
 
-    var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+    let blob = new Blob([data], {type: "text/plain;charset=utf-8"});
     saveAs(blob, "exported_issues.csv");
     this.showMessage("");
     data = null;
@@ -461,17 +495,17 @@ var IssueExportDialog = (function() {
    * @param repo GitHub repository name
    */
   IssueExportDialog.prototype.export = function(token, api_uri, repo) {
-    this.saveConfig();
+    this.storeConfig();
     if (token == null) {
       this.showMessage("Please sign in GitHub!", true);
       return;
     }
 
-    var self = this;
-    var exports = {
+    let self = this;
+    let exports = {
       url: null, issues: [], parser: {}, labels: {}, total_count: 0
     };
-    var can_export = false;
+    let can_export = false;
     this.config.headers.forEach(function(header) {
       if (header.enable) {
         exports.parser[header.name] = self.parser[header.name]
@@ -484,8 +518,8 @@ var IssueExportDialog = (function() {
       return;
     }
 
-    var base_uri = "https://" + api_uri + "/search/issues";
-    var url = this._buildSearchUrlByFilters(base_uri, repo);
+    let base_uri = "https://" + api_uri + "/search/issues";
+    let url = this._buildSearchUrlByFilters(base_uri, repo);
     if (url != null) {
       exports.url = url;
       exports.token = token;

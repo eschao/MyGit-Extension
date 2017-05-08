@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-/*
-function getPopupView() {
-  var views = mg_browser.extension.getViews({
-    type: "popup"
-  });
-
-  if (views != null && views.length > 0) {
-    return views[0];
-  }
-  else {
-    console.log("Can't get popup view!");
-    return null;
-  }
-}*/
-
 // When user click 'Sign In GitHub', the new browser tab will be opened for
 // GitHub oauth, the tab object will be saved in this global variable and
 // used in tab listener later.
@@ -50,7 +35,7 @@ browser_api.tabs.onUpdated.addListener(function(id, changeInfo, tab) {
         // save token in browser storage
         if (token != undefined && token != null) {
           g_oauth_tab = null;
-          var data = {};
+          let data = {};
           data[MYGIT_GITHUB_KEY] =  {"token" : token};
           browser_api.storage.set(data, function(){ });
         }
@@ -62,7 +47,7 @@ browser_api.tabs.onUpdated.addListener(function(id, changeInfo, tab) {
  * Sign in public github
  */
 function signInGitHub() {
-  var url = "https://github.com/login/oauth/authorize?client_id="
+  let url = "https://github.com/login/oauth/authorize?client_id="
             + CLIENT_ID + "&scope=" + SCOPE + "&redirect_uri=" + REDIRECT_URI;
   browser_api.tabs.create({'url': url}, function(tab) {
     g_oauth_tab = tab;
@@ -86,7 +71,7 @@ function signOutGitHub() {
  * @token Access token for github enterprise
  */
 function signInGitHubEnterprise(baseUri, token) {
-  var data = {};
+  let data = {};
   data[MYGIT_GITHUB_E_KEY] = { "uri" : baseUri, "token" : token };
   browser_api.storage.set(data, function(){});
 }

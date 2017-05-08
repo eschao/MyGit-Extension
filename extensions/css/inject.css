@@ -349,6 +349,10 @@ a.mg-disabled {
   content: "\f0c7";
 }
 
+.mg-icon-trash-o:before {
+  content: "\f014";
+}
+
 .mg-m-icon {
   font-size: 18px;
 }

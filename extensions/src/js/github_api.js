@@ -27,10 +27,10 @@ var GitHubApi = (function() {
    * @return Repository name or NULL if can't find name
    */
   GitHubApi.prototype.getRepoName = function() {
-    var el_a = document.querySelector(
+    let el_a = document.querySelector(
       "div[class*='repohead-details-container'] strong[itemprop='name'] a");
     if (el_a != null && el_a.pathname != null && el_a.pathname.length > 0) {
-      var name = el_a.pathname;
+      let name = el_a.pathname;
       if (name[0] == "/") {
         name = name.slice(1);
       }

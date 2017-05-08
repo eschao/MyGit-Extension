@@ -29,7 +29,7 @@ var GitHubComp = (function() {
    */
   GitHubComp.prototype.init = function() {
     // sign in button event handler
-    var signin_btn = document.getElementById("mg-signin-btn");
+    let signin_btn = document.getElementById("mg-signin-btn");
     signin_btn.onclick = function () {
       signin_btn.disabled = true;
       if (browser_api.isFirefox()) {
@@ -47,8 +47,8 @@ var GitHubComp = (function() {
     }
 
     // sign out button event handler
-    var self = this;
-    var signout_btn = document.getElementById("mg-signout-btn");
+    let self = this;
+    let signout_btn = document.getElementById("mg-signout-btn");
     signout_btn.onclick = function() {
       signout_btn.disabled = true;
       browser_api.storage.remove(MYGIT_GITHUB_KEY, function() {
@@ -58,8 +58,8 @@ var GitHubComp = (function() {
     }
 
     // info click event handler
-    var ele_info = document.getElementById("mg-info");
-    ele_info.onclick = function() {
+    let el_info = document.getElementById("mg-info");
+    el_info.onclick = function() {
       browser_api.tabs.create({url: this.href});
       window.close();
     }
@@ -72,8 +72,8 @@ var GitHubComp = (function() {
    * Render UI component
    */
   GitHubComp.prototype.render = function() {
-    var signin_div = document.getElementById("mg-github-signin-div");
-    var signout_div = document.getElementById("mg-github-signout-div");
+    let signin_div = document.getElementById("mg-github-signin-div");
+    let signout_div = document.getElementById("mg-github-signout-div");
 
     // read configurations from chome storage and render UI according to
     // configurations
@@ -91,7 +91,7 @@ var GitHubComp = (function() {
     },
     function onError(error) {
       console.log(`Error: ${error}`);
-      });
+    });
   }
 
   return GitHubComp;
@@ -120,33 +120,33 @@ var GitHubEnterpriseComp = (function() {
    * Init UI component
    */
   GitHubEnterpriseComp.prototype.init = function() {
-    var token_input = document.getElementById("mg-github-e-token");
-    var message_span = document.getElementById("mg-message");
+    let token_input = document.getElementById("mg-github-e-token");
+    let message_span = document.getElementById("mg-message");
 
     // clean message when inputting token
     token_input.oninput = function() {
       message_span.textContent = "";
     }
 
-    var self = this;
-    var signin_btn = document.getElementById("mg-e-signin-btn");
-    var select_btn = document.getElementById("mg-select-github-e");
+    let self = this;
+    let signin_btn = document.getElementById("mg-e-signin-btn");
+    let select_btn = document.getElementById("mg-select-github-e");
 
     // sign in click event handler
     signin_btn.onclick = function() {
-      var uri = document.getElementById("mg-github-e-uri").innerText;
+      let uri = document.getElementById("mg-github-e-uri").innerText;
       if (uri == null || uri.trim().length < 1) {
         message_span.textContent = "Please choose a GitHub Enterprise!";
         return;
       }
 
-      var token = token_input.value;
+      let token = token_input.value;
       if (token == null || token.trim().length < 1) {
         message_span.textContent = "Please input oauthroized token!";
         return;
       }
 
-      var data = {};
+      let data = {};
       data[MYGIT_GITHUB_E_KEY] = {
         "name" : select_btn.getAttribute("ghe"),
         "uri" : uri,
@@ -162,7 +162,7 @@ var GitHubEnterpriseComp = (function() {
     }
 
     // sign out click event handler
-    var signout_btn = document.getElementById("mg-e-signout-btn");
+    let signout_btn = document.getElementById("mg-e-signout-btn");
     signout_btn.onclick = function() {
       signout_btn.disabled = true;
       browser_api.storage.remove(MYGIT_GITHUB_E_KEY, function() {
@@ -179,12 +179,12 @@ var GitHubEnterpriseComp = (function() {
    * Init GitHub Enterprise menu modal
    */
   GitHubEnterpriseComp.prototype.initMenuModal = function() {
-    var menu_modal = document.getElementById("mg-select-menu-modal");
-    var select_btn = document.getElementById("mg-select-github-e");
-    var menu_list_div = document.getElementById("mg-menu-list");
+    let menu_modal = document.getElementById("mg-select-menu-modal");
+    let select_btn = document.getElementById("mg-select-github-e");
+    let menu_list_div = document.getElementById("mg-menu-list");
 
     // install all supported github enterprise
-    var menu_items = "";
+    let menu_items = "";
     this.all_github_e.forEach(function(item) {
       menu_items += '<div class="mg-select-menu-item" ghe="' + item.name + '">\n'
         + '<a href="#" ghe="' + item.name + '">\n' +
@@ -197,35 +197,37 @@ var GitHubEnterpriseComp = (function() {
     menu_list_div.innerHTML = menu_items;
 
     // set onclick event of menu item
-    var self = this;
+    let self = this;
     menu_list_div.getElementsByClassName("mg-select-menu-item")
                  .forEach(function(ele) {
       ele.onclick = function() {
         menu_modal.style.display = "none";
-        var name = ele.getAttribute("ghe");
-        var oldName = select_btn.getAttribute("ghe");
-        self.all_github_e.forEach(function(item) {
+        let name = ele.getAttribute("ghe");
+        let oldName = select_btn.getAttribute("ghe");
+
+        for (let i = 0; i < self.all_github_e.length; ++i) {
+          let item = self.all_github_e[i];
           if (name == item.name && oldName != item.name) {
             select_btn.setAttribute("ghe", item.name);
             select_btn.innerHTML =
                 '<i class="' + item.icon + ' mg-menu-logo"/></i>\n' +
                 '<span id="mg-github-e-uri">' + item.uri + '</span>\n' +
                 '<i class="mg-icon-caret-down mg-select-i-show-menu"></i>\n';
-            return;
+            break;
           }
-        });
+        }
       };
     });
 
     // show menu modal
     select_btn.onclick = function(event) {
-      var show_menu_btn = document.querySelector("i[class^='mg-icon-caret-down']");
+      let show_menu_btn = document.querySelector("i[class^='mg-icon-caret-down']");
       if (show_menu_btn.style != null &&
           show_menu_btn.style.display != "none") {
         menu_modal.style.display = "block";
-        var name = select_btn.getAttribute("ghe");
+        let name = select_btn.getAttribute("ghe");
         menu_list_div.getElementsByTagName("a").forEach(function(ele) {
-          var ele_check = ele.querySelector("i[class^='mg-icon-check']");
+          let ele_check = ele.querySelector("i[class^='mg-icon-check']");
           if (ele.getAttribute("ghe") == name) {
             ele_check.style.display = "block";
           }
@@ -257,14 +259,14 @@ var GitHubEnterpriseComp = (function() {
    * Render UI component
    */
   GitHubEnterpriseComp.prototype.render = function () {
-    var self = this;
-    var signin_div = document.getElementById("mg-github-e-signin-div");
-    var signout_div = document.getElementById("mg-github-e-signout-div");
-    var token_input = document.getElementById("mg-github-e-token");
-    var select_btn = document.getElementById("mg-select-github-e");
+    let self = this;
+    let signin_div = document.getElementById("mg-github-e-signin-div");
+    let signout_div = document.getElementById("mg-github-e-signout-div");
+    let token_input = document.getElementById("mg-github-e-token");
+    let select_btn = document.getElementById("mg-select-github-e");
 
     browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
-      var ghe = self.all_github_e[0];
+      let ghe = self.all_github_e[0];
       if (item != null &&
           item[MYGIT_GITHUB_E_KEY] != null &&
           item[MYGIT_GITHUB_E_KEY].token != null &&
@@ -276,12 +278,13 @@ var GitHubEnterpriseComp = (function() {
         token_input.disabled = true;
         ghe.token = token_input.value;
 
-        self.all_github_e.forEach(function(t) {
+        for (let i = 0; i < self.all_github_e.length; ++i) {
+          let t = self.all_github_e[i];
           if (t.name == item[MYGIT_GITHUB_E_KEY].name) {
             ghe = t;
-            return;
+            break;
           }
-        });
+        }
       }
       else {
         signout_div.style.display = "none";
@@ -297,7 +300,7 @@ var GitHubEnterpriseComp = (function() {
         ghe.token = null;
       }
 
-      var style = "";
+      let style = "";
       if (ghe.token != null) {
         style = ' style="display:none"';
       }

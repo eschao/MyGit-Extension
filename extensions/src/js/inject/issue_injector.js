@@ -39,7 +39,7 @@ var IssueInjector = (function() {
     this.issue_filter = new IssueFilter();
 
     // read configurations from browser storage
-    var self = this;
+    let self = this;
     browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
       if (item != null) {
         self.github_token = item[MYGIT_GITHUB_KEY];
@@ -80,56 +80,26 @@ var IssueInjector = (function() {
   }
 
   /**
-   * Build export dialog
-   */
-  IssueInjector.prototype._buildExportDialog = function() {
-    var root = document.createElement('div');
-    root.className = "mg-dialog-center hidden";
-    root.setAttribute("id", "mg-export-dialog");
-
-    // read export dialog html and initiate
-    var self = this;
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET",
-             browser_api.extension.getURL("templates/issue_export_dialog.html")
-             , true);
-    xhr.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        root.innerHTML = this.responseText;
-        document.body.appendChild(root);
-        self.export_dialog.initDialog(root);
-        document.getElementById("mg-start-export-btn").onclick = function(e) {
-          e.preventDefault();
-          self.export_dialog.export(self.token, self.api_uri, self._getRepoName());
-        }
-      }
-    };
-    xhr.send();
-  }
-
-  /**
    * Try to inject issue Export button
    *
    * @return True if injection is successful
    */
   IssueInjector.prototype._tryInjectExport = function() {
-    var el_menu_div = document.querySelector(
+    let el_menu_div = document.querySelector(
         "div[class^='subnav-links'][role='navigation']");
-    var el_export_btn = document.getElementById("mg-issue-export-btn");
+    let el_export_btn = document.getElementById("mg-issue-export-btn");
     if (el_menu_div != null && el_export_btn == null) {
-      var el_export_btn = document.createElement('a');
+      let el_export_btn = document.createElement('a');
       el_export_btn.title = "Export";
       el_export_btn.href = "#";
       el_export_btn.innerHTML = "Export";
       el_export_btn.className = "js-selected-navigation-item subnav-item";
       el_export_btn.setAttribute("id", "mg-issue-export-btn");
-      var self = this;
+      let self = this;
       el_export_btn.onclick = function() {
-        self.export_dialog.show();
+        self.export_dialog.show({token: self.token, api_uri: self.api_uri});
       };
-
       el_menu_div.appendChild(el_export_btn);
-      this._buildExportDialog();
       return true;
     }
 
@@ -140,8 +110,8 @@ var IssueInjector = (function() {
    * Try to inject Save filter icon
    */
   IssueInjector.prototype._tryInjectFilter = function() {
-    var el_filter_input = document.getElementById("js-issues-search");
-    var el_save_filter = document.getElementById("mg-save-issue-filter");
+    let el_filter_input = document.getElementById("js-issues-search");
+    let el_save_filter = document.getElementById("mg-save-issue-filter");
     if (el_filter_input != null && el_save_filter == null) {
       el_filter_input.style.paddingRight = "30px";
 
@@ -151,9 +121,9 @@ var IssueInjector = (function() {
       el_save_filter.id = "mg-save-issue-filter";
       el_filter_input.parentNode.appendChild(el_save_filter);
 
-      var self = this;
+      let self = this;
       el_save_filter.onclick = function() {
-        self.issue_filter.save();
+        self.issue_filter.show();
       }
 
       this.issue_filter.init();
@@ -167,14 +137,14 @@ var IssueInjector = (function() {
    * Inject export button
    */
   IssueInjector.prototype.inject = function(url) {
-    var match = this._matchInjectUrl(url);
+    let match = this._matchInjectUrl(url);
     if (match != this.URL_UNKNOWN) {
-      var count = 0;
-      var self = this;
-      var is_injected = { issue_export: false, issue_filter: false };
+      let count = 0;
+      let self = this;
+      let is_injected = { issue_export: false, issue_filter: false };
 
       // periodically try to inject until success or over number of attempts
-      var interval = setInterval(function() {
+      let interval = setInterval(function() {
         if (!is_injected.issue_export) {
           is_injected.issue_export = self._tryInjectExport();
         }
@@ -189,18 +159,6 @@ var IssueInjector = (function() {
         }
       }, this.INTERVAL_TIME);
     }
-  };
-
-  /**
-   * Get repository name
-   */
-  IssueInjector.prototype._getRepoName = function() {
-    var meta = document.querySelector("meta[property='og:title']");
-    if (meta != null) {
-      return meta.getAttribute("content");
-    }
-
-    return null;
   };
 
   return IssueInjector;

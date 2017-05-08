@@ -20,6 +20,7 @@ var MyGitInjector = (function() {
   function MyGitInjector() {
     this.issue_injector = new IssueInjector();
     this.favorite_repos = new FavoriteReposInjector();
+    this.labels_injector = new LabelsInjector();
   }
 
   /**
@@ -32,6 +33,7 @@ var MyGitInjector = (function() {
     window.addEventListener("load", function() {
       self.issue_injector.inject(window.location.href);
       self.favorite_repos.inject(window.location.href);
+      self.labels_injector.inject(window.location.href);
     }, false);
 
     // when window state is changed, check if we need to inject

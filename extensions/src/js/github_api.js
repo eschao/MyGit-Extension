@@ -18,7 +18,46 @@
  * GitHub Api class
  */
 var GitHubApi = (function() {
+
   function GitHubApi() {
+    this.github_token = null;
+    this.github_e_token = null;
+
+    // read configurations from browser storage
+    let self = this;
+    browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
+      if (item != null) {
+        self.github_token = item[MYGIT_GITHUB_KEY];
+      }
+    });
+    browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
+      if (item != null) {
+        self.github_e_token = item[MYGIT_GITHUB_E_KEY];
+      }
+    });
+  }
+
+  GitHubApi.prototype.getKeys = function() {
+    let url = window.location.href;
+
+    // is github enterprise?
+    if (url.search("https:\/\/" + this.github_e_token.uri +
+        "\/.*\/.*\/issues(?!\/\\d+).*") > -1) {
+      return {
+        token: this.github_e_token,
+        api_uri: this.github_e_token.uri + "/api/v3"
+      };
+    }
+
+    // is public github?
+    if (url.search("https:\/\/github.com\/.*\/.*\/issues(?!\/\\d+).*") > -1) {
+      return {
+        token: this.github_token,
+        api_uri: "api.github.com"
+      };
+    }
+
+    return { token: null, api_uri: null };
   }
 
   /**

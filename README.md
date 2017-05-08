@@ -29,7 +29,11 @@ The following functions are planned to provide:
    - Enable/disable expanding issue labels
    
  - **Save Issue Filter**
- 
+   
+   <p align="center">
+   <img src="https://cloud.githubusercontent.com/assets/20178358/25797286/183d4d18-340f-11e7-908a-f0c5af3d5dc8.png"/>
+   </p>
+   
    Injects a **Save** button in issue filter input box. You can save a customized filter for later using.
    
  - **Favorite Rpository**

@@ -161,7 +161,7 @@ var IssueExportDialog = (function() {
   /**
    * Show export dialog
    */
-  IssueExportDialog.prototype.show = function(github_info) {
+  IssueExportDialog.prototype.show = function() {
     let root = document.createElement('div');
     root.className = "mg-dialog-center mg-flex";
     root.setAttribute("id", "mg-export-dialog");
@@ -176,7 +176,7 @@ var IssueExportDialog = (function() {
       if (this.readyState == 4 && this.status == 200) {
         root.innerHTML = this.responseText;
         document.body.appendChild(root);
-        self.initDialog(root, github_info);
+        self.initDialog(root);
       }
     };
     xhr.send();
@@ -187,7 +187,7 @@ var IssueExportDialog = (function() {
    *
    * @param root Root element of dialog
    */
-  IssueExportDialog.prototype.initDialog = function(root, github_info) {
+  IssueExportDialog.prototype.initDialog = function(root) {
     // init generate headers
     let el_gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
     el_gen_headers.checked = this.config.gen_headers;
@@ -265,8 +265,7 @@ var IssueExportDialog = (function() {
     // click event for export button
     document.getElementById("mg-start-export-btn").onclick = function(e) {
       e.preventDefault();
-      self.export(github_info.token, github_info.api_uri,
-                  github_api.getRepoName());
+      self.export();
     }
   }
 
@@ -489,14 +488,11 @@ var IssueExportDialog = (function() {
 
   /**
    * Export issues from GitHub issue page
-   *
-   * @param token GitHub token
-   * @param api_uri GitHub API uri
-   * @param repo GitHub repository name
    */
-  IssueExportDialog.prototype.export = function(token, api_uri, repo) {
+  IssueExportDialog.prototype.export = function() {
     this.storeConfig();
-    if (token == null) {
+    let hub = github_api.getCurrentHub();
+    if (hub.token == null) {
       this.showMessage("Please sign in GitHub!", true);
       return;
     }
@@ -518,11 +514,11 @@ var IssueExportDialog = (function() {
       return;
     }
 
-    let base_uri = "https://" + api_uri + "/search/issues";
-    let url = this._buildSearchUrlByFilters(base_uri, repo);
+    let base_uri = "https://" + hub.api_uri + "/search/issues";
+    let url = this._buildSearchUrlByFilters(base_uri, hub.repo);
     if (url != null) {
       exports.url = url;
-      exports.token = token;
+      exports.token = hub.token;
       this.showMessage("Exporting issues ...");
       this._exportIssues(exports);
     }

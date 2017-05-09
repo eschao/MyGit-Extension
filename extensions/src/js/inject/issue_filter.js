@@ -124,7 +124,7 @@ var IssueFilter = (function() {
     }
 
     // filter value
-    let value = el_filter.getAttribute("value");
+    let value = el_filter.value;
     if (value == null) {
       return;
     }

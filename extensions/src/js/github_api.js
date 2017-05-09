@@ -37,27 +37,42 @@ var GitHubApi = (function() {
     });
   }
 
-  GitHubApi.prototype.getKeys = function() {
+  /**
+   * Get current GitHub information
+   *
+   * @return GitHub information object which includes:
+   *          {
+   *            token: github_token,
+   *            api_uri: github api uri,
+   *            repo: current repository name
+   *          }
+   *         Some property is null if it is not avialable
+   */
+  GitHubApi.prototype.getCurrentHub = function() {
     let url = window.location.href;
+    let name = this.getRepoName();
 
     // is github enterprise?
-    if (url.search("https:\/\/" + this.github_e_token.uri +
-        "\/.*\/.*\/issues(?!\/\\d+).*") > -1) {
+    if (this.github_e_token != null &&
+        this.github_e_token.uri != null &&
+        url.search("https:\/\/" + this.github_e_token.uri + "\/.*") > -1) {
       return {
-        token: this.github_e_token,
-        api_uri: this.github_e_token.uri + "/api/v3"
+        token: this.github_e_token.token,
+        api_uri: this.github_e_token.uri + "/api/v3",
+        repo: name
       };
     }
 
     // is public github?
-    if (url.search("https:\/\/github.com\/.*\/.*\/issues(?!\/\\d+).*") > -1) {
+    if (url.search("https:\/\/github.com\/.*") > -1) {
       return {
-        token: this.github_token,
-        api_uri: "api.github.com"
+        token: this.github_token.token,
+        api_uri: "api.github.com",
+        repo: name
       };
     }
 
-    return { token: null, api_uri: null };
+    return { token: null, api_uri: null, repo: name};
   }
 
   /**

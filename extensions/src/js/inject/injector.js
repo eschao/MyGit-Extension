@@ -39,9 +39,9 @@ var MyGitInjector = (function() {
     // when window state is changed, check if we need to inject
     window.addEventListener("statechange", function() {
       let state = window.history.state;
-      if (state != null) {
-        self.issue_injector.inject(window.location.href);
-        self.labels_injector.inject(window.location.href);
+      if (state != null && state.url != null) {
+        self.issue_injector.inject(state.url);
+        self.labels_injector.inject(state.url);
       }
     }, false);
   };

@@ -20,25 +20,26 @@
 var IssueInjector = (function() {
   "use strict";
 
+  // constants
+  let MAX_INTERVAL_COUNT = 100;
+  let INTERVAL_TIME = 100;
+  let URL_UNKNOWN = -1;
+  let URL_MATCH_GITHUB = 1;
+  let URL_MATCH_GITHUB_ENTERPRISE = 2;
+
   /**
    * Constrcutor
    */
   function IssueInjector() {
-    // constants definition
-    this.MAX_INTERVAL_COUNT = 100;
-    this.INTERVAL_TIME = 100;
-    this.URL_UNKNOWN = -1;
-    this.URL_MATCH_GITHUB = 1;
-    this.URL_MATCH_GITHUB_ENTERPRISE = 2;
-
-    this.github_token = null;
-    this.github_e_token = null;
-    this.api_uri = "api.github.com";
-    this.token = null;
+    //this.github_token = null;
+    //this.github_e_token = null;
+    //this.api_uri = "api.github.com";
+    //this.token = null;
     this.export_dialog = new IssueExportDialog();
     this.issue_filter = new IssueFilter();
 
     // read configurations from browser storage
+    /*
     let self = this;
     browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
       if (item != null) {
@@ -49,7 +50,7 @@ var IssueInjector = (function() {
       if (item != null) {
         self.github_e_token = item[MYGIT_GITHUB_E_KEY];
       }
-    });
+    });*/
   }
 
   /**
@@ -58,25 +59,25 @@ var IssueInjector = (function() {
   IssueInjector.prototype._matchInjectUrl = function(url) {
     if (url != null) {
       // is public github url?
-      if (this.github_token != null &&
-          this.github_token.token != null &&
+      if (github_api.github_token != null &&
+          github_api.github_token.token != null &&
           url.search("https:\/\/github.com\/.*\/.*\/issues(?!\/\\d+).*") > -1) {
-        this.token = this.github_token.token;
-        return this.URL_MATCH_GITHUB;
+        //this.token = github_api.github_token.token;
+        return URL_MATCH_GITHUB;
       }
 
       // is github enterprise url?
-      if (this.github_e_token != null &&
-          this.github_e_token.token != null &&
-          url.search("https:\/\/" + this.github_e_token.uri +
+      if (github_api.github_e_token != null &&
+          github_api.github_e_token.token != null &&
+          url.search("https:\/\/" + github_api.github_e_token.uri +
             "\/.*\/.*\/issues(?!\/\\d+).*") > -1) {
-        this.token = this.github_e_token.token;
-        this.api_uri = this.github_e_token.uri + "/api/v3";
-        return this.URL_MATCH_GITHUB_ENTERPRISE;
+        //this.token = github_api.github_e_token.token;
+        //this.api_uri = github_api.github_e_token.uri + "/api/v3";
+        return URL_MATCH_GITHUB_ENTERPRISE;
       }
     }
 
-    return this.URL_UNKNOWN;
+    return URL_UNKNOWN;
   }
 
   /**
@@ -97,7 +98,7 @@ var IssueInjector = (function() {
       el_export_btn.setAttribute("id", "mg-issue-export-btn");
       let self = this;
       el_export_btn.onclick = function() {
-        self.export_dialog.show({token: self.token, api_uri: self.api_uri});
+        self.export_dialog.show();//{token: self.token, api_uri: self.api_uri});
       };
       el_menu_div.appendChild(el_export_btn);
       return true;
@@ -138,13 +139,13 @@ var IssueInjector = (function() {
    */
   IssueInjector.prototype.inject = function(url) {
     let match = this._matchInjectUrl(url);
-    if (match != this.URL_UNKNOWN) {
-      let count = 0;
+    if (match != URL_UNKNOWN) {
       let self = this;
       let is_injected = { issue_export: false, issue_filter: false };
 
       // periodically try to inject until success or over number of attempts
-      let interval = setInterval(function() {
+      var count = 0;
+      var interval = setInterval(function() {
         if (!is_injected.issue_export) {
           is_injected.issue_export = self._tryInjectExport();
         }
@@ -154,10 +155,10 @@ var IssueInjector = (function() {
         }
 
         if ((is_injected.issue_export && is_injected.issue_filter) ||
-            ++count > self.MAX_INTERVAL_COUNT) {
+            ++count > MAX_INTERVAL_COUNT) {
           clearInterval(interval);
         }
-      }, this.INTERVAL_TIME);
+      }, INTERVAL_TIME);
     }
   };
 

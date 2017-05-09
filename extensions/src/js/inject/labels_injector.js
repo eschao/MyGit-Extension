@@ -20,7 +20,10 @@
 var LabelsInjector = (function() {
   "use strict";
 
-  let new_colors = [
+  // constants
+  let MAX_INTERVAL_COUNT = 100;
+  let INTERVAL_TIME = 100;
+  let NEW_COLORS = [
     "eb6ea6", "e95295", "a25768", "a22041",
     "f7b977", "f39800", "ee7800", "c89932",
     "c3d825", "aacf53", "82ae46", "69821b",
@@ -37,17 +40,29 @@ var LabelsInjector = (function() {
 
   LabelsInjector.prototype.inject = function(url) {
     if (url.search("https:\/\/github.com\/.*\/.*\/labels") > -1 ||
+       (github_api.github_e_token != null &&
+        github_api.github_e_token.uri != null &&
         url.search("https:\/\/" + github_api.github_e_token.uri +
-            "\/.*\/.*\/labels") > -1) {
+            "\/.*\/.*\/labels") > -1)) {
       // clear color list
       this.colors = {};
 
+      let self = this;
+      var count = 0;
+      var interval = setInterval(function() {
+        if (self._tryInjectColorList() || ++count > MAX_INTERVAL_COUNT) {
+          clearInterval(interval);
+        }
+      }, INTERVAL_TIME);
+  }
+
+  LabelsInjector.prototype._tryInjectColorList = function() {
       // get predefined colors
       let el_color_menus = document.querySelectorAll(
                     "div[class='dropdown-menu dropdown-menu-se label-colors']");
       if (!el_color_menus || el_color_menus.length < 1) {
         console.log("Can't get predefined color list");
-        return;
+        return false;
       }
 
       // get all color menus
@@ -61,58 +76,67 @@ var LabelsInjector = (function() {
       });
 
       // add new colors
-      new_colors.forEach(function(c) {
+      NEW_COLORS.forEach(function(c) {
         self.colors[c] = false;
       });
 
       // mark the used color
       this._markUsedColors();
-      /*
-      let el_labels = document.querySelectorAll("a[class='label label-link']");
-      if (el_labels != null) {
-        el_labels.forEach(function(l) {
-          if (l.style != null & l.style.backgroundColor != null) {
-            let color = rgbToHex(l.style.backgroundColor);
-            if (self.colors.hasOwnProperty(color)) {
-              self.colors[color] = true;
-            }
-          }
-        });
-      }*/
 
       // add new colors to all color menus
       for (let i = 0; i < el_color_menus.length; ++i) {
-        this._initColorMenuList(el_color_menus[i]);
+        let el_input = el_color_menus[i].parentNode.querySelector("input");
+        //this._initColorMenuList(el_color_menus[i]);
+        this._addInputFocusListener(el_input);
       }
 
       // install event listeners
-      this._installColorInputListener();
       this._installColorSaveListener();
+      this._installLabelListObserver();
+      return true;
     }
   }
 
-  LabelsInjector.prototype._installColorInputListener = function() {
-    let el_inputs = document.getElementsByName("label[color]");
-    if (!el_inputs) {
-      return;
-    }
-
-    let self = this;
-    //let new_color = this.new_colors[0];
-    for (let i = 0; i < el_inputs.length; ++i) {
-      let el_input = el_inputs[i];
-      el_input.addEventListener("focus", function() {
-        let el_existed = el_input.parentNode.querySelector(
-          "span[data-hex-color='" + new_colors[0] + "']");
-        if (el_existed == null) {
-          let el_color_menu = el_input.parentNode.querySelector(
-            "div[class*='label-colors']");
-          if (!el_color_menu) {
-            self._initColorMenuList(el_color_menu);
-          }
+  LabelsInjector.prototype._installLabelListObserver = function() {
+    var self = this;
+    var MObserver = window.MutationObserver || window.WebKitMutationObserver;
+    var observer = new MObserver(function(mutations, observer) {
+      mutations.forEach(function(m, i) {
+        if (m.type == "childList" &&
+            m.addedNodes != null &&
+            m.addedNodes.length > 0) {
+          m.addedNodes.forEach(function(el) {
+            if (el.tagName == "LI") {
+              let el_input = el.querySelector("input[name='label[color]']");
+              if (el_input != null) {
+                self._addInputFocusListener(el_input);
+              }
+            }
+          });
         }
-      }, false);
-    }
+      });
+    });
+
+    let el_ul = document.querySelector("ul[class='table-list " +
+                                       "table-list-bordered']");
+    observer.observe(el_ul, { childList:true });
+  }
+
+  LabelsInjector.prototype._addInputFocusListener = function(el) {
+    let self = this;
+    var handler = function() {
+      let el_existed = el.parentNode.querySelector("span[data-hex-color='" +
+                        NEW_COLORS[0] + "']");
+      if (el_existed == null) {
+        let el_color_menu = el.parentNode.querySelector(
+          "div[class*='label-colors']");
+        if (el_color_menu != null) {
+          self._initColorMenuList(el_color_menu);
+          el.removeEventListener("focus", handler, false);
+        }
+      }
+    };
+    el.addEventListener("focus", handler, false);
   }
 
   LabelsInjector.prototype._initColorMenuList = function(el_menu) {
@@ -130,14 +154,14 @@ var LabelsInjector = (function() {
 
     // append new colors
     let el_ul = null;
-    for (let j = 0; j < new_colors.length; ++j) {
+    for (let j = 0; j < NEW_COLORS.length; ++j) {
       if (j % 8 == 0) {
         el_ul = document.createElement("ul");
         el_ul.className = "color-chooser";
         el_menu.appendChild(el_ul);
       }
 
-      let color = new_colors[j];
+      let color = NEW_COLORS[j];
       let el_li = document.createElement("li");
       el_li.innerHTML =
         '<span class="color-cooser-color js-color-chooser-color ' +
@@ -177,22 +201,10 @@ var LabelsInjector = (function() {
             return;
           }
           new_color = new_color.replace("#", "");
-          self._updateColorsMark(org_color, false);
-          self._updateColorsMark(new_color, true);
           self.colors[org_color] = false;
           self.colors[new_color] = true;
         }, false);
       }
-    }
-  }
-
-  LabelsInjector.prototype._updateColorsMark = function(color, is_mark) {
-    let el_colors = document.querySelectorAll("span[data-hex-color='" +
-                    color + "']");
-    if (el_colors != null) {
-      el_colors.forEach(function(el) {
-        el.firstElementChild.style.color = is_mark ? "white" : ('#' + color);
-      });
     }
   }
 

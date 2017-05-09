@@ -41,6 +41,7 @@ var MyGitInjector = (function() {
       let state = window.history.state;
       if (state != null) {
         self.issue_injector.inject(window.location.href);
+        self.labels_injector.inject(window.location.href);
       }
     }, false);
   };

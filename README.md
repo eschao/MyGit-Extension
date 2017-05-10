@@ -50,6 +50,10 @@ The following functions are planned to provide:
    
  - **More Colors For Label Creation**
  
+   <p align="center">
+   <img src="https://cloud.githubusercontent.com/assets/20178358/25891123/78414752-35a2-11e7-9483-aa9fd51b67a1.png"/>
+   </p>
+   
    Injects a rich color list for picking when you create/edit a label.
    
 ## Installation

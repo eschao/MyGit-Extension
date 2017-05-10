@@ -40,6 +40,7 @@ var MyGitInjector = (function() {
     window.addEventListener("statechange", function() {
       let state = window.history.state;
       if (state != null && state.url != null) {
+        console.log("==== State.url : " + state.url);
         self.issue_injector.inject(state.url);
         self.labels_injector.inject(state.url);
       }

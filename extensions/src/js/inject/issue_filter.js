@@ -212,8 +212,10 @@ var IssueFilter = (function() {
     if (this.filters.hasOwnProperty(repo)) {
       let keys = Object.keys(this.filters[repo]);
       for (let i = 0; i < keys.length; ++i) {
-        if (keys[i] == filter.name) {
-          el_name.value = keys[i];
+        let name = keys[i];
+        if (this.filters[repo][name] == filter.value) {
+          el_name.value = name;
+          filter.name = name;
           break;
         }
       }

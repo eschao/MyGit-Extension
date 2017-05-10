@@ -35,30 +35,46 @@ var LabelsInjector = (function() {
   ];
 
   function LabelsInjector() {
-    // init colors with empty
     this.colors = {};
+    this.timer = null;
+  }
+
+  /**
+   * Match if the url is label url
+   */
+  LabelsInjector.prototype._matchUrl = function(url) {
+    return (url.search("https:\/\/github.com\/.*\/.*\/labels$") > -1 ||
+           (github_api.github_e_token != null &&
+            github_api.github_e_token.uri != null &&
+            url.search("https:\/\/" + github_api.github_e_token.uri +
+              "\/.*\/.*\/labels$") > -1));
   }
 
   /**
    * Inject color list for label creation/edit
    */
   LabelsInjector.prototype.inject = function(url) {
-    if (url.search("https:\/\/github.com\/.*\/.*\/labels") > -1 ||
-       (github_api.github_e_token != null &&
-        github_api.github_e_token.uri != null &&
-        url.search("https:\/\/" + github_api.github_e_token.uri +
-            "\/.*\/.*\/labels") > -1)) {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+
+    if (this._matchUrl(url)) {
       // clear color list
       this.colors = {};
 
       let self = this;
       var count = 0;
-      var interval = setInterval(function() {
-        if (self._tryInjectColorList() || ++count > MAX_INTERVAL_COUNT) {
-          clearInterval(interval);
+      this.timer = setInterval(function() {
+        if (self._tryInjectColorList() || ++count > MAX_INTERVAL_COUNT ||
+            !self._matchUrl(window.location.href)) {
+          clearInterval(self.timer);
+          self.timer = null;
         }
       }, INTERVAL_TIME);
+    }
   }
+
 
   /**
    * Try to inject color list
@@ -66,53 +82,58 @@ var LabelsInjector = (function() {
    * @return True if inject sucessfully
    */
   LabelsInjector.prototype._tryInjectColorList = function() {
-      // get predefined colors
-      let el_color_menu = document.querySelector(
-          "div[class='dropdown-menu dropdown-menu-se label-colors']");
-      if (!el_color_menu || el_color_menu.childElementCount < 1) {
-        console.log("Can't get predefined color list");
-        return false;
-      }
-
-      console.log("Labels injecting...");
-
-      // get all color menus
-      let el_colors = el_color_menu.getElementsByTagName("span");
-      let self = this;
-      el_colors.forEach(function(c) {
-        let color = c.getAttribute("data-hex-color");
-        if (color != null) {
-          self.colors[color] = false;
-        }
-      });
-
-      // add new colors
-      NEW_COLORS.forEach(function(c) {
-        self.colors[c] = false;
-      });
-
-      // mark the used color
-      this._markUsedColors();
-
-      // add listeners to all color menus
-      let el_lis = document.querySelectorAll("ul[class='table-list " +
-          "table-list-bordered'] li");
-      for (let i = 0; i < el_lis.length; ++i) {
-        let el_input = el_lis[i].querySelector("input[name='label[color]']");
-        let el_save = el_lis[i].querySelector("div[class='new-label-actions']" +
-            " button[type='submit']");
-        let el_delete = el_lis[i].querySelector("div[class='label-delete'] " +
-            "button[type='submit']");
-        this._addListeners(el_input, el_save, el_delete);
-      }
-
-      // install event listeners
-      this._installListenersForCreateLabel();
-      this._installLabelListObserver();
-      return true;
+    // get predefined colors
+    let el_color_menu = document.querySelector(
+        "div[class='dropdown-menu dropdown-menu-se label-colors']");
+    if (!el_color_menu || el_color_menu.childElementCount < 1) {
+      console.log("Can't get predefined color list");
+      return false;
     }
+
+    // double check the URL could be injected
+    if (!this._matchUrl(window.location.href)) {
+      return false;
+    }
+
+    // get all color menus
+    let el_colors = el_color_menu.getElementsByTagName("span");
+    let self = this;
+    el_colors.forEach(function(c) {
+      let color = c.getAttribute("data-hex-color");
+      if (color) {
+        self.colors[color] = 0;
+      }
+    });
+
+    // add new colors
+    NEW_COLORS.forEach(function(c) {
+      self.colors[c] = 0;
+    });
+
+    // mark the used color
+    this._markUsedColors();
+
+    // add listeners to all color menus
+    let el_lis = document.querySelectorAll("ul[class='table-list " +
+        "table-list-bordered'] li");
+    for (let i = 0; i < el_lis.length; ++i) {
+      let el_input = el_lis[i].querySelector("input[name='label[color]']");
+      let el_save = el_lis[i].querySelector("div[class='new-label-actions']" +
+          " button[type='submit']");
+      let el_delete = el_lis[i].querySelector("div[class='label-delete'] " +
+          "button[type='submit']");
+      this._addListeners(el_input, el_save, el_delete);
+    }
+
+    // install event listeners
+    this._installListenersForCreateLabel();
+    this._installLabelListObserver();
+    return true;
   }
 
+  /**
+   * Install listeners for creating label
+   */
   LabelsInjector.prototype._installListenersForCreateLabel = function() {
     let el_form = document.querySelector("form[id='new_label']");
     if (el_form) {
@@ -122,6 +143,20 @@ var LabelsInjector = (function() {
     }
   }
 
+  /**
+   * Install observer for label list DOM change
+   * When a new label insert label list as <li> item, the following event
+   * listeners will be add for specified HTML element
+   *
+   * 1. For color INPUT element, the 'focus' event listener will be added
+   * since the new colors should be inserted when it is first showing
+   *
+   * 2. For 'Save Changes' button, the 'click' event listener will be added
+   * because we need to update color mark when a color is used by a label
+   *
+   * 3. For 'Delete Label' button, the 'click' event listener will be added
+   * since we need to update color mark when a label is deleted
+   */
   LabelsInjector.prototype._installLabelListObserver = function() {
     let self = this;
     let MObserver = window.MutationObserver || window.WebKitMutationObserver;
@@ -131,6 +166,7 @@ var LabelsInjector = (function() {
             m.addedNodes != null &&
             m.addedNodes.length > 0) {
           m.addedNodes.forEach(function(el) {
+            // new label node in DOM, add nesccessary listeners
             if (el.tagName == "LI") {
               let el_input = el.querySelector("input[name='label[color]']");
               let el_save = el.querySelector("div[class='new-label-actions'] " +
@@ -149,6 +185,13 @@ var LabelsInjector = (function() {
     observer.observe(el_ul, { childList:true });
   }
 
+  /**
+   * Add listeneres for given elements
+   *
+   * @param el_input Label color input elment, add 'focus' listener on it
+   * @param el_save Label save/create button, add 'click' listener on it
+   * @param el_delete Label delete button, add 'click' listener on it
+   */
   LabelsInjector.prototype._addListeners = function(el_input, el_save,
     el_delete) {
     let self = this;
@@ -175,24 +218,28 @@ var LabelsInjector = (function() {
       el_save.addEventListener("click", function() {
         let old_color = (el_input.defaultValue || "").replace("#", "");
         let new_color = (el_input.value || "").replace("#", "");
-        self.colors[old_color] = false;
-        self.colors[new_color] = true;
+        self.colors[old_color]--;
+        self.colors[new_color]++;
 
-        // hide all old colors' mark
+        // hide all old colors' mark if need
+        let old_mark = self.colors[old_color] > 0 ? "white" : ("#" + old_color);
         let el_old_colors = document.querySelectorAll("i[name='" + old_color +
             "']");
         for (let i = 0; i < el_old_colors.length; ++i) {
-          if (el_old_colors[i].style) {
-            el_old_colors[i].style.color = '#' + old_color;
+          if (el_old_colors[i].style &&
+              el_old_colors[i].style.color !== old_mark) {
+            el_old_colors[i].style.color = old_mark;
           }
         }
 
-        // show all new colors' mark
+        // show all new colors' mark if need
+        let new_mark = self.colors[new_color] > 0 ? "white" : ("#" + new_color);
         let el_new_colors = document.querySelectorAll("i[name='" + new_color +
             "']");
         for (let i = 0; i < el_new_colors.length; ++i) {
-          if (el_new_colors[i].style) {
-            el_new_colors[i].style.color = "white";
+          if (el_new_colors[i].style &&
+              el_new_colors[i].style.color !== new_mark) {
+            el_new_colors[i].style.color = new_mark;
           }
         }
       }, false);
@@ -202,34 +249,22 @@ var LabelsInjector = (function() {
     if (el_delete) {
       el_delete.addEventListener("click", function() {
         let color = (el_input.defaultValue || "").replace("#", "");
+        self.colors[color]--;
+        let mark = self.colors[color] > 0 ? "white" : ("#" + color);
         let el_colors = document.querySelectorAll("i[name='" + color + "']");
         for (let i = 0; i < el_colors.length; ++i) {
-          if (el_colors[i].style) {
-            el_colors[i].style.color = '#' + color;
+          if (el_colors[i].style &&
+              el_colors[i].style.color !== mark) {
+            el_colors[i].style.color = mark;
           }
         }
       }, false);
     }
   }
 
-  /*
-  LabelsInjector.prototype._addInputFocusListener = function(el) {
-    let self = this;
-    var handler = function() {
-      let el_existed = el.parentNode.querySelector("span[data-hex-color='" +
-                        NEW_COLORS[0] + "']");
-      if (el_existed == null) {
-        let el_color_menu = el.parentNode.querySelector(
-          "div[class*='label-colors']");
-        if (el_color_menu != null) {
-          self._initColorMenuList(el_color_menu);
-          el.removeEventListener("focus", handler, false);
-        }
-      }
-    };
-    el.addEventListener("focus", handler, false);
-  }*/
-
+  /**
+   * Init color list for a label
+   */
   LabelsInjector.prototype._initColorMenuList = function(el_menu) {
     // set marked for used predefined color
     let el_spans = el_menu.getElementsByTagName("span");
@@ -240,7 +275,7 @@ var LabelsInjector = (function() {
         el_span.innerHTML = '<i class="mg-icon-check mg-color-mark" name="' +
             color + '"></i>';
         el_span.firstElementChild.style.color =
-          this.colors[color] == true ? "white" : ('#' + color);
+            this.colors[color] > 0 ? "white" : ('#' + color);
       }
     }
 
@@ -263,46 +298,12 @@ var LabelsInjector = (function() {
         '"></i></span>';
       el_ul.appendChild(el_li);
       let el_color = el_li.firstElementChild.firstElementChild;
-      el_color.style.color =
-        this.colors[color] == true ? "white" : ('#' + color);
-    }
-  }
-
-  LabelsInjector.prototype._installColorSaveListener = function() {
-    let el_divs = document.getElementsByClassName("new-label-actions");
-    if (!el_divs) {
-      return;
-    }
-
-    let self = this;
-    for (let i = 0; i < el_divs.length; ++i) {
-      let el_save = el_divs[i].querySelector("button[type='submit']");
-      if (el_save != null) {
-        el_save.addEventListener("click", function() {
-          let el_input = el_divs[i].parentNode.querySelector(
-                          "input[name='label[color]']");
-          let org_color = el_input.defaultValue;
-          if (org_color != null) {
-            org_color = org_color.replace("#", "");
-          }
-          else {
-            org_color = "";
-          }
-
-          let new_color = el_input.value;
-          if (new_color == null || new_color.length < 1) {
-            return;
-          }
-          new_color = new_color.replace("#", "");
-          self.colors[org_color] = false;
-          self.colors[new_color] = true;
-        }, false);
-      }
+      el_color.style.color = this.colors[color] > 0 ? "white" : ('#' + color);
     }
   }
 
   /**
-   * Mark labels used color with true
+   * Count colors which is used by label
    */
   LabelsInjector.prototype._markUsedColors = function() {
     let el_labels = document.querySelectorAll("a[class='label label-link']");
@@ -312,7 +313,7 @@ var LabelsInjector = (function() {
         if (l.style != null & l.style.backgroundColor != null) {
           let color = rgbToHex(l.style.backgroundColor);
           if (self.colors.hasOwnProperty(color)) {
-            self.colors[color] = true;
+            self.colors[color]++;
           }
         }
       });

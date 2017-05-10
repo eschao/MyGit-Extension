@@ -60,7 +60,7 @@ The following functions are planned to provide:
 
   * Install from Chrome/Firefox store
   
-    - For **Chrome**: &lt;TBD&gt;
+    - For **Chrome**: [Chrome Web Stroe](https://chrome.google.com/webstore/detail/mygit/oaiohmmoefnkfdbjjkjnconhnhpiigel?hl=en)
     - For **Firefox**: &lt;TBD&gt;
     
   * Install from [release](https://github.com/eschao/MyGit-Extension/releases)

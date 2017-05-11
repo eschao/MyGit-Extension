@@ -70,9 +70,7 @@ var FavoriteReposInjector = (function() {
     // check if should inject
     let origin = window.location.origin;
     let repo_name = github_api.getRepoName();
-    if (!repo_name &&
-        (!this.repos[origin] ||
-          Object.keys(this.repos[origin]).length < 1)) {
+    if (!repo_name && Object.keys(this.repos).length < 1) {
       return;
     }
 
@@ -125,14 +123,31 @@ var FavoriteReposInjector = (function() {
       for (let i = 0; i < self.repos[origin].length; ++i) {
         let it = self.repos[origin][i];
         if (it.name == item.name) {
+          let el_pre = el_item.previousElementSibling;
+          let el_next = el_item.nextElementSibling;
+          let el_parent = el_item.parentNode;
+
+          // remove from dropdown DOM
+          el_parent.removeChild(el_item);
+
           // remove from memory data
           self.repos[origin].splice(i, 1);
           if (self.repos[origin].length < 1) {
             delete self.repos[origin];
-          }
 
-          // remove from dropdown DOM
-          el_item.parentNode.removeChild(el_item);
+            // if its pre sibling is divider, remove it
+            if (el_pre && el_pre.className &&
+                el_pre.className == "dropdown-divider") {
+              el_parent.removeChild(el_pre);
+            }
+            // if its next sibling is divider and is the first element in
+            // parent node, remove it
+            else if (el_next && el_next.className &&
+                el_next.className == "dropdown-divider" &&
+                !el_next.previousElementSibling) {
+              el_parent.removeChild(el_next);
+            }
+          }
 
           // save to storage
           self.storeFavoriteRepos();
@@ -182,17 +197,25 @@ var FavoriteReposInjector = (function() {
 
         // insert a repo item into dropdown menu DOM
         let el_item = self._createItem(item);
-        let el_items = el_ul.querySelectorAll("mg-dropdown-item-text");
+        let el_items = el_ul.querySelectorAll(
+            "a[class='mg-dropdown-item-text']");
         if (el_items.length < 1) {
           el_ul.insertBefore(el_item, el_divider);
         }
         else {
-          for (let i = 0; i < el_items.length; ++i) {
+          let i = 0;
+          let len = el_items.length;
+          for (; i < len; ++i) {
             let el = el_items[i];
             if (el.href.startsWith(origin)) {
               el_ul.insertBefore(el_item, el.parentNode);
               break;
             }
+          }
+
+          if (i >= len) {
+            el_ul.insertBefore(el_item, el_divider);
+            el_ul.insertBefore(self._createDivider(), el_item);
           }
         }
 
@@ -223,20 +246,42 @@ var FavoriteReposInjector = (function() {
         el_add.style.display = "none";
       }
       else {
-        el_divider.style = null;
+        if (Object.keys(self.repos).length > 0) {
+          el_divider.style = null;
+        }
+        else {
+          el_divider.style.display = "none"
+        }
         el_add.style = null;
       }
     }
 
     // create elements for all favorite repos and add it into DOM
-    Object.keys(this.repos).forEach(function(key) {
-      if (self.repos[key]) {
-        self.repos[key].forEach(function(repo) {
-          let el_item = self._createItem(repo);
+    let uri_keys = Object.keys(this.repos);
+    let len = uri_keys.length;
+    for (let i = 0; i < len; ++i) {
+      let uri = uri_keys[i];
+      if (this.repos[uri]) {
+        this.repos[uri].forEach(function(item) {
+          let el_item = self._createItem(item);
           el_ul.insertBefore(el_item, el_divider);
         });
+
+        // add divider between different github
+        if (i < len - 1) {
+          el_ul.insertBefore(this._createDivider(), el_divider);
+        }
       }
-    });
+    }
+  }
+
+  /**
+   * Create a divider element between repsotories from different github uri
+   */
+  FavoriteReposInjector.prototype._createDivider = function() {
+    let el_divider = document.createElement("div");
+    el_divider.className = "dropdown-divider";
+    return el_divider;
   }
 
   return FavoriteReposInjector;

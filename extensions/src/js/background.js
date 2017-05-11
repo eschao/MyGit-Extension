@@ -26,14 +26,14 @@ var g_oauth_tab = null;
  * user account
  */
 browser_api.tabs.onUpdated.addListener(function(id, changeInfo, tab) {
-  if (g_oauth_tab != null && g_oauth_tab.id == id && tab.url != null) {
+  if (g_oauth_tab && g_oauth_tab.id == id && tab.url) {
     // search the authorized token
     index = tab.url.search(GITHUB_TOKEN_Q);
     if (index > -1) {
         token = tab.url.substr(index + GITHUB_TOKEN_Q.length);
 
         // save token in browser storage
-        if (token != undefined && token != null) {
+        if (token) {
           g_oauth_tab = null;
           let data = {};
           data[MYGIT_GITHUB_KEY] =  {"token" : token};

@@ -26,12 +26,12 @@ var GitHubApi = (function() {
     // read configurations from browser storage
     let self = this;
     browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
-      if (item != null) {
+      if (item) {
         self.github_token = item[MYGIT_GITHUB_KEY];
       }
     });
     browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
-      if (item != null) {
+      if (item) {
         self.github_e_token = item[MYGIT_GITHUB_E_KEY];
       }
     });
@@ -53,8 +53,7 @@ var GitHubApi = (function() {
     let name = this.getRepoName();
 
     // is github enterprise?
-    if (this.github_e_token != null &&
-        this.github_e_token.uri != null &&
+    if (this.github_e_token && this.github_e_token.uri &&
         url.search("https:\/\/" + this.github_e_token.uri + "\/.*") > -1) {
       return {
         token: this.github_e_token.token,
@@ -83,7 +82,7 @@ var GitHubApi = (function() {
   GitHubApi.prototype.getRepoName = function() {
     let el_a = document.querySelector(
       "div[class*='repohead-details-container'] strong[itemprop='name'] a");
-    if (el_a != null && el_a.pathname != null && el_a.pathname.length > 0) {
+    if (el_a && el_a.pathname) {
       let name = el_a.pathname;
       if (name[0] == "/") {
         name = name.slice(1);

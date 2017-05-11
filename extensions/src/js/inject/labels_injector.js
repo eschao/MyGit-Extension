@@ -44,8 +44,8 @@ var LabelsInjector = (function() {
    */
   LabelsInjector.prototype._matchUrl = function(url) {
     return (url.search("https:\/\/github.com\/.*\/.*\/labels$") > -1 ||
-           (github_api.github_e_token != null &&
-            github_api.github_e_token.uri != null &&
+           (github_api.github_e_token &&
+            github_api.github_e_token.uri &&
             url.search("https:\/\/" + github_api.github_e_token.uri +
               "\/.*\/.*\/labels$") > -1));
   }
@@ -162,9 +162,7 @@ var LabelsInjector = (function() {
     let MObserver = window.MutationObserver || window.WebKitMutationObserver;
     let observer = new MObserver(function(mutations, observer) {
       mutations.forEach(function(m, i) {
-        if (m.type == "childList" &&
-            m.addedNodes != null &&
-            m.addedNodes.length > 0) {
+        if (m.type == "childList" && m.addedNodes && m.addedNodes.length > 0) {
           m.addedNodes.forEach(function(el) {
             // new label node in DOM, add nesccessary listeners
             if (el.tagName == "LI") {
@@ -201,7 +199,7 @@ var LabelsInjector = (function() {
       var handler = function() {
         let el_existed = el_input.parentNode.querySelector(
             "i[name='" + NEW_COLORS[0] + "']");
-        if (el_existed == null) {
+        if (!el_existed) {
           let el_color_menu = el_input.parentNode.querySelector(
                               "div[class*='label-colors']");
           if (el_color_menu) {
@@ -307,10 +305,10 @@ var LabelsInjector = (function() {
    */
   LabelsInjector.prototype._markUsedColors = function() {
     let el_labels = document.querySelectorAll("a[class='label label-link']");
-    if (el_labels != null) {
+    if (el_labels) {
       let self = this;
       el_labels.forEach(function(l) {
-        if (l.style != null & l.style.backgroundColor != null) {
+        if (l.style && l.style.backgroundColor) {
           let color = rgbToHex(l.style.backgroundColor);
           if (self.colors.hasOwnProperty(color)) {
             self.colors[color]++;

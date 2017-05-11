@@ -21,26 +21,25 @@
  */
 var BrowserApi = (function() {
 
+  let UNKNOWN = -1;
+  let CHROME = 0;
+  let FIREFOX = 1;
+
   /**
    * Constructor
    */
   function BrowserApi() {
-    // constants definition
-    this.UNKNOWN = -1;
-    this.CHROME = 0;
-    this.FIREFOX = 1;
-
     // browser type
-    this.type = this.UNKNOWN;
+    this.type = UNKNOWN;
 
     // firefox browser
     if (typeof browser !== "undefined" && browser != null) {
-      this.type = this.FIREFOX;
+      this.type = FIREFOX;
       this._initFirefox();
     }
     // chrome browser
     else if (typeof chrome !== "undefined" && chrome != null) {
-      this.type = this.CHROME;
+      this.type = CHROME;
       this._initChrome();
     }
     // unsuportted browser
@@ -128,14 +127,14 @@ var BrowserApi = (function() {
    * Is Chrome browser?
    */
   BrowserApi.prototype.isChrome = function() {
-    return this.type == this.CHROME;
+    return this.type == CHROME;
   }
 
   /**
    * Is Firefox browser?
    */
   BrowserApi.prototype.isFirefox = function() {
-    return this.type == this.FIREFOX;
+    return this.type == FIREFOX;
   }
 
   return BrowserApi;

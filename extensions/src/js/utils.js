@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-//(function() {
-"use strict";
+/**
+ * Convert RGB attribute value of HTML element to HEX
+ *
+ * @return HEX format value
+ */
 function rgbToHex(rgb) {
   if (/^#[0-9A-F]{6}$/i.test(rgb)) {
     return rgb;
@@ -28,5 +31,3 @@ function rgbToHex(rgb) {
 
   return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 }
-
-//}());

@@ -40,11 +40,9 @@ var IssueInjector = (function() {
    * Match if the url is issue URL and can be injected
    */
   IssueInjector.prototype._matchUrl = function(url) {
-    console.log("------ Matching URL: " + url);
-    if (url != null) {
+    if (url) {
       // is public github url?
-      if (github_api.github_token != null &&
-          github_api.github_token.token != null) {
+      if (github_api.github_token && github_api.github_token.token) {
         let uri = "https:\/\/github.com\/.*\/.*\/";
         if (url.search(uri + "issues(?!\/\\d+).*") > -1 ||
             url.search(uri + "labels\/.+") > -1) {
@@ -53,8 +51,7 @@ var IssueInjector = (function() {
       }
 
       // is github enterprise url?
-      if (github_api.github_e_token != null &&
-          github_api.github_e_token.token != null) {
+      if (github_api.github_e_token && github_api.github_e_token.token) {
         let uri = "https:\/\/" + github_api.github_e_token.uri + "\/.*\/.*\/";
         if (url.search(uri + "issues(?!\/\\d+).*") > -1 ||
             url.search(uri + "labels\/.+") > -1) {
@@ -72,11 +69,11 @@ var IssueInjector = (function() {
    * @return True if injection is successful
    */
   IssueInjector.prototype._tryInjectExport = function() {
-    console.log("------ Try inject EXPORT :" + window.location.href);
     let el_menu_div = document.querySelector(
         "div[class^='subnav-links'][role='navigation']");
     let el_export_btn = document.getElementById("mg-issue-export-btn");
-    if (el_menu_div != null && el_export_btn == null &&
+
+    if (el_menu_div && !el_export_btn &&
         this._matchUrl(window.location.href) != URL_UNKNOWN) {
       let el_export_btn = document.createElement('a');
       el_export_btn.title = "Export";
@@ -89,7 +86,6 @@ var IssueInjector = (function() {
         self.export_dialog.show();
       };
       el_menu_div.appendChild(el_export_btn);
-      console.log("****** Inject EXPORT end ...");
       return true;
     }
 
@@ -102,7 +98,8 @@ var IssueInjector = (function() {
   IssueInjector.prototype._tryInjectFilter = function() {
     let el_filter_input = document.getElementById("js-issues-search");
     let el_save_filter = document.getElementById("mg-save-issue-filter");
-    if (el_filter_input != null && el_save_filter == null &&
+
+    if (el_filter_input && !el_save_filter &&
         this._matchUrl(window.location.href) != URL_UNKNOWN) {
       el_filter_input.style.paddingRight = "30px";
 
@@ -138,7 +135,6 @@ var IssueInjector = (function() {
       let self = this;
       let is_injected = { issue_export: false, issue_filter: false };
 
-      console.log(">>>> Start issue injector...");
       // periodically try to inject until success or over number of attempts
       var count = 0;
       this.timer = setInterval(function() {

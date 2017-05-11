@@ -20,20 +20,19 @@
 var IssueExportDialog = (function() {
   "use strict";
 
+  let DIALOG_ROOT_ID = "mg-export-dialog";
+  let DELIMITER = ",";
+  let TBL_HEADERS_DIV_ID = "mg-table-headers";
+  let GEN_TBL_HEADER_ID = "mg-gen-headers";
+  let CSV_DELIMITER_ID = "mg-csv-delimiter";
+  let EXPAND_LABELS_ID = "mg-expand-labels";
+  let LABEL_DELIMITER_ID = "mg-label-delimiter";
+  let MESSAGE_ID = "mg-message";
+
   /**
    * Constructor
    */
   function IssueExportDialog() {
-    // constants definition
-    this.DIALOG_ROOT_ID = "mg-export-dialog";
-    this.DELIMITER = ",";
-    this.TBL_HEADERS_DIV_ID = "mg-table-headers";
-    this.GEN_TBL_HEADER_ID = "mg-gen-headers";
-    this.CSV_DELIMITER_ID = "mg-csv-delimiter";
-    this.EXPAND_LABELS_ID = "mg-expand-labels";
-    this.LABEL_DELIMITER_ID = "mg-label-delimiter";
-    this.MESSAGE_ID = "mg-message";
-
     // use drag & drop to adjust issue headers
     //this.drag_drop = new DragDrop();
     this._initConfig();
@@ -45,13 +44,13 @@ var IssueExportDialog = (function() {
   IssueExportDialog.prototype._initConfig = function() {
     let self = this;
     browser_api.storage.get(MYGIT_GITHUB_ISSUE_EXPORT_KEY, function(item) {
-      let config = (item != null) ? item[MYGIT_GITHUB_ISSUE_EXPORT_KEY] : null;
-      if (config != null && config.headers != null) {
+      let config = item ? item[MYGIT_GITHUB_ISSUE_EXPORT_KEY] : null;
+      if (config && config.headers) {
         self.config = config;
       }
       else {
         self.config = {
-          "delimiter": self.DELIMITER,
+          "delimiter": DELIMITER,
           "gen_headers": true,
           "label": { "expand": true, "delimiter": "|" },
           "headers": [
@@ -83,7 +82,7 @@ var IssueExportDialog = (function() {
       // issue assignee parser
       "assignee": function(item) {
         let s = "";
-        if (item.assignees != null) {
+        if (item.assignee) {
           item.assignees.forEach(function(a) {
             s += a.login + ' ';
           });
@@ -98,7 +97,7 @@ var IssueExportDialog = (function() {
       },
       // issue milestone parser
       "milestone": function(item) {
-        return item.milestone != null ? item.milestone.title : "";
+        return item.milestone ? item.milestone.title : "";
       },
       // issue labels parser
       "labels": function(item, delimiter, expand, exports) {
@@ -108,7 +107,7 @@ var IssueExportDialog = (function() {
             exports.labels[l] = "";
           });
 
-          if (item.labels != null) {
+          if (item.labels) {
             item.labels.forEach(function(l) {
               exports.labels[l.name] = l.name;
             });
@@ -144,18 +143,9 @@ var IssueExportDialog = (function() {
    * @param is_error True if message is error and will be showed with red color
    */
   IssueExportDialog.prototype.showMessage = function(msg, is_error) {
-    let el_msg = document.getElementById(this.MESSAGE_ID);
-    if (is_error != null && is_error) {
-      el_msg.style.color = "red";
-    }
-    else {
-      el_msg.style.color = "blue";
-    }
-
-    if (msg == null) {
-      msg = "";
-    }
-    el_msg.innerText = msg;
+    let el_msg = document.getElementById(MESSAGE_ID);
+    el_msg.style.color = is_error ? "red" : "blue";
+    el_msg.innerText = msg || "";
   }
 
   /**
@@ -189,19 +179,19 @@ var IssueExportDialog = (function() {
    */
   IssueExportDialog.prototype.initDialog = function(root) {
     // init generate headers
-    let el_gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
+    let el_gen_headers = document.getElementById(GEN_TBL_HEADER_ID);
     el_gen_headers.checked = this.config.gen_headers;
 
     // init csv delimiter
-    let el_delimiter = document.getElementById(this.CSV_DELIMITER_ID);
+    let el_delimiter = document.getElementById(CSV_DELIMITER_ID);
     el_delimiter.value = this.config.delimiter;
 
     // init expand labels
-    let el_expand_labels = document.getElementById(this.EXPAND_LABELS_ID);
+    let el_expand_labels = document.getElementById(EXPAND_LABELS_ID);
     el_expand_labels.checked = this.config.label.expand;
 
     // init label delimiter
-    let el_label_delimiter = document.getElementById(this.LABEL_DELIMITER_ID);
+    let el_label_delimiter = document.getElementById(LABEL_DELIMITER_ID);
     el_label_delimiter.value = this.config.label.delimiter;
 
     // close export dialog
@@ -231,7 +221,7 @@ var IssueExportDialog = (function() {
       }
     }
 
-    let headers = document.getElementById(this.TBL_HEADERS_DIV_ID)
+    let headers = document.getElementById(TBL_HEADERS_DIV_ID)
                           .getElementsByTagName("div");
     for (let i = 0; i < headers.length; ++i) {
       headers[i].onclick = onToggleHeader;
@@ -273,16 +263,16 @@ var IssueExportDialog = (function() {
    * Save configurations to browser storage
    */
   IssueExportDialog.prototype.storeConfig = function() {
-    let gen_headers = document.getElementById(this.GEN_TBL_HEADER_ID);
-    let delimiter = document.getElementById(this.CSV_DELIMITER_ID);
-    let expand_labels = document.getElementById(this.EXPAND_LABELS_ID);
-    let label_delimiter = document.getElementById(this.LABEL_DELIMITER_ID);
+    let gen_headers = document.getElementById(GEN_TBL_HEADER_ID);
+    let delimiter = document.getElementById(CSV_DELIMITER_ID);
+    let expand_labels = document.getElementById(EXPAND_LABELS_ID);
+    let label_delimiter = document.getElementById(LABEL_DELIMITER_ID);
     let is_others_changed = (delimiter.value != this.config.delimiter ||
                            gen_headers.checked != this.config.gen_headers ||
                            expand_labels.checked != this.config.label.expand ||
                            label_delimiter.value != this.config.label.delimiter);
 
-    let headers = document.getElementById(this.TBL_HEADERS_DIV_ID)
+    let headers = document.getElementById(TBL_HEADERS_DIV_ID)
                           .getElementsByTagName("div");
     let is_headers_changed = false;
     for (let i = 0; i < headers.length; ++i) {
@@ -323,7 +313,7 @@ var IssueExportDialog = (function() {
       this.config = config;
       let data = {};
       data[MYGIT_GITHUB_ISSUE_EXPORT_KEY] = this.config;
-      browser_api.storage.set(data, function() {});
+      browser_api.storage.set(data);
     }
   }
 
@@ -342,7 +332,7 @@ var IssueExportDialog = (function() {
       if (xhr.readyState == 4) {
         if (xhr.status == 200) {
           let json = JSON.parse(xhr.responseText);
-          if (json != null) {
+          if (json) {
             if (exports.total_count < 1) {
               exports.total_count = json.total_count;
             }
@@ -350,28 +340,28 @@ var IssueExportDialog = (function() {
           }
 
           let link = xhr.getResponseHeader("Link");
-          if (link == null) {
-            self._saveIssues(exports);
-          }
-          else {
+          if (link) {
             let items = link.split(',');
             let next_url = null;
             for (let i = 0; i < items.length; ++i) {
               if (items[i].includes('rel="next"')) {
                 let hrefs = items[i].split(';');
-                if (hrefs[0] != null) {
+                if (hrefs[0]) {
                   next_url = hrefs[0].trim().slice(1, -1);
                 }
               }
             }
 
-            if (next_url != null) {
+            if (next_url) {
               exports.url = next_url;
               self._exportIssues(exports);
             }
             else {
               self._saveIssues(exports);
             }
+          }
+          else {
+            self._saveIssues(exports);
           }
         }
         else {
@@ -387,17 +377,17 @@ var IssueExportDialog = (function() {
    */
   IssueExportDialog.prototype._buildSearchUrlByFilters = function(base_uri, repo) {
     let el_filter = document.querySelector("input[id='js-issues-search']");
-    if (el_filter == null) {
+    if (!el_filter) {
       console.log("Can't find issue filter input element");
       return null;
     }
 
     let filters = el_filter.getAttribute("value");
-    if (filters == null || filters.trim().length < 1) {
+    if (!filters) {
       return base_uri + "?q=" + encodeURI("repo:" + repo + " state:open is:issue");
     }
 
-    if (repo != null) {
+    if (repo) {
       if (filters[filters.length-1] != ' ') {
         filters += " repo:" + repo;
       }
@@ -419,7 +409,7 @@ var IssueExportDialog = (function() {
 
     for (let i = 0; i < json.items.length; ++i) {
       let item = json.items[i];
-      if (item == null) {
+      if (!item) {
         return;
       }
 
@@ -435,7 +425,7 @@ var IssueExportDialog = (function() {
 
       exports.issues.push(issue);
       self.showMessage("Exporting issues " + exports.issues.length + " of " +
-        exports.total_count + " ...");
+          exports.total_count + " ...");
     }
   };
 
@@ -448,7 +438,7 @@ var IssueExportDialog = (function() {
     let headers = [];
 
     this.config.headers.forEach(function(e) {
-      if (exports.parser[e.name] != null) {
+      if (exports.parser[e.name]) {
         headers.push(e.title);
         if (e.name == "labels") {
          label_index = headers.length - 1;
@@ -492,7 +482,7 @@ var IssueExportDialog = (function() {
   IssueExportDialog.prototype.export = function() {
     this.storeConfig();
     let hub = github_api.getCurrentHub();
-    if (hub.token == null) {
+    if (!hub.token) {
       this.showMessage("Please sign in GitHub!", true);
       return;
     }
@@ -516,11 +506,14 @@ var IssueExportDialog = (function() {
 
     let base_uri = "https://" + hub.api_uri + "/search/issues";
     let url = this._buildSearchUrlByFilters(base_uri, hub.repo);
-    if (url != null) {
+    if (url) {
       exports.url = url;
       exports.token = hub.token;
       this.showMessage("Exporting issues ...");
       this._exportIssues(exports);
+    }
+    else {
+      this.showMessage("Can't export issues, Please check issue filter!", true);
     }
   };
 

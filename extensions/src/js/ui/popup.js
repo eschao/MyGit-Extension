@@ -78,9 +78,7 @@ var GitHubComp = (function() {
     // read configurations from chome storage and render UI according to
     // configurations
     browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
-      if (item != null &&
-          item[MYGIT_GITHUB_KEY] != null &&
-          item[MYGIT_GITHUB_KEY].token != null) {
+      if (item && item[MYGIT_GITHUB_KEY] && item[MYGIT_GITHUB_KEY].token) {
         signout_div.style.display = "block";
         signin_div.style.display = "none";
       }
@@ -135,13 +133,13 @@ var GitHubEnterpriseComp = (function() {
     // sign in click event handler
     signin_btn.onclick = function() {
       let uri = document.getElementById("mg-github-e-uri").innerText;
-      if (uri == null || uri.trim().length < 1) {
+      if (!uri) {
         message_span.textContent = "Please choose a GitHub Enterprise!";
         return;
       }
 
       let token = token_input.value;
-      if (token == null || token.trim().length < 1) {
+      if (!token) {
         message_span.textContent = "Please input oauthroized token!";
         return;
       }
@@ -222,7 +220,7 @@ var GitHubEnterpriseComp = (function() {
     // show menu modal
     select_btn.onclick = function(event) {
       let show_menu_btn = document.querySelector("i[class^='mg-icon-caret-down']");
-      if (show_menu_btn.style != null &&
+      if (show_menu_btn.style &&
           show_menu_btn.style.display != "none") {
         menu_modal.style.display = "block";
         let name = select_btn.getAttribute("ghe");
@@ -247,7 +245,7 @@ var GitHubEnterpriseComp = (function() {
     // global click event handler
     document.onclick = function(event) {
       // close menu modal if it is showed
-      if (menu_modal.style != null && menu_modal.style.display == "block" &&
+      if (menu_modal.style && menu_modal.style.display == "block" &&
           !menu_modal.contains(event.target)) {
         menu_modal.style.display = "none";
         return;
@@ -267,10 +265,9 @@ var GitHubEnterpriseComp = (function() {
 
     browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
       let ghe = self.all_github_e[0];
-      if (item != null &&
-          item[MYGIT_GITHUB_E_KEY] != null &&
-          item[MYGIT_GITHUB_E_KEY].token != null &&
-          item[MYGIT_GITHUB_E_KEY].uri != null) {
+      if (item && item[MYGIT_GITHUB_E_KEY] &&
+          item[MYGIT_GITHUB_E_KEY].token &&
+          item[MYGIT_GITHUB_E_KEY].uri) {
         signout_div.style.display = "block";
         signin_div.style.display = "none";
         select_btn.style.cursor = "default";
@@ -290,20 +287,12 @@ var GitHubEnterpriseComp = (function() {
         signout_div.style.display = "none";
         signin_div.style.display = "block";
         select_btn.style.cursor = "pointer";
-        if (ghe.token != null) {
-          token_input.value = ghe.token;
-        }
-        else {
-          token_input.value = "";
-        }
+        token_input.value = ghe.token || "";
         token_input.disabled = false;
         ghe.token = null;
       }
 
-      let style = "";
-      if (ghe.token != null) {
-        style = ' style="display:none"';
-      }
+      let style = ghe.token ? ' style="display:none"' : "";
       select_btn.setAttribute("ghe", ghe.name);
       select_btn.innerHTML =
           '<i class="' + ghe.icon + ' mg-menu-logo"/></i>\n' +

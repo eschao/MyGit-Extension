@@ -18,7 +18,60 @@
  * GitHub Api class
  */
 var GitHubApi = (function() {
+
   function GitHubApi() {
+    this.github_token = null;
+    this.github_e_token = null;
+
+    // read configurations from browser storage
+    let self = this;
+    browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
+      if (item) {
+        self.github_token = item[MYGIT_GITHUB_KEY];
+      }
+    });
+    browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
+      if (item) {
+        self.github_e_token = item[MYGIT_GITHUB_E_KEY];
+      }
+    });
+  }
+
+  /**
+   * Get current GitHub information
+   *
+   * @return GitHub information object which includes:
+   *          {
+   *            token: github_token,
+   *            api_uri: github api uri,
+   *            repo: current repository name
+   *          }
+   *         Some property is null if it is not avialable
+   */
+  GitHubApi.prototype.getCurrentHub = function() {
+    let url = window.location.href;
+    let name = this.getRepoName();
+
+    // is github enterprise?
+    if (this.github_e_token && this.github_e_token.uri &&
+        url.search("https:\/\/" + this.github_e_token.uri + "\/.*") > -1) {
+      return {
+        token: this.github_e_token.token,
+        api_uri: this.github_e_token.uri + "/api/v3",
+        repo: name
+      };
+    }
+
+    // is public github?
+    if (url.search("https:\/\/github.com\/.*") > -1) {
+      return {
+        token: this.github_token.token,
+        api_uri: "api.github.com",
+        repo: name
+      };
+    }
+
+    return { token: null, api_uri: null, repo: name};
   }
 
   /**
@@ -29,7 +82,7 @@ var GitHubApi = (function() {
   GitHubApi.prototype.getRepoName = function() {
     let el_a = document.querySelector(
       "div[class*='repohead-details-container'] strong[itemprop='name'] a");
-    if (el_a != null && el_a.pathname != null && el_a.pathname.length > 0) {
+    if (el_a && el_a.pathname) {
       let name = el_a.pathname;
       if (name[0] == "/") {
         name = name.slice(1);

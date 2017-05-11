@@ -211,6 +211,10 @@ a.mg-disabled {
   background-color: #656d78;
 }
 
+.mg-color-mark {
+  color: white;
+}
+
 .mg-left-20m {
   margin-left: 20px;
 }

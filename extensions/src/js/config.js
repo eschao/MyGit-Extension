@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
 
 const CLIENT_ID               = "cf0ec09e8a65db31a4d7";

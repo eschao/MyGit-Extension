@@ -38,18 +38,18 @@ var IssueFilter = (function() {
     // read configs from storage
     let self = this;
     browser_api.storage.get(MYGIT_GITHUB_ISSUE_FILTER_KEY, function(item) {
-      if (item != null) {
+      if (item) {
         let data = item[MYGIT_GITHUB_ISSUE_FILTER_KEY];
-        if (data != null) {
+        if (data) {
             self.filters = data;
         }
       }
     });
     browser_api.storage.get(MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY,
       function(item) {
-      if (item != null) {
+      if (item) {
         let data = item[MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY];
-        if (data != null) {
+        if (data) {
           self.settings = data;
         }
       }
@@ -118,26 +118,24 @@ var IssueFilter = (function() {
    */
   IssueFilter.prototype.show = function() {
     let el_filter = document.querySelector("input[id='js-issues-search']");
-    if (el_filter == null) {
+    if (!el_filter) {
       console.log("Can't find issue filter input element!");
       return;
     }
 
     // filter value
-    let value = el_filter.getAttribute("value");
-    if (value == null) {
-      return;
-    }
-    value = value .trim();
-    if (value.length < 1) {
+    let value = el_filter.value || "";
+    value = value.trim();
+    if (!value) {
+      console.log("The issue filter is empty!");
       return;
     }
 
     // repo name
     let repo_name = github_api.getRepoName();
-    if (repo_name == null) {
+    if (!repo_name) {
       console.log("Can't get repository name!");
-      return null;
+      return;
     }
 
     // show filter save dialog
@@ -212,8 +210,10 @@ var IssueFilter = (function() {
     if (this.filters.hasOwnProperty(repo)) {
       let keys = Object.keys(this.filters[repo]);
       for (let i = 0; i < keys.length; ++i) {
-        if (keys[i] == filter.name) {
-          el_name.value = keys[i];
+        let name = keys[i];
+        if (this.filters[repo][name] == filter.value) {
+          el_name.value = name;
+          filter.name = name;
           break;
         }
       }
@@ -223,11 +223,11 @@ var IssueFilter = (function() {
     let self = this;
     let state_change_func = function() {
       let name = el_name.value;
-      if (name != null) {
+      if (name) {
         name = name.trim();
       }
 
-      if (name == null || name.length < 1 ||
+      if (!name ||
          (self._isFilterExists(filter.repo, name) && !el_overwrite.checked)) {
         if (!el_save.className.includes("mg-disabled")) {
           el_save.className += " mg-disabled";
@@ -254,17 +254,17 @@ var IssueFilter = (function() {
     // click event for Save
     el_save.onclick = function() {
       let name = el_name.value;
-      if (name != null) {
+      if (name) {
         name = name.trim();
       }
 
-      if (name != null && name.length > 0) {
+      if (name) {
         // close save dialog
         close_dialog();
 
         // save to memory
         filter.name = name;
-        if (self.filters[repo] == null) {
+        if (!self.filters[repo]) {
           self.filters[repo] = {};
         }
         self.filters[repo][name] = filter.value;
@@ -288,8 +288,7 @@ var IssueFilter = (function() {
    * @return True if it exists in storage
    */
   IssueFilter.prototype._isFilterExists = function(repo, name) {
-    return (this.filters[repo] != null &&
-            this.filters[repo][name] != null);
+    return (this.filters[repo] && this.filters[repo][name]);
   }
 
   /**
@@ -334,7 +333,7 @@ var IssueFilter = (function() {
    * @param filter Issue filter
    */
   IssueFilter.prototype._addFilterItem = function(filter) {
-    if (this.el_filter_mlist == null) {
+    if (!this.el_filter_mlist) {
       return;
     }
 
@@ -343,14 +342,14 @@ var IssueFilter = (function() {
     let el_nodes = this.el_filter_mlist.children;
     for (let i = 0; i < el_nodes.length; ++i) {
       let name = el_nodes[i].getAttribute("mg-filter-name");
-      if (name != null && name == filter.name) {
+      if (name && name == filter.name) {
         el_node = el_nodes[i];
         break;
       }
     }
 
     // update existing node
-    if (el_node != null) {
+    if (el_node) {
       el_node.href = filter.buildUrl();
     }
     // insert a new node

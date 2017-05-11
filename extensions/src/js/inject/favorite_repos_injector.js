@@ -45,9 +45,9 @@ var FavoriteReposInjector = (function() {
     // read favorite repositories from chrom storage
     let self = this;
     browser_api.storage.get(MYGIT_GITHUB_FAVORITE_REPOS_KEY, function(item) {
-      if (item != null) {
+      if (item) {
         let data = item[MYGIT_GITHUB_FAVORITE_REPOS_KEY];
-        if (data != null) {
+        if (data) {
           self.repos = data;
         }
       }
@@ -68,14 +68,17 @@ var FavoriteReposInjector = (function() {
    */
   FavoriteReposInjector.prototype.inject = function(url) {
     // check if should inject
-    let repo_name = this._getRepoName();
-    if (repo_name == null && Object.keys(this.repos).length < 1) {
+    let origin = window.location.origin;
+    let repo_name = github_api.getRepoName();
+    if (!repo_name &&
+        (!this.repos[origin] ||
+          Object.keys(this.repos[origin]).length < 1)) {
       return;
     }
 
     // inject favorite repos menu
     let el_favorite_nav = document.getElementById("mg-favorite-repos-nav-item");
-    if (el_favorite_nav == null) {
+    if (!el_favorite_nav) {
       let el_nav_item = document.querySelector(
         "li[class^='header-nav-item dropdown js-menu-container']");
       el_favorite_nav = document.createElement("li");
@@ -135,12 +138,10 @@ var FavoriteReposInjector = (function() {
           self.storeFavoriteRepos();
 
           // remove favorite repos menu from top banner if need
-          if (Object.keys(self.repos).length < 1) {
-            let repo_name = self._getRepoName();
-            if (repo_name == null) {
-              let el_li = document.getElementById("mg-favorite-repos-nav-item");
-              el_li.parentNode.removeChild(el_li);
-            }
+          if (Object.keys(self.repos).length < 1 &&
+              !github_api.getRepoName()) {
+            let el_li = document.getElementById("mg-favorite-repos-nav-item");
+            el_li.parentNode.removeChild(el_li);
           }
           break;
         }
@@ -164,8 +165,8 @@ var FavoriteReposInjector = (function() {
 
     // add repository event handler
     el_add.onclick = function() {
-      let repo_name = self._getRepoName();
-      if (repo_name != null) {
+      let repo_name = github_api.getRepoName();
+      if (repo_name) {
         // new repo item
         let item = {
           name: repo_name,
@@ -206,8 +207,8 @@ var FavoriteReposInjector = (function() {
     let old_click_handler = el_fr.onclick;
     el_fr.onclick = function(e) {
       let is_added = false;
-      let repo_name = self._getRepoName();
-      if (self.repos[origin] != null) {
+      let repo_name = github_api.getRepoName();
+      if (self.repos[origin]) {
         for (let i = 0; i < self.repos[origin].length; ++i) {
           let repo = self.repos[origin][i];
           if (repo.name == repo_name) {
@@ -217,7 +218,7 @@ var FavoriteReposInjector = (function() {
         }
       }
 
-      if (is_added || repo_name == null) {
+      if (is_added || !repo_name) {
         el_divider.style.display = "none"
         el_add.style.display = "none";
       }
@@ -229,7 +230,7 @@ var FavoriteReposInjector = (function() {
 
     // create elements for all favorite repos and add it into DOM
     Object.keys(this.repos).forEach(function(key) {
-      if (self.repos[key] != null) {
+      if (self.repos[key]) {
         self.repos[key].forEach(function(repo) {
           let el_item = self._createItem(repo);
           el_ul.insertBefore(el_item, el_divider);
@@ -237,28 +238,6 @@ var FavoriteReposInjector = (function() {
       }
     });
   }
-
-  /**
-   * Get repository name
-   */
-  FavoriteReposInjector.prototype._getRepoName = function() {
-    let el_a = document.querySelector(
-      "div[class*='repohead-details-container'] strong[itemprop='name'] a");
-    if (el_a != null && el_a.pathname != null && el_a.pathname.length > 0) {
-      let name = el_a.pathname;
-      if (name[0] == "/") {
-        name = name.slice(1);
-      }
-
-      if (name.slice(0, -1) == "/") {
-        name = name.slice(0, -1);
-      }
-
-      return name;
-    }
-
-    return null;
-  };
 
   return FavoriteReposInjector;
 }());

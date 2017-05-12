@@ -269,7 +269,7 @@ var LabelsInjector = (function() {
     for (let j = 0; j < el_spans.length; ++j) {
       let el_span = el_spans[j];
       if (el_span.style && el_span.style.backgroundColor) {
-        let color = rgbToHex(el_span.style.backgroundColor);
+        let color = ColorUtils.rgb2hex(el_span.style.backgroundColor);
         el_span.innerHTML = '<i class="mg-icon-check mg-color-mark" name="' +
             color + '"></i>';
         el_span.firstElementChild.style.color =
@@ -309,7 +309,7 @@ var LabelsInjector = (function() {
       let self = this;
       el_labels.forEach(function(l) {
         if (l.style && l.style.backgroundColor) {
-          let color = rgbToHex(l.style.backgroundColor);
+          let color = ColorUtils.rgb2hex(l.style.backgroundColor);
           if (self.colors.hasOwnProperty(color)) {
             self.colors[color]++;
           }

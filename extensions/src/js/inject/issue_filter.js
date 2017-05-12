@@ -81,7 +81,9 @@ var IssueFilter = (function() {
         let self = this;
         let el_last = this.el_filter_mlist.lastElementChild;
 
-        Object.keys(this.filters[repo_name]).forEach(function(n) {
+        Object.keys(this.filters[repo_name])
+              .sort(StrUtils.compareIgnoreCase)
+              .forEach(function(n) {
           let filter = {
             repo: repo_name, name: n, value: self.filters[repo_name][n],
             buildUrl: function() {

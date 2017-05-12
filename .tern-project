@@ -1,0 +1,15 @@
+{
+  "libs": [
+    "browser"
+  ],
+  "loadEagerly": [
+    "extensions/src/js/*.js"
+  ],
+  "plugins": {
+    "requirejs": {
+      "baseURL": "./",
+      "paths": {}
+    }
+  }
+}
+

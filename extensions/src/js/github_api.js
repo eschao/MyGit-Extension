@@ -98,6 +98,36 @@ var GitHubApi = (function() {
     return null;
   }
 
+  /**
+   * Get repository name as dictionary
+   * The GitHub repository normally is composed by: <user/organization>/<repo>
+   *
+   * @return A dictionary object is like the below:
+   *          {
+   *            name : <user name or organization name>
+   *            repo : <repository name>
+   *            full_name : original name
+   *          }
+   */
+  GitHubApi.prototype.getRepoNameDict = function() {
+    let name = this.getRepoName();
+    if (name) {
+      let i = name.indexOf('/');
+      if (i < 0) {
+        return { user: "__empty__", repo: name, full_name: name };
+      }
+      else {
+        return {
+          user: name.substring(0, i),
+          repo: name.substring(i + 1),
+          full_name: name
+        };
+      }
+    }
+
+    return null;
+  }
+
   return GitHubApi;
 }());
 

@@ -20,19 +20,18 @@
 var FavoriteReposInjector = (function() {
   "use strict";
 
+  let EMPTY_NAME = "__empty__";
+
   /**
    * storage data structure of favorite repository
    * {
-   *    "github url" : [
-   *      {
-   *        "name" : "repo name",
-   *        "url" : "repo url"
-   *      },
+   *    "github url" : {
+   *      "user name" : ["repo1", "repo2", ...],
+   *      "org name" : ["repo1", "repo2", ....],
+   *      "__empty__": ...
    *      ...
-   *      ]
-   *      "github enterprise url" : [
-   *      ...
-   *    ]
+   *    },
+   *    ...
    * }
    */
 
@@ -42,7 +41,7 @@ var FavoriteReposInjector = (function() {
   function FavoriteReposInjector() {
     this.repos = {};
 
-    // read favorite repositories from chrom storage
+    // read favorite repositories from browser storage
     let self = this;
     browser_api.storage.get(MYGIT_GITHUB_FAVORITE_REPOS_KEY, function(item) {
       if (item) {
@@ -70,9 +69,7 @@ var FavoriteReposInjector = (function() {
     // check if should inject
     let origin = window.location.origin;
     let repo_name = github_api.getRepoName();
-    if (!repo_name &&
-        (!this.repos[origin] ||
-          Object.keys(this.repos[origin]).length < 1)) {
+    if (!repo_name && Object.keys(this.repos).length < 1) {
       return;
     }
 
@@ -105,15 +102,18 @@ var FavoriteReposInjector = (function() {
   /**
    * Create dropdown item element for repoisotry
    *
+   * @param uri GitHub uri
    * @param item repository item
    * @return a html element for repository item
    */
-  FavoriteReposInjector.prototype._createItem = function(item) {
+  FavoriteReposInjector.prototype._createItem = function(uri, item) {
     let el_item = document.createElement("div");
     el_item.className = "dropdown-item mg-dropdown-item";
+    el_item.setAttribute("mg-repo-group", item.user);
+    el_item.setAttribute("mg-repo", item.repo);
     el_item.innerHTML =
-      '<a class="mg-dropdown-item-text" href="' + item.url + '">\n' +
-      item.name + '</a>\n' +
+      '<a class="mg-dropdown-item-text" href="' + uri + '/' + item.full_name +
+      '">\n' + item.full_name+ '</a>\n' +
       '<span class="mg-dropdown-item-del"><i class="mg-icon-close"></i></span>'
       + '\n';
 
@@ -121,18 +121,37 @@ var FavoriteReposInjector = (function() {
     // list
     let self = this;
     el_item.getElementsByTagName("span")[0].onclick = function(e) {
-      let origin = el_item.getElementsByTagName("a")[0].origin;
-      for (let i = 0; i < self.repos[origin].length; ++i) {
-        let it = self.repos[origin][i];
-        if (it.name == item.name) {
-          // remove from memory data
-          self.repos[origin].splice(i, 1);
-          if (self.repos[origin].length < 1) {
-            delete self.repos[origin];
-          }
+      //let origin = el_item.getElementsByTagName("a")[0].origin;
+      for (let i = 0; i < self.repos[uri][item.user].length; ++i) {
+        if (self.repos[uri][item.user][i] == item.repo) {
+          let el_pre = el_item.previousElementSibling;
+          let el_next = el_item.nextElementSibling;
+          let el_parent = el_item.parentNode;
 
           // remove from dropdown DOM
-          el_item.parentNode.removeChild(el_item);
+          el_parent.removeChild(el_item);
+
+          // remove from memory data
+          self.repos[uri][item.user].splice(i, 1);
+          if (self.repos[uri][item.user].length < 1) {
+            delete self.repos[uri][item.user];
+            if (Object.keys(self.repos[uri]).length < 1) {
+              delete self.repos[uri];
+            }
+
+            // if its pre sibling is divider, remove it
+            if (el_pre && el_pre.className &&
+                el_pre.className == "dropdown-divider") {
+              el_parent.removeChild(el_pre);
+            }
+            // if its next sibling is divider and is the first element in
+            // parent node, remove it
+            else if (el_next && el_next.className &&
+                el_next.className == "dropdown-divider" &&
+                !el_next.id && !el_next.previousElementSibling) {
+              el_parent.removeChild(el_next);
+            }
+          }
 
           // save to storage
           self.storeFavoriteRepos();
@@ -165,34 +184,36 @@ var FavoriteReposInjector = (function() {
 
     // add repository event handler
     el_add.onclick = function() {
-      let repo_name = github_api.getRepoName();
-      if (repo_name) {
+      let repo = github_api.getRepoNameDict();
+      if (repo) {
         // new repo item
-        let item = {
-          name: repo_name,
-          url: origin + '/' + repo_name
-        };
-        if (self.repos[origin] == null) {
-          self.repos[origin] = [];
+        if (!self.repos[origin]) {
+          self.repos[origin] = {};
         }
-        self.repos[origin].push(item);
+        if (!self.repos[origin][repo.user]) {
+          self.repos[origin][repo.user] = [];
+        }
+        self.repos[origin][repo.user].push(repo.repo);
 
         // save to browser storage
         self.storeFavoriteRepos();
 
         // insert a repo item into dropdown menu DOM
-        let el_item = self._createItem(item);
-        let el_items = el_ul.querySelectorAll("mg-dropdown-item-text");
+        let el_item = self._createItem(origin, repo);
+        let el_items = el_ul.querySelectorAll(
+            "a[class='mg-dropdown-item-text']");
         if (el_items.length < 1) {
           el_ul.insertBefore(el_item, el_divider);
         }
         else {
-          for (let i = 0; i < el_items.length; ++i) {
-            let el = el_items[i];
-            if (el.href.startsWith(origin)) {
-              el_ul.insertBefore(el_item, el.parentNode);
-              break;
-            }
+          let el_first = el_ul.querySelector(
+              "div[mg-repo-group='" + repo.user+ "']");
+          if (!el_first) {
+            el_ul.insertBefore(el_item, el_divider);
+            el_ul.insertBefore(self._createDivider(), el_item);
+          }
+          else {
+            el_ul.insertBefore(el_item, el_first);
           }
         }
 
@@ -206,37 +227,79 @@ var FavoriteReposInjector = (function() {
     let el_fr = root.getElementsByTagName("a")[0];
     let old_click_handler = el_fr.onclick;
     el_fr.onclick = function(e) {
-      let is_added = false;
-      let repo_name = github_api.getRepoName();
-      if (self.repos[origin]) {
-        for (let i = 0; i < self.repos[origin].length; ++i) {
-          let repo = self.repos[origin][i];
-          if (repo.name == repo_name) {
+      let repo = github_api.getRepoNameDict();
+      let is_added = !repo;
+      if (!is_added && self.repos[origin] && self.repos[origin][repo.user]) {
+        let repos = self.repos[origin][repo.user];
+        for (let i = 0; i < repos.length; ++i) {
+          if (repos[i] == repo.repo) {
             is_added = true;
             break;
           }
         }
       }
 
-      if (is_added || !repo_name) {
+      if (is_added) {
         el_divider.style.display = "none"
         el_add.style.display = "none";
       }
       else {
-        el_divider.style = null;
+        if (Object.keys(self.repos).length > 0) {
+          el_divider.style = null;
+        }
+        else {
+          el_divider.style.display = "none"
+        }
         el_add.style = null;
       }
     }
 
     // create elements for all favorite repos and add it into DOM
-    Object.keys(this.repos).forEach(function(key) {
-      if (self.repos[key]) {
-        self.repos[key].forEach(function(repo) {
-          let el_item = self._createItem(repo);
-          el_ul.insertBefore(el_item, el_divider);
-        });
+    let uris = Object.keys(this.repos);
+    let is_insert_divider = false;
+    // every github uri
+    for (let i = 0; i < uris.length; ++i) {
+      let uri = uris[i];
+      if (!this.repos[uri]) {
+        continue;
       }
-    });
+
+      // every user name or organization name
+      let names = Object.keys(this.repos[uri]).sort(StrUtils.compareIgnoreCase);
+      for (let j = 0; j < names.length; ++j) {
+        let repos = this.repos[uri][names[j]];
+
+        // every repository name under specified user/org
+        if (repos) {
+          // add divider between different user
+          if (is_insert_divider) {
+            el_ul.insertBefore(this._createDivider(), el_divider);
+          }
+          else {
+            is_insert_divider = true;
+          }
+
+          repos.sort(StrUtils.compareIgnoreCase);
+          repos.forEach(function(r) {
+            let item = {
+                user: names[j], repo: r,
+                full_name: names[j] == EMPTY_NAME ? r : names[j] + "/" + r
+            };
+            let el_item = self._createItem(uri, item);
+            el_ul.insertBefore(el_item, el_divider);
+          });
+        };
+      }
+    }
+  }
+
+  /**
+   * Create a divider element between repsotories from different github uri
+   */
+  FavoriteReposInjector.prototype._createDivider = function() {
+    let el_divider = document.createElement("div");
+    el_divider.className = "dropdown-divider";
+    return el_divider;
   }
 
   return FavoriteReposInjector;

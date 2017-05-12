@@ -14,20 +14,37 @@
  * limitations under the License.
  */
 
-/**
- * Convert RGB attribute value of HTML element to HEX
- *
- * @return HEX format value
- */
-function rgbToHex(rgb) {
-  if (/^#[0-9A-F]{6}$/i.test(rgb)) {
-    return rgb;
-  }
+var ColorUtils = (function() {
 
-  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-  function hex(x) {
-    return ("0" + parseInt(x).toString(16)).slice(-2);
-  }
+  return {
+    /**
+     * Convert RGB attribute value of HTML element to HEX
+     *
+     * @return HEX format value
+     */
+    rgb2hex: function(rgb) {
+      if (/^#[0-9A-F]{6}$/i.test(rgb)) {
+        return rgb;
+      }
 
-  return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-}
+      rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+      function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+      }
+
+      return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+    }
+  }
+})();
+
+var StrUtils = (function() {
+
+  return {
+    /**
+     * Compare string with ignore case
+     */
+    compareIgnoreCase: function(a, b) {
+      return a.toLowerCase().localeCompare(b.toLowerCase());
+    }
+  }
+})();

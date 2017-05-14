@@ -15,6 +15,7 @@
  */
 
 var ColorUtils = (function() {
+  "use strict";
 
   return {
     /**
@@ -38,6 +39,7 @@ var ColorUtils = (function() {
 })();
 
 var StrUtils = (function() {
+  "use strict";
 
   return {
     /**
@@ -45,6 +47,58 @@ var StrUtils = (function() {
      */
     compareIgnoreCase: function(a, b) {
       return a.toLowerCase().localeCompare(b.toLowerCase());
+    }
+  }
+})();
+
+var DomUtils = (function() {
+  "use strict";
+
+  return {
+    /**
+     * Get screen rect of element
+     */
+    getElementScreenRect: function(el) {
+      let c = {
+        left: el.offsetLeft,
+        top: el.offsetTop,
+        width: el.offsetWidth,
+        height: el.offsetHeight
+      }
+
+      while (el.offsetParent && el.offsetParent != document.body) {
+        c.left += el.offsetParent.offsetLeft;
+        c.top += el.offsetParent.offsetTop;
+        el = el.offsetParent;
+      }
+
+      c.bottom = c.top + c.height;
+      c.right = c.left + c.width;
+      return c;
+    },
+
+    createStylesheet: function(name) {
+      var style = document.createElement("style");
+      style.title = name;
+      document.head.appendChild(style);
+      return style.sheet;
+    },
+
+    addCSSRule: function(sheet, selector, rules, index) {
+      if ("insertRule" in sheet) {
+        return sheet.insertRule(selector + "{" + rules + "}", index);
+      }
+      else if ("addRule" in sheet) {
+        return sheet.addRule(selector, rules, index);
+      }
+
+      return -1;
+    },
+
+    cleanStylesheet: function(sheet) {
+      while (sheet.rules.length > 0) {
+        sheet.deleteRule(0);
+      }
     }
   }
 })();

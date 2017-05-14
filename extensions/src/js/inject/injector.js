@@ -21,6 +21,7 @@ var MyGitInjector = (function() {
     this.issue_injector = new IssueInjector();
     this.favorite_repos = new FavoriteReposInjector();
     this.labels_injector = new LabelsInjector();
+    this.issue_preview = new IssuePreviewInjector();
   }
 
   /**
@@ -34,6 +35,7 @@ var MyGitInjector = (function() {
       self.issue_injector.inject(window.location.href);
       self.favorite_repos.inject(window.location.href);
       self.labels_injector.inject(window.location.href);
+      self.issue_preview.inject(window.location.href);
     }, false);
 
     // when window state is changed, check if we need to inject
@@ -42,6 +44,7 @@ var MyGitInjector = (function() {
       if (state && state.url) {
         self.issue_injector.inject(state.url);
         self.labels_injector.inject(state.url);
+        self.issue_preview.inject(state.url);
       }
     }, false);
   };

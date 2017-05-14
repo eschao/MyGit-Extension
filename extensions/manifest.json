@@ -41,6 +41,7 @@
         "src/js/inject/issue_export_dialog.js",
         "src/js/inject/issue_filter.js",
         "src/js/inject/issue_injector.js",
+        "src/js/inject/issue_preview.js",
         "src/js/inject/favorite_repos_injector.js",
         "src/js/inject/labels_injector.js",
         "src/js/inject/injector.js"

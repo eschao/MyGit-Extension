@@ -2,7 +2,7 @@
   <label class="mg-issue-loading">Loading ... </label>
 </div>
 
-<div id="mg-issue-content">
+<div id="mg-issue-content" class="mg-issue-content">
 <div class="mg-issue-title-sec">
   <label class="mg-issue-number" id="mg-issue-number">#16</label>
   <label id= "mg-issue-title">
@@ -22,7 +22,7 @@
 
 <div class="mg-issue-divider"></div>
 
-<div id="mg-issue-misc-sec" class="mg-issue-sec-space" alt="Milestone">
+<div id="mg-issue-misc-sec">
   <div id="mg-issue-milestone" class="mg-issue-misc-line">
     <span class="mg-issue-misc-line-head"><i class="mg-icon-map-signs"></i></span>
     <label class="mg-f-color">2017-05</label>
@@ -36,17 +36,21 @@
   </div>
 
   <div id="mg-issue-labels" class="mg-issue-misc-line" alt="Labels">
-    <span class="mg-issue-misc-line-head"><i class="mg-icon-tag"></i></span>
-    <label class="mg-issue-label mg-f-normal" style="background:#1d76db">Chrome</label>
-    <label class="mg-issue-label mg-f-normal" style="background:#d0576b">Firefox</label>
-    <label class="mg-issue-label mg-f-normal" style="background:#884898">Plan</label>
+    <div>
+      <span class="mg-issue-misc-line-head"><i class="mg-icon-tag"></i></span>
+    </div>
+    <div id="mg-issue-all-labels">
+      <label class="mg-issue-label mg-f-normal" style="background:#1d76db">Chrome</label>
+      <label class="mg-issue-label mg-f-normal" style="background:#d0576b">Firefox</label>
+      <label class="mg-issue-label mg-f-normal" style="background:#884898">Plan</label>
+    </div>
   </div>
 </div>
 
 <div class="mg-issue-divider" id="mg-issue-misc-divider"></div>
 <div class="mg-issue-body-sec">
   <div class="mg-issue-body-title">Issue Description</div>
-  <div class="mg-issue-body">
+  <div class="mg-issue-body" id="mg-issue-body">
   We often connect a issue with another one in its description or comments, but the **only** issue number will be showed after linked and it is not quite sense to us, you must click it to open the linked issue in the current browser tab or new tab to see what it really is. Under the circumstances, a preview for linked issue when mouse is over it is very useful.
   </div>
 </div>

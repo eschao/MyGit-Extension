@@ -23,12 +23,100 @@ var IssuePreviewInjector = (function() {
   // constants
   let MAX_INTERVAL_COUNT = 100;
   let INTERVAL_TIME = 100;
-  let MAX_PREVIEW_WIDTH = 500;
-  let MIN_PREVIEW_WIDTH = 300;
+  let MAX_PREVIEW_WIDTH = 600;
 
   function IssuePreviewInjector() {
     this.timer = null;
     this.style_sheet = null;
+
+    this.renders = {
+      'mg-issue-number': function(el, json) {
+        el.innerText = '#' + json.number;
+      },
+      'mg-issue-title': function(el, json) {
+        el.innerText = json.title;
+      },
+      'mg-issue-state': function(el, json) {
+        if (json.state) {
+          if (json.state == 'closed') {
+            el.innerText = 'Closed';
+            el.style.background = '#cb2431';
+          }
+          else {
+            el.innerText = json.state.charAt(0).toUpperCase() +
+                json.state.slice(1);
+            el.style.background = '#2cbe4e';
+          }
+        }
+      },
+      'mg-issue-state-desc': function(el, json) {
+      },
+      'mg-issue-milestone': function(el, json) {
+        if (json.milestone) {
+          el.style.display = 'flex';
+          el.getElementsByTagName('label')[0].innerText = json.milestone.title;
+        }
+        else {
+          el.style.display = 'none';
+        }
+      },
+      'mg-issue-assignees': function(el, json) {
+        let el_imgs = el.getElementsByTagName('img');
+        while (el_imgs.length > 0) {
+          el.removeChild(el_imgs[0]);
+        }
+
+        if (json.assignees) {
+          el.style.display = 'flex';
+          for (let i = 0; i < json.assignees.length; ++i) {
+            let user = json.assignees[i];
+            let el_img = document.createElement('img');
+            el_img.alt = '@' + user.login;
+            el_img.className = 'avatar mg-issue-avatar';
+            el_img.width = '20';
+            el_img.height = '20';
+            el_img.src = user.avatar_url;
+            el.appendChild(el_img);
+          }
+        }
+        else {
+          el.style.display = 'none';
+        }
+      },
+      'mg-issue-labels': function(el, json) {
+        let el_div = el.querySelector('div[id="mg-issue-all-labels"]');
+        let el_labels = el_div.getElementsByTagName('label');
+        while (el_labels.length > 0) {
+          el_div.removeChild(el_labels[0]);
+        }
+
+        if (json.labels) {
+          el.style.display = 'flex';
+          for (let i = 0; i < json.labels.length; ++i) {
+            let label = json.labels[i];
+            let el_label = document.createElement('label');
+            el_label.className = 'mg-issue-label mg-f-normal';
+            el_label.style.background = '#' + label.color;
+            el_label.innerText = label.name;
+            el_div.appendChild(el_label);
+          }
+        }
+        else {
+          el.style.display = 'none';
+        }
+      },
+      'mg-issue-misc-divider': function(el, json) {
+        if (json.milestone || json.assignees || json.labels) {
+          el.style.display = 'flex';
+        }
+        else {
+          el.style.display = 'none';
+        }
+      },
+      'mg-issue-body': function(el, json) {
+        el.innerHTML = json.body || '';
+      }
+    };
   }
 
   IssuePreviewInjector.prototype._matchUrl = function(url) {
@@ -57,7 +145,7 @@ var IssuePreviewInjector = (function() {
     let el_loading = el_root.querySelector("div[id='mg-issue-loading']");
     let el_issue = el_root.querySelector("div[id='mg-issue-content']");
 
-    el_loading.style.display = "inline-block";
+    el_loading.style.display = "block";
     el_issue.style.display = "none";
 
     let screen_r = DomUtils.getElementScreenRect(el_anchor);
@@ -102,8 +190,8 @@ var IssuePreviewInjector = (function() {
     }
     else if (where.left) {
       let right = client_r.right + max_dialog_width / 2;
-      if (right > view_size.width - 2) {
-        right = view_size.width - 2;
+      if (right > view_size.width - 4) {
+        right = view_size.width - 4;
       }
 
       let pos = right - client_r.right + (where.top ? 8 : -16);
@@ -113,8 +201,8 @@ var IssuePreviewInjector = (function() {
     }
     else {
       let left = client_r.middle_x - max_dialog_width / 2;
-      if (left < 2) {
-        left = 2;
+      if (left < 4) {
+        left = 4;
       }
       let pos = client_r.middle_x - left + (where.top ? -10 : 10);
       after.position += 'left:' + pos + 'px;';
@@ -126,14 +214,14 @@ var IssuePreviewInjector = (function() {
       after.rotate = 'transform:rotate(-45deg);'
       after.box_shadow = 'box-shadow:-2px 2px 1px 0 rgba(0, 0, 0, 0.04), ' +
           '-4px 4px 3px 0 rgba(0, 0, 0, 0.16);';
-      after.position += 'bottom:-16px;';
+      after.position += 'bottom:-15px;';
       el_root.style.top = (screen_r.top - 10) + 'px';
       translate.y = '-100%';
     }
     else {
       after.rotate = 'transform:rotate(135deg);'
       after.box_shadow = 'box-shadow:-1px 1px 1px 0 rgba(0, 0, 0, 0.2); ';
-      after.position += 'top:0px;';
+      after.position += 'top:1px;';
       el_root.style.top = (screen_r.bottom + 16) + 'px';
     }
 
@@ -152,38 +240,16 @@ var IssuePreviewInjector = (function() {
     let el_loading = el_root.querySelector('div[id="mg-issue-loading"]');
     let el_issue = el_root.querySelector('div[id="mg-issue-content"]');
     el_loading.style.display = 'none';
-    el_issue.style.display = 'inline-block';
+    el_issue.style.display = 'flex';
     this._dockPreviewDialog(el_root, client_r, screen_r, MAX_PREVIEW_WIDTH);
 
-    let el_labels = el_root.getElementByTagName('label');
-    for (let i = 0; i < el_labels.length; ++i) {
-      let id = el_labels[i].id;
-      if (id == 'mg-issue-number') {
-      }
-      else if (id == 'mg-issue-title') {
-      }
-      else if (id == 'mg-issue-state') {
+    let el_ids = el_root.querySelectorAll('*[id^="mg-issue-"]');
+    for (let i = 0; i < el_ids.length; ++i) {
+      let id = el_ids[i].id;
+      if (this.renders[id]) {
+        this.renders[id](el_ids[i], json);
       }
     }
-
-    /*
-    el_issue.setAttribute("issue-id", json.id);
-    let el_title = el_issue.querySelector("span[id='mg-issue-title']");
-    el_title.innerText = "#" + json.number + " " + json.title;
-    let el_state_labels= el_issue.querySelector(
-        "div[id='mg-issue-state-labels']");
-    el_state_labels.innerHTML = "<label>";
-    if (json.state == "open") {
-    }
-    else if (json.state == "closed") {
-    }
-    el_state_labels.innerHTML += json.state + "</label>";
-    if (json.labels) {
-      for (let i = 0; i < json.labels.length; ++i) {
-        el_state_labels.innerHTML += "<label>" + json.labels[i].name
-            + "</label>";
-      }
-    }*/
   }
 
   IssuePreviewInjector.prototype._createPreviewDialog = function(el_anchor) {
@@ -192,7 +258,6 @@ var IssuePreviewInjector = (function() {
     el_root.id = 'mg-issue-preview';
     el_root.style.maxWidth = MAX_PREVIEW_WIDTH + 'px';
     this.style_sheet = DomUtils.createStylesheet('mg-style-sheet');
-    //el_root.style.minWidth = MIN_PREVIEW_WIDTH + 'px';
 
     let self = this;
     let xhr = new XMLHttpRequest();

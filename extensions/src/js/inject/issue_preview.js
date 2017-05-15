@@ -24,6 +24,7 @@ var IssuePreviewInjector = (function() {
   let MAX_INTERVAL_COUNT = 100;
   let INTERVAL_TIME = 100;
   let MAX_PREVIEW_WIDTH = 500;
+  let MIN_PREVIEW_WIDTH = 300;
 
   function IssuePreviewInjector() {
     this.timer = null;
@@ -52,93 +53,120 @@ var IssuePreviewInjector = (function() {
     return false;
   }
 
-  IssuePreviewInjector.prototype._showLoading = function(el_root) {
+  IssuePreviewInjector.prototype._showLoading = function(el_root, el_anchor) {
     let el_loading = el_root.querySelector("div[id='mg-issue-loading']");
     let el_issue = el_root.querySelector("div[id='mg-issue-content']");
 
     el_loading.style.display = "inline-block";
-    el_issue.style.dispaly = "none";
+    el_issue.style.display = "none";
+
+    let screen_r = DomUtils.getElementScreenRect(el_anchor);
+    let client_r = el_anchor.getBoundingClientRect();
+    this._dockPreviewDialog(el_root, client_r, screen_r, 120);
   }
 
-  // https://codepen.io/ryanmcnz/pen/JDLhu
-  IssuePreviewInjector.prototype._setPreviewDialogPos =
-    function(el_root, clientRect, scrRect) {
-    let view_width = document.documentElement.clientWidth;
-    let view_height = document.documentElement.clientHeight;
-    let is_top = true;//clientRect.top > (view_height - clientRect.bottom);
-    let is_left = clientRect.left > (view_width - clientRect.right);
+  /**
+   * Dock issue preview dialog
+   */
+  IssuePreviewInjector.prototype._dockPreviewDialog =
+    function(el_root, client_r, screen_r, max_dialog_width) {
+    let view_size = {
+        width: document.documentElement.clientWidth,
+        height: document.documentElement.clientHeight,
+    };
 
-    let middle_x = scrRect.left + clientRect.width / 2;
-    let is_middle = (middle_x > MAX_PREVIEW_WIDTH / 2) &&
-                    ((view_width - middle_x) > MAX_PREVIEW_WIDTH / 2);
-    DomUtils.cleanStylesheet(this.style_sheet);
+    let middle_x = client_r.left + client_r.width / 2;
+    let where = {
+        top: client_r.top > (view_size.height- client_r.bottom),
+        left: client_r.left > (view_size.width - client_r.right),
+        middle: (middle_x > max_dialog_width / 2) &&
+                ((view_size.width - middle_x) > max_dialog_width / 2)
+    };
 
-    let after_before_css = 'border:solid transparent; content:" "; height:0; border-left-width: 0; border-right-width:0;'
-        + 'width:0; position:absolute; pointer-events:none;';
-    let top_or_bottom = is_top ? "top:100%; " : "bottom:100%; ";
-    let transform = { x: '0', y: '0' };
-    if (is_middle) {
-      after_before_css += top_or_bottom + 'left:50%;';
+    let after = {
+      css:'content:""; position:absolute; width:0; height:0; ' +
+          'box-size:border-box; border:8px solid black; transform-origin:0 0;' +
+          'border-color:transparent transparent #fff #fff;',
+      rotate: '',
+      box_shadow: '',
+      position: ''
+    };
+
+    client_r.middle_x = client_r.left + client_r.width / 2;
+    let translate = { x: '0', y: '0' };
+
+    if (where.middle) {
+      after.position += 'left:calc(50% ' + (where.top ? '-' : '+') + ' 10px);';
       el_root.style.left = middle_x + 'px';
-      transform.x = '-50%';
+      translate.x = '-50%';
     }
-    else if (is_left) {
-      after_before_css += top_or_bottom + 'left:calc(100% - ' +
-          clientRect.width / 2 + 'px);';
-      el_root.style.left = 'calc(' + scrRect.right + 'px - 100%)';
-      el_root.style.transform = null;
+    else if (where.left) {
+      let right = client_r.right + max_dialog_width / 2;
+      if (right > view_size.width - 2) {
+        right = view_size.width - 2;
+      }
+
+      let pos = right - client_r.right + (where.top ? 8 : -16);
+      after.position += 'right:' + pos + 'px;';
+      el_root.style.right = (view_size.width - right) + 'px';
+      el_root.style.left = 'auto';
     }
     else {
-      after_before_css += top_or_bottom + 'left:' + clientRect.width / 2 + 'px;';
-      el_root.style.left = scrRect.left + 'px';
-      el_root.style.transform = null;
+      let left = client_r.middle_x - max_dialog_width / 2;
+      if (left < 2) {
+        left = 2;
+      }
+      let pos = client_r.middle_x - left + (where.top ? -10 : 10);
+      after.position += 'left:' + pos + 'px;';
+      el_root.style.left = left + 'px';
+      el_root.style.right = 'auto';
     }
 
-    let after_css;
-    let before_css;
-    if (is_top) {
-      after_css = "border-top-color:#fff; border-width: 10px; " +
-          "margin-left: -10px;";
-      before_css = "border-top-color:#d1d5da; border-width: 11px; " +
-          "margin-left: -11px; box-shadow: 10px 5px 5px black";
-      let s = "calc(" + (scrRect.top - 12) + "px -100%)";
-      el_root.style.top = (scrRect.top - 12) + 'px';
-      transform.y = '-100%';
+    if (where.top) {
+      after.rotate = 'transform:rotate(-45deg);'
+      after.box_shadow = 'box-shadow:-2px 2px 1px 0 rgba(0, 0, 0, 0.04), ' +
+          '-4px 4px 3px 0 rgba(0, 0, 0, 0.16);';
+      after.position += 'bottom:-16px;';
+      el_root.style.top = (screen_r.top - 10) + 'px';
+      translate.y = '-100%';
     }
     else {
-      after_css = "border-bottom-color:#fff; border-width: 10px; " +
-          "margin-left: -10px;";
-      before_css = "border-bottom-color:#d1d5da; border-width: 11px; " +
-          "margin-left: -11px;";
-      el_root.style.top = (scrRect.bottom + 12) + "px";
+      after.rotate = 'transform:rotate(135deg);'
+      after.box_shadow = 'box-shadow:-1px 1px 1px 0 rgba(0, 0, 0, 0.2); ';
+      after.position += 'top:0px;';
+      el_root.style.top = (screen_r.bottom + 16) + 'px';
     }
 
-    el_root.style.transform = 'translate(' + transform.x + ',' +
-        transform.y + ')';
+    el_root.style.transform = 'translate(' + translate.x + ',' +
+        translate.y + ')';
 
-    DomUtils.addCSSRule(this.style_sheet, ".mg-issue-preview:after",
-        after_css, 0);
-    DomUtils.addCSSRule(this.style_sheet, ".mg-issue-preview:before",
-        before_css, 0);
-    DomUtils.addCSSRule(this.style_sheet,
-        ".mg-issue-preview:after, .mg-issue-preview:before",
-        after_before_css, 0);
+    DomUtils.cleanStylesheet(this.style_sheet);
+    DomUtils.addCSSRule(this.style_sheet, '.mg-issue-preview:after',
+        after.css + after.position + after.rotate + after.box_shadow, 0);
   }
 
-  IssuePreviewInjector.prototype._showIssue =
-    function(el_anchor, el_root, json) {
-    let scrRect = DomUtils.getElementScreenRect(el_anchor);
-    this._setPreviewDialogPos(el_root, el_anchor.getBoundingClientRect(),
-        scrRect);
-    //el_root.style.left = rect.left + "px";
-    //el_root.style.top = rect.bottom + "px";
-    let el_loading = el_root.querySelector("div[id='mg-issue-loading']");
-    let el_issue = el_root.querySelector("div[id='mg-issue-content']");
+  IssuePreviewInjector.prototype._previewIssue =
+    function(el_root, el_anchor, json) {
+    let screen_r = DomUtils.getElementScreenRect(el_anchor);
+    let client_r = el_anchor.getBoundingClientRect();
+    let el_loading = el_root.querySelector('div[id="mg-issue-loading"]');
+    let el_issue = el_root.querySelector('div[id="mg-issue-content"]');
+    el_loading.style.display = 'none';
+    el_issue.style.display = 'inline-block';
+    this._dockPreviewDialog(el_root, client_r, screen_r, MAX_PREVIEW_WIDTH);
+
+    let el_labels = el_root.getElementByTagName('label');
+    for (let i = 0; i < el_labels.length; ++i) {
+      let id = el_labels[i].id;
+      if (id == 'mg-issue-number') {
+      }
+      else if (id == 'mg-issue-title') {
+      }
+      else if (id == 'mg-issue-state') {
+      }
+    }
 
     /*
-    el_loading.style.display = "none";
-    el_issue.style.display = "inline-block";
-
     el_issue.setAttribute("issue-id", json.id);
     let el_title = el_issue.querySelector("span[id='mg-issue-title']");
     el_title.innerText = "#" + json.number + " " + json.title;
@@ -158,21 +186,24 @@ var IssuePreviewInjector = (function() {
     }*/
   }
 
-  IssuePreviewInjector.prototype._createPreviewDialog = function() {
-    this.style_sheet = DomUtils.createStylesheet('mg-style-sheet');
+  IssuePreviewInjector.prototype._createPreviewDialog = function(el_anchor) {
     let el_root = document.createElement('div');
     el_root.className = 'mg-issue-preview';
     el_root.id = 'mg-issue-preview';
     el_root.style.maxWidth = MAX_PREVIEW_WIDTH + 'px';
+    this.style_sheet = DomUtils.createStylesheet('mg-style-sheet');
+    //el_root.style.minWidth = MIN_PREVIEW_WIDTH + 'px';
 
+    let self = this;
     let xhr = new XMLHttpRequest();
-    xhr.open("GET",
-             browser_api.extension.getURL("templates/issue_preview_dialog.html")
+    xhr.open('GET',
+             browser_api.extension.getURL('templates/issue_preview_dialog.html')
              , true);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         el_root.innerHTML = this.responseText;
         document.body.appendChild(el_root);
+        self._showLoading(el_root, el_anchor);
       }
     }
     xhr.send();
@@ -193,10 +224,10 @@ var IssuePreviewInjector = (function() {
           if (hub.token && hub.api_uri && hub.repo) {
             let el_root = document.getElementById("mg-issue-preview");
             if (el_root) {
-              this._showLoading(el_root);
+              self._showLoading(el_root, el_links[i]);
             }
             else {
-              el_root = self._createPreviewDialog();
+              el_root = self._createPreviewDialog(el_links[i]);
             }
 
             let url = "https://" + hub.api_uri + "/repos" +
@@ -208,7 +239,7 @@ var IssuePreviewInjector = (function() {
             xhr.setRequestHeader("Authorization", "token " + hub.token);
             xhr.onreadystatechange = function() {
               if (xhr.readyState == 4 && xhr.status == 200) {
-                self._showIssue(el_links[i], el_root,
+                self._previewIssue(el_root, el_links[i],
                     JSON.parse(xhr.responseText));
               }
             }

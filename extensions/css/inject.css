@@ -282,15 +282,25 @@ a.mg-disabled {
   z-index: 999;
   padding: 10px 10px;
   text-align: left;
-  font-size: 12px;
-  flex-direction: column;
+  font-size: 13px;
 }
 
-.mg-arrow {
+.mg-issue-preview-top:after {
+  content: "";
   position: absolute;
-  border: 1px solid #d1d5da;
+  width: 0;
+  height: 0;
+  bottom: -20px;
+  left: 50%;
+  box-size: border-box;
+  border: 10px solid black;
+  border-color: transparent transparent #fff #fff;
+  transform-origin: 0 0;
+  transform: rotate(-45deg);
+  box-shadow: -2px 2px 1px 0 rgba(0, 0, 0, 0.04),  -4px 4px 3px 0 rgba(0, 0, 0, 0.16);
 }
 
+/*
 .mg-issue-preview-top:after, .mg-issue-preview-top:before {
   bottom: 100%;
   left: 50%;
@@ -303,18 +313,22 @@ a.mg-disabled {
 }
 
 .mg-issue-preview-top:after {
-  /*border-color: rgba(135, 182, 212, 0);*/
 	border-bottom-color: #fff;
   border-width: 10px;
   margin-left: -10px;
 }
 
 .mg-issue-preview-top:before {
-  /*border-color: rgba(27,31,35,0);*/
-	/*border-bottom-color: rgba(27,31,35,0.3);*/
   border-bottom-color: #d1d5da;
   border-width: 11px;
   margin-left: -11px;
+}*/
+
+.mg-issue-loading {
+  font-size: 14px;
+  font-weight: normal;
+  text-align: left;
+  width: 100px;
 }
 
 .mg-issue-title-sec {
@@ -394,7 +408,7 @@ a.mg-disabled {
 
 .mg-issue-body-title {
   background-color: rgb(241, 248, 255);
-  padding: 2px 6px 2px 6px;
+  padding: 3px 6px 3px 6px;
   font-weight: 600;
   color: #586069;
   border-bottom: 1px solid #d1d5da;

@@ -34,6 +34,18 @@ var ColorUtils = (function() {
       }
 
       return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+    },
+
+    getLuma: function(color) {
+      if (color.charAt(0) == '#') {
+        color = color.slice(1);
+      }
+
+      let rgb = parseInt(color, 16);
+      let r = (rgb >> 16) & 0xff;
+      let g = (rgb >> 8) & 0xff;
+      let b = (rgb >> 0) & 0xff;
+      return (0.2126 * r + 0.7152 * g + 0.0722 * b);
     }
   }
 })();
@@ -99,6 +111,22 @@ var DomUtils = (function() {
       while (sheet.rules.length > 0) {
         sheet.deleteRule(0);
       }
+    }
+  }
+})();
+
+var DateUtils = (function() {
+  'use strict';
+
+  let MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+  return {
+    daysPassed: function(d) {
+      let old = new Date(d);
+      let now = new Date();
+      let utc_old = Date.UTC(old.getFullYear(), old.getMonth(), old.getDate());
+      let utc_now = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      return Math.floor((utc_now - utc_old) / MS_PER_DAY);
     }
   }
 })();

@@ -30,38 +30,67 @@ var IssuePreviewInjector = (function() {
     this.style_sheet = null;
 
     this.renders = {
-      'mg-issue-number': function(el, json) {
-        el.innerText = '#' + json.number;
-      },
       'mg-issue-title': function(el, json) {
-        el.innerText = json.title;
+        el.innerHTML =
+            '<a href="' + json.html_url + '" class="mg-issue-a" ' +
+            'target="_blank"> <span class="mg-issue-number">#' + json.number +
+            '</span>&nbsp;' + json.title + '</a>';
       },
       'mg-issue-state': function(el, json) {
         if (json.state) {
           if (json.state == 'closed') {
-            el.innerText = 'Closed';
+            el.innerHTML = '<i class="mg-octicon-closed mg-issue-state-icon">' +
+                '</i>Closed';
             el.style.background = '#cb2431';
           }
           else {
-            el.innerText = json.state.charAt(0).toUpperCase() +
+            el.innerHTML = '<i class="mg-octicon-opened mg-issue-state-icon">' +
+                '</i>' + json.state.charAt(0).toUpperCase() +
                 json.state.slice(1);
             el.style.background = '#2cbe4e';
           }
         }
       },
       'mg-issue-state-desc': function(el, json) {
+        if (json.closed_at && json.closed_by) {
+          el.innerHTML = '<a href="' + json.closed_by.html_url + '" ' +
+              'class="mg-issue-a mg-f-bold" target="_blank">' +
+              json.closed_by.login + '</a> closed this issue ' +
+              DateUtils.daysPassed(json.closed_at) + ' days ago ';
+        }
+        else {
+          el.innerHTML = '<a href="' + json.user.html_url + '" ' +
+              'class="mg-issue-a mg-f-bold" target="_blank">' +
+              json.user.login + '</a> opend this issue ' +
+              DateUtils.daysPassed(json.created_at) + ' days ago ';
+        }
       },
       'mg-issue-milestone': function(el, json) {
         if (json.milestone) {
           el.style.display = 'flex';
-          el.getElementsByTagName('label')[0].innerText = json.milestone.title;
+          el.getElementsByTagName('label')[0].innerHTML =
+              '<a href="' + json.milestone.html_url + '" class="mg-issue-a" ' +
+              'target="_blank">' + json.milestone.title + '</a>';
+
+          let pct = 0;
+          let el_pct = el.querySelector('span[id="mg-issue-progress-pct"]');
+          if (json.milestone.open_issues != null &&
+              json.milestone.closed_issues != null) {
+            let open = Number(json.milestone.open_issues);
+            let closed = Number(json.milestone.closed_issues);
+            pct = closed / (open + closed) * 100;
+            el_pct.style.width = pct + '%';
+          }
+          else {
+            el_pct.style.width = '0';
+          }
         }
         else {
           el.style.display = 'none';
         }
       },
       'mg-issue-assignees': function(el, json) {
-        let el_imgs = el.getElementsByTagName('img');
+        let el_imgs = el.getElementsByTagName('a');
         while (el_imgs.length > 0) {
           el.removeChild(el_imgs[0]);
         }
@@ -70,13 +99,14 @@ var IssuePreviewInjector = (function() {
           el.style.display = 'flex';
           for (let i = 0; i < json.assignees.length; ++i) {
             let user = json.assignees[i];
-            let el_img = document.createElement('img');
-            el_img.alt = '@' + user.login;
-            el_img.className = 'avatar mg-issue-avatar';
-            el_img.width = '20';
-            el_img.height = '20';
-            el_img.src = user.avatar_url;
-            el.appendChild(el_img);
+            let el_a = document.createElement('a');
+            el_a.href = user.html_url;
+            el_a.target = '_blank';
+            el_a.className = 'mg-issue-a';
+            el_a.innerHTML = '<img alt="@' + user.login + '" class="avatar ' +
+                'mg-issue-avatar" width="20" height="20" src="' +
+                user.avatar_url + '">';
+            el.appendChild(el_a);
           }
         }
         else {
@@ -97,7 +127,13 @@ var IssuePreviewInjector = (function() {
             let el_label = document.createElement('label');
             el_label.className = 'mg-issue-label mg-f-normal';
             el_label.style.background = '#' + label.color;
-            el_label.innerText = label.name;
+
+            let index = label.url.indexOf('\/repos\/');
+            let url = index > -1 ? label.url.slice(index + 6) : label.url;
+            let color = ColorUtils.getLuma(label.color) > 160 ?
+                'style="color:black"' : '';
+            el_label.innerHTML = '<a href="' + url + '" class="mg-issue-a" ' +
+                'target="_blank" ' + color + '>' + label.name + '</a>';
             el_div.appendChild(el_label);
           }
         }
@@ -112,6 +148,9 @@ var IssuePreviewInjector = (function() {
         else {
           el.style.display = 'none';
         }
+      },
+      'mg-issue-comments-number': function(el, json) {
+        el.innerHTML = json.comments + ' Comments';
       },
       'mg-issue-body': function(el, json) {
         el.innerHTML = json.body || '';
@@ -243,13 +282,36 @@ var IssuePreviewInjector = (function() {
     el_issue.style.display = 'flex';
     this._dockPreviewDialog(el_root, client_r, screen_r, MAX_PREVIEW_WIDTH);
 
-    let el_ids = el_root.querySelectorAll('*[id^="mg-issue-"]');
-    for (let i = 0; i < el_ids.length; ++i) {
-      let id = el_ids[i].id;
-      if (this.renders[id]) {
-        this.renders[id](el_ids[i], json);
+    if (json) {
+      let el_ids = el_root.querySelectorAll('*[id^="mg-issue-"]');
+      for (let i = 0; i < el_ids.length; ++i) {
+        let id = el_ids[i].id;
+        if (this.renders[id]) {
+          this.renders[id](el_ids[i], json);
+        }
+      }
+
+      el_root.setAttribute('mg-issue-id', json.id);
+    }
+  }
+
+  IssuePreviewInjector.prototype._initPreviewDialog = function(el_root) {
+    let el_close = el_root.querySelector('i[id="mg-issue-close"]');
+    let win_click = function(e) {
+      if (e.target != el_root && !el_root.contains(e.target)) {
+        el_close.onclick();
       }
     }
+
+    // check if close dialog when click is outside of it
+    window.addEventListener("click", win_click, false);
+    // click event for close button
+    let close_dialog = function() {
+      //window.removeEventListener("click", win_click, false);
+      el_root.style.display = 'none';
+    }
+    el_close.onclick = close_dialog;
+    el_close.style.cursor = 'pointer';
   }
 
   IssuePreviewInjector.prototype._createPreviewDialog = function(el_anchor) {
@@ -268,6 +330,7 @@ var IssuePreviewInjector = (function() {
       if (this.readyState == 4 && this.status == 200) {
         el_root.innerHTML = this.responseText;
         document.body.appendChild(el_root);
+        self._initPreviewDialog(el_root);
         self._showLoading(el_root, el_anchor);
       }
     }
@@ -289,11 +352,22 @@ var IssuePreviewInjector = (function() {
           if (hub.token && hub.api_uri && hub.repo) {
             let el_root = document.getElementById("mg-issue-preview");
             if (el_root) {
+              let index = el_links[i].pathname.lastIndexOf('/');
+              let issue_id = index ? el_links[i].pathname.slice(index + 1) : '';
+              let loaded_id = el_root.getAttribute('mg-issue-id');
+              if (loaded_id && issue_id == loaded_id) {
+                self._previewIssue(el_root, el_links[i], null);
+                return;
+              }
+              if (el_root.style && el_root.style.display) {
+                el_root.style.display = null;
+              }
               self._showLoading(el_root, el_links[i]);
             }
             else {
               el_root = self._createPreviewDialog(el_links[i]);
             }
+
 
             let url = "https://" + hub.api_uri + "/repos" +
                 el_links[i].pathname;

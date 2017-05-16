@@ -350,7 +350,7 @@ a.mg-disabled {
 }
 
 .mg-issue-content {
-  max-height: 600px;
+  /*max-height: 600px;*/
   overflow: scroll;
 }
 

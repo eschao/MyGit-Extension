@@ -18,24 +18,31 @@
  * Issue preview injector class
  */
 var IssuePreviewInjector = (function() {
-  "use strict";
+  'use strict';
 
   // constants
   let MAX_INTERVAL_COUNT = 100;
   let INTERVAL_TIME = 100;
   let MAX_PREVIEW_SIZE = { width: 600, height: 600 };
+  let SHOW_PREVIEW_TIMEOUT = 1000;
+  let CLOSE_PREVIEW_TIMEOUT = 500;
 
   function IssuePreviewInjector() {
-    this.timer = null;
+    // injection timer
+    this.timer = { injector: null, close_preview_dialog : null };
+    // use to dynamically draw arrow of preview dialog
     this.style_sheet = null;
 
+    // render issue content handlers
     this.renders = {
+      // render issue title
       'mg-issue-title': function(el, json) {
         el.innerHTML =
             '<a href="' + json.html_url + '" class="mg-issue-a" ' +
             'target="_blank"> <span class="mg-issue-number">#' + json.number +
             '</span>&nbsp;' + json.title + '</a>';
       },
+      // render issue state: Open or Closed
       'mg-issue-state': function(el, json) {
         if (json.state) {
           if (json.state == 'closed') {
@@ -51,6 +58,7 @@ var IssuePreviewInjector = (function() {
           }
         }
       },
+      // render issue state description: <who> opened this issue xxx days ago
       'mg-issue-state-desc': function(el, json) {
         if (json.closed_at && json.closed_by) {
           el.innerHTML = '<a href="' + json.closed_by.html_url + '" ' +
@@ -65,6 +73,7 @@ var IssuePreviewInjector = (function() {
               DateUtils.daysPassed(json.created_at) + ' days ago ';
         }
       },
+      // render issue milestone
       'mg-issue-milestone': function(el, json) {
         if (json.milestone) {
           el.style.display = 'flex';
@@ -72,13 +81,14 @@ var IssuePreviewInjector = (function() {
               '<a href="' + json.milestone.html_url + '" class="mg-issue-a" ' +
               'target="_blank">' + json.milestone.title + '</a>';
 
+          // render completion percentage
           let pct = 0;
           let el_pct = el.querySelector('span[id="mg-issue-progress-pct"]');
           if (json.milestone.open_issues != null &&
               json.milestone.closed_issues != null) {
-            let open = Number(json.milestone.open_issues);
+            let opened = Number(json.milestone.open_issues);
             let closed = Number(json.milestone.closed_issues);
-            pct = closed / (open + closed) * 100;
+            pct = closed / (opened + closed) * 100;
             el_pct.style.width = pct + '%';
           }
           else {
@@ -89,7 +99,9 @@ var IssuePreviewInjector = (function() {
           el.style.display = 'none';
         }
       },
+      // render issue assignees
       'mg-issue-assignees': function(el, json) {
+        // clean old assignees
         let el_imgs = el.getElementsByTagName('a');
         while (el_imgs.length > 0) {
           el.removeChild(el_imgs[0]);
@@ -113,7 +125,9 @@ var IssuePreviewInjector = (function() {
           el.style.display = 'none';
         }
       },
+      // render isseu labels
       'mg-issue-labels': function(el, json) {
+        // clean old labels
         let el_div = el.querySelector('div[id="mg-issue-all-labels"]');
         let el_labels = el_div.getElementsByTagName('label');
         while (el_labels.length > 0) {
@@ -141,6 +155,7 @@ var IssuePreviewInjector = (function() {
           el.style.display = 'none';
         }
       },
+      // if no milestone/labels/assignees, the divider need to be hidden
       'mg-issue-misc-divider': function(el, json) {
         if (json.milestone || json.assignees || json.labels) {
           el.style.display = 'flex';
@@ -149,13 +164,26 @@ var IssuePreviewInjector = (function() {
           el.style.display = 'none';
         }
       },
+      // render issue comments number
       'mg-issue-comments-number': function(el, json) {
         el.innerHTML = json.comments + ' Comments';
       },
+      // render issue body
       'mg-issue-body': function(el, json) {
         el.innerHTML = json.body || '';
       }
     };
+  }
+
+  /**
+   * Init after injection
+   */
+  IssuePreviewInjector.prototype._init = function() {
+    // injection timer
+    this.timer = { injector: null, close_preview_dialog : null };
+
+    // use to dynamically draw arrow of preview dialog
+    this.style_sheet = null;
   }
 
   /**
@@ -170,13 +198,15 @@ var IssuePreviewInjector = (function() {
 
     el_loading.style.display = 'block';
     el_issue.style.display = 'none';
-
     let max_size = { width: 120, height: 80 };
     this._dockPreviewDialog(el_root, el_anchor, el_issue, max_size);
   }
 
   /**
    * Show loading error message
+   *
+   * @param el_root Root DOM element of preview dialog
+   * @param err_code Error code returning from fetching issue
    */
   IssuePreviewInjector.prototype._showLoadingError =
     function(el_root, err_code) {
@@ -204,10 +234,10 @@ var IssuePreviewInjector = (function() {
         height: document.documentElement.clientHeight,
     };
 
-    // middle point x of anchor element
+    // middle point x on anchor element
     client_r.middle_x = client_r.left + client_r.width / 2;
 
-    // where to dock?
+    // where to dock preview dialog?
     // where.top: if true, dock on the top of anchor element, otherwise dock
     //    under it
     // where.left: if true, dock on the left of anchor element, otherwise dock
@@ -221,9 +251,9 @@ var IssuePreviewInjector = (function() {
             ((view_size.width - client_r.middle_x) > max_dialog_size.width / 2)
     };
 
-    // the css value of .mg-issue-preview::after which is used to draw arrow,
+    // the value of css: .mg-issue-preview::after which is used to draw arrow,
     // since the arrow orientation is following the preview dialog position,
-    // its css value need to be dynamically set
+    // its css value need to be dynamically computed and set
     let after = {
       css:'content:""; position:absolute; width:0; height:0; ' +
           'box-size:border-box; border:8px solid black; transform-origin:0 0;' +
@@ -275,6 +305,8 @@ var IssuePreviewInjector = (function() {
       after.position += 'bottom:-15px;';
       el_root.style.top = (screen_r.top - 10) + 'px';
       translate.y = '-100%';
+
+      // make sure preview dialog is shown in visible area
       if (screen_r.top < max_dialog_size.height + 34) {
         max_height = screen_r.top - 34;
       }
@@ -285,7 +317,9 @@ var IssuePreviewInjector = (function() {
       after.box_shadow = 'box-shadow:-1px 1px 1px 0 rgba(0, 0, 0, 0.2); ';
       after.position += 'top:1px;';
       el_root.style.top = (screen_r.bottom + 16) + 'px';
-      let scroll_height = document.documentElement.scroll_height;
+
+      // make sure preview dialog is shown in visible area
+      let scroll_height = document.documentElement.scrollHeight;
       if (screen_r.bottom + 40 + max_dialog_size.height > scroll_height) {
         max_height = scroll_height - 40 - screen_r.bottom;
       }
@@ -314,16 +348,18 @@ var IssuePreviewInjector = (function() {
     let el_loading = el_root.querySelector('div[id="mg-issue-loading"]');
     let el_issue = el_root.querySelector('div[id="mg-issue-content"]');
 
-    // uri is not matched, don't show the issue json, becuase it maybe is
+    // if uri is not matched, don't show the issue json, becuase it maybe is
     // the old issue from outdated request
     if (json && !json.html_url.endsWith(el_anchor.pathname)) {
       return;
     }
 
+    // show preview dialog with issue content
     el_loading.style.display = 'none';
     el_issue.style.display = 'flex';
     this._dockPreviewDialog(el_root, el_anchor, el_issue, MAX_PREVIEW_SIZE);
 
+    // update issue content if need
     if (json) {
       let el_ids = el_root.querySelectorAll('*[id^="mg-issue-"]');
       for (let i = 0; i < el_ids.length; ++i) {
@@ -333,6 +369,7 @@ var IssuePreviewInjector = (function() {
         }
       }
 
+      // update issue url
       el_root.setAttribute('mg-issue-uri', json.html_url);
     }
   }
@@ -340,25 +377,37 @@ var IssuePreviewInjector = (function() {
   /**
    * Init preview dialog after it is created
    *
-   * @param el_root Root DOM element of preview dialog
+   * @param el_root Root element of preview dialog
    */
-  IssuePreviewInjector.prototype._initPreviewDialog = function(el_root) {
+  IssuePreviewInjector.prototype._initPreviewDialog =
+    function(el_root, el_anchor) {
+    // click event for close button
     let el_close = el_root.querySelector('i[id="mg-issue-close"]');
-    let win_click = function(e) {
-      if (e.target != el_root && !el_root.contains(e.target)) {
-        el_close.onclick();
+    el_close.style.cursor = 'pointer';
+    el_close.onclick = function() {
+      el_root.style.display = 'none';
+    }
+
+    // close dialog when mouse is moving outside of it
+    let self = this;
+    el_root.onmouseout = function(e) {
+      if (!el_root.contains(e.toElement) &&
+          el_anchor != e.toElement) {
+          self._onClosePreview(el_root);
+      }
+      else if (self.timer.close_preview_dialog) {
+        clearTimeout(self.timer.close_preview_dialog);
+        self.close_preview_dialog = null;
       }
     }
 
-    // check if close dialog when click is outside of it
-    window.addEventListener("click", win_click, false);
-    // click event for close button
-    let close_dialog = function() {
-      //window.removeEventListener("click", win_click, false);
-      el_root.style.display = 'none';
+    // clear close dialog timer
+    el_root.onmouseover = function() {
+      if (self.timer.close_preview_dialog) {
+        clearTimeout(self.timer.close_preview_dialog);
+        self.timer.close_preview_dialog = null;
+      }
     }
-    el_close.onclick = close_dialog;
-    el_close.style.cursor = 'pointer';
   }
 
   /**
@@ -367,12 +416,14 @@ var IssuePreviewInjector = (function() {
    * @param el_anchor Anchor element where preview dialog docks on
    */
   IssuePreviewInjector.prototype._createPreviewDialog = function(el_anchor) {
+    // create root element
     let el_root = document.createElement('div');
     el_root.className = 'mg-issue-preview';
     el_root.id = 'mg-issue-preview';
     el_root.style.maxWidth = MAX_PREVIEW_SIZE.width + 'px';
     this.style_sheet = DomUtils.createStylesheet('mg-style-sheet');
 
+    // load preview dialog html template
     let self = this;
     let xhr = new XMLHttpRequest();
     xhr.open('GET',
@@ -382,12 +433,75 @@ var IssuePreviewInjector = (function() {
       if (this.readyState == 4 && this.status == 200) {
         el_root.innerHTML = this.responseText;
         document.body.appendChild(el_root);
-        self._initPreviewDialog(el_root);
+        self._initPreviewDialog(el_root, el_anchor);
         self._showLoading(el_root, el_anchor);
       }
     }
     xhr.send();
     return el_root;
+  }
+
+  IssuePreviewInjector.prototype._onShowPreview = function(el_anchor) {
+    let hub = github_api.getCurrentHub();
+    if (!hub.token || !hub.api_uri || !hub.repo) {
+      return;
+    }
+
+    // check preview dialog
+    let pathname = el_anchor.pathname;
+    let el_root = document.getElementById('mg-issue-preview');
+    if (el_root) {
+      // check if the issue is loaded in preview dialog
+      let uri = el_root.getAttribute('mg-issue-uri');
+      if (uri && uri.endsWith(pathname)) {
+        el_root.style.display = null;
+        this._previewIssue(el_root, el_anchor, null);
+        return;
+      }
+
+      // show loading message
+      this._showLoading(el_root, el_anchor);
+      el_root.style.display = null;
+    }
+    else {
+      // create preview dialog
+      el_root = this._createPreviewDialog(el_anchor);
+    }
+
+    // send request to fetch issue content
+    let self = this;
+    let url = 'https://' + hub.api_uri + '/repos' + pathname;
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('Accept', 'application/vnd.github.mercy-preview+json');
+    xhr.setRequestHeader('Authorization', 'token ' + hub.token);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+        if (xhr.status == 200) {
+          self._previewIssue(el_root, el_anchor, JSON.parse(xhr.responseText));
+        }
+        else {
+          self._showLoadingError(xhr.status);
+        }
+      }
+    }
+    xhr.send();
+  }
+
+  /**
+   * Close preview dialog
+   *
+   * @param el_root Root element of preview dialog
+   */
+  IssuePreviewInjector.prototype._onClosePreview = function(el_root) {
+    let self = this;
+    this.timer.close_preview_dialog = setTimeout(function() {
+      let el_loading = el_root.querySelector('div[id="mg-issue-loading"]');
+      el_loading.style.display = 'none';
+      el_loading.setAttribute('mg-issue-uri', null);
+      el_root.style.display = 'none';
+      self.timer.close_preview_dialog = null;
+    }, CLOSE_PREVIEW_TIMEOUT);
   }
 
   /**
@@ -398,64 +512,43 @@ var IssuePreviewInjector = (function() {
     let el_close = document.querySelector('button[name="comment_and_close"]');
 
     if ((el_open || el_close) && this._matchUrl(window.location.href)) {
+      // init
+      //this._init();
+
       let self = this;
       let el_links = document.getElementsByTagName('a');
-
       for (let i = 0; i < el_links.length; ++i) {
         // check if <a> is a issue link, the current issue link will be ignored
-        if (!el_links[i].href ||
-            window.location.href.includes(el_links[i].pathname) ||
-            el_links[i].href.search('\/issues\/\\d+$') < 0) {
+        let el_a = el_links[i];
+        if (!el_a.href ||
+            window.location.href.includes(el_a.pathname) ||
+            el_a.href.search('\/issues\/\\d+$') < 0) {
           continue;
         }
 
-        // mouse over event handler
-        el_links[i].onmouseover = function() {
-          let hub = github_api.getCurrentHub();
-          if (!hub.token || !hub.api_uri || !hub.repo) {
-            return;
+        // when mouse is over link
+        var timer;
+        el_a.onmouseover = function() {
+          if (!timer) {
+            timer = setTimeout(function() {
+              self._onShowPreview(el_a);
+              timer = null;
+            }, SHOW_PREVIEW_TIMEOUT);
           }
+        }
 
-          // check preview dialog
-          let pathname = this.pathname;
-          let el_root = document.getElementById('mg-issue-preview');
-          if (el_root) {
-            // check if the issue is loaded in preview dialog
-            let uri = el_root.getAttribute('mg-issue-uri');
-            if (uri && uri.endsWith(this.pathname)) {
-              el_root.style.display = null;
-              self._previewIssue(el_root, this, null);
-              return;
-            }
-
-            // show loading message
-            self._showLoading(el_root, this);
-            el_root.style.display = null;
+        // when mouse is moving outside of link
+        el_a.onmouseout = function(e) {
+          if (timer) {
+            clearTimeout(timer);
+            timer = null;
           }
           else {
-            // create preview dialog
-            el_root = self._createPreviewDialog(this);
-          }
-
-          // send request to fetch issue content
-          let el_a = this;
-          let url = 'https://' + hub.api_uri + '/repos' + this.pathname;
-          let xhr = new XMLHttpRequest();
-          xhr.open('GET', url, true);
-          xhr.setRequestHeader('Accept',
-              'application/vnd.github.mercy-preview+json');
-          xhr.setRequestHeader('Authorization', 'token ' + hub.token);
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-              if (xhr.status == 200) {
-                self._previewIssue(el_root, el_a, JSON.parse(xhr.responseText));
-              }
-              else {
-                self._showLoadingError(xhr.status);
-              }
+            let el_root = document.getElementById('mg-issue-preview');
+            if (el_root) {
+              self._onClosePreview(el_root);
             }
           }
-          xhr.send();
         }
       }
 
@@ -465,6 +558,9 @@ var IssuePreviewInjector = (function() {
     return false;
   }
 
+  /**
+   * Match the url to determine if it can be injected?
+   */
   IssuePreviewInjector.prototype._matchUrl = function(url) {
     if (url) {
       // is public github url?
@@ -487,26 +583,26 @@ var IssuePreviewInjector = (function() {
     return false;
   }
 
+  /**
+   * Inject preview dialog
+   */
   IssuePreviewInjector.prototype.inject = function(url) {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
+    if (this.timer.injector) {
+      clearInterval(this.timer.injector);
+      this.timer.injector = null;
     }
 
     if (this._matchUrl(url)) {
       let self = this;
       var count = 0;
-      this.timer = setInterval(function() {
+      this.timer.injector = setInterval(function() {
         if (self._tryInjectPreview() || ++count > MAX_INTERVAL_COUNT ||
             !self._matchUrl(window.location.href)) {
-          clearInterval(self.timer);
-          self.timer = null;
+          clearInterval(self.timer.injector);
+          self.timer.injector = null;
         }
       }, INTERVAL_TIME);
     }
-  }
-
-  IssuePreviewInjector.prototype.init = function() {
   }
 
   return IssuePreviewInjector;

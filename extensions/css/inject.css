@@ -15,7 +15,6 @@ div.mg-dialog-center {
   flex-direction: column;
 }
 
-/* put in menu div */
 div.mg-export-win {
   position: absolute;
   width: 600px;
@@ -282,10 +281,10 @@ a.mg-disabled {
   color: #586069;
 }
 
-.mg-issue-preview-top, .mg-issue-preview {
+.mg-issue-preview {
   position: absolute;
   background: #fff;
-  border: 1px solid #d1d5da;/*rgba(27,31,35,0.2);*/
+  border: 1px solid #d1d5da;
   border-radius: 4px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   z-index: 999;
@@ -293,45 +292,6 @@ a.mg-disabled {
   text-align: left;
   font-size: 13px;
 }
-
-.mg-issue-preview-top:after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 0;
-  bottom: -20px;
-  left: 50%;
-  box-size: border-box;
-  border: 10px solid black;
-  border-color: transparent transparent #fff #fff;
-  transform-origin: 0 0;
-  transform: rotate(-45deg);
-  box-shadow: -2px 2px 1px 0 rgba(0, 0, 0, 0.04),  -4px 4px 3px 0 rgba(0, 0, 0, 0.16);
-}
-
-/*
-.mg-issue-preview-top:after, .mg-issue-preview-top:before {
-  bottom: 100%;
-  left: 50%;
-  border: solid transparent;
-  content: " ";
-  height: 0px;
-  width: 0px;
-  position: absolute;
-  pointer-events: none;
-}
-
-.mg-issue-preview-top:after {
-	border-bottom-color: #fff;
-  border-width: 10px;
-  margin-left: -10px;
-}
-
-.mg-issue-preview-top:before {
-  border-bottom-color: #d1d5da;
-  border-width: 11px;
-  margin-left: -11px;
-}*/
 
 .mg-issue-a {
   color: inherit;
@@ -350,7 +310,6 @@ a.mg-disabled {
 }
 
 .mg-issue-content {
-  /*max-height: 600px;*/
   overflow: scroll;
 }
 
@@ -620,14 +579,3 @@ a.mg-disabled {
   background-color: #f6f8fa !important;
   z-index: 999;
 }
-
-/*
-.mg-close {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-image: url("chrome-extension://__MSG_@@extension_id__/img/svg/x.svg");
-}*/
-

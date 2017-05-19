@@ -67,14 +67,14 @@ The following functions are planned to provide:
    </p>
   
    You can preview a issue though moving mouse over a issue link in **Issue** and **Pull Request** pages. 
-   * What can you see in preview
+   * **What can you see in preview**
      - Issue title/number
      - Issue state/creator
      - Issue milestone
      - Issue assignees
      - Issue labels
      - Issue description
-   * What's limitation in preview
+   * **What's limitation for preview**
      - Only can preview issue link in **Issue** and **Pull Request** pages
      - Can't show issue comments 
      - Issue description is shown with original format, for example: markdown original format

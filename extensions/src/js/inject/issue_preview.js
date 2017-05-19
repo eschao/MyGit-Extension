@@ -107,7 +107,7 @@ var IssuePreviewInjector = (function() {
           el.removeChild(el_imgs[0]);
         }
 
-        if (json.assignees) {
+        if (json.assignees && json.assignees.length > 0) {
           el.style.display = 'flex';
           for (let i = 0; i < json.assignees.length; ++i) {
             let user = json.assignees[i];
@@ -134,7 +134,7 @@ var IssuePreviewInjector = (function() {
           el_div.removeChild(el_labels[0]);
         }
 
-        if (json.labels) {
+        if (json.labels && json.labels.length) {
           el.style.display = 'flex';
           for (let i = 0; i < json.labels.length; ++i) {
             let label = json.labels[i];
@@ -157,7 +157,9 @@ var IssuePreviewInjector = (function() {
       },
       // if no milestone/labels/assignees, the divider need to be hidden
       'mg-issue-misc-divider': function(el, json) {
-        if (json.milestone || json.assignees || json.labels) {
+        if (json.milestone ||
+            (json.assignees && json.assignees.length > 0) ||
+            (json.labels && json.labels.length > 0)) {
           el.style.display = 'flex';
         }
         else {
@@ -176,17 +178,6 @@ var IssuePreviewInjector = (function() {
   }
 
   /**
-   * Init after injection
-   */
-  IssuePreviewInjector.prototype._init = function() {
-    // injection timer
-    this.timer = { injector: null, close_preview_dialog : null };
-
-    // use to dynamically draw arrow of preview dialog
-    this.style_sheet = null;
-  }
-
-  /**
    * Show loading message in preview dialog
    *
    * @param el_root Root DOM element of preview dialog
@@ -200,7 +191,7 @@ var IssuePreviewInjector = (function() {
     el_issue.style.display = 'none';
     let max_size = { width: 120, height: 80 };
     this._dockPreviewDialog(el_root, el_anchor, el_issue, max_size);
-  }
+  };
 
   /**
    * Show loading error message
@@ -209,11 +200,11 @@ var IssuePreviewInjector = (function() {
    * @param err_code Error code returning from fetching issue
    */
   IssuePreviewInjector.prototype._showLoadingError =
-    function(el_root, err_code) {
+  function(el_root, err_code) {
     let el_loading = el_root.querySelector('div[id="mg-issue-loading"]');
     let el_msg = el_loading.getElementsByTagName('label')[0];
     el_msg.innerHTML = "Can't load issue with error: " + err_code;
-  }
+  };
 
   /**
    * Dock issue preview dialog on given anchor element
@@ -224,14 +215,14 @@ var IssuePreviewInjector = (function() {
    * @param max_dialog_size Max width and height of preview dialog
    */
   IssuePreviewInjector.prototype._dockPreviewDialog =
-    function(el_root, el_anchor, el_issue, max_dialog_size) {
+  function(el_root, el_anchor, el_issue, max_dialog_size) {
     let screen_r = DomUtils.getElementScreenRect(el_anchor);
     let client_r = el_anchor.getBoundingClientRect();
 
     // viewport size of browser
     let view_size = {
-        width: document.documentElement.clientWidth,
-        height: document.documentElement.clientHeight,
+      width: document.documentElement.clientWidth,
+      height: document.documentElement.clientHeight,
     };
 
     // middle point x on anchor element
@@ -245,10 +236,10 @@ var IssuePreviewInjector = (function() {
     // where.middle, if true, the middle point x of preview dialog is same with
     //    the middle point of anchor element
     let where = {
-        top: client_r.top > (view_size.height- client_r.bottom),
-        left: client_r.left > (view_size.width - client_r.right),
-        middle: (client_r.middle_x > max_dialog_size.width / 2) &&
-            ((view_size.width - client_r.middle_x) > max_dialog_size.width / 2)
+      top: client_r.top > (view_size.height- client_r.bottom),
+      left: client_r.left > (view_size.width - client_r.right),
+      middle: (client_r.middle_x > max_dialog_size.width / 2) &&
+        ((view_size.width - client_r.middle_x) > max_dialog_size.width / 2)
     };
 
     // the value of css: .mg-issue-preview::after which is used to draw arrow,
@@ -256,7 +247,9 @@ var IssuePreviewInjector = (function() {
     // its css value need to be dynamically computed and set
     let after = {
       css:'content:""; position:absolute; width:0; height:0; ' +
-          'box-size:border-box; border:8px solid black; transform-origin:0 0;' +
+          'box-size:border-box; border:8px solid black; ' +
+          'transform-origin:0 0; -moz-transform-origin:0 0; ' +
+          '-webkit-transform-origin:0 0; -ms-transform-origin:0 0; ' +
           'border-color:transparent transparent #fff #fff;',
       rotate: '',
       box_shadow: '',
@@ -268,7 +261,9 @@ var IssuePreviewInjector = (function() {
 
     // dock on the middle of anchor
     if (where.middle) {
-      after.position += 'left:calc(50% ' + (where.top ? '-' : '+') + ' 10px);';
+      let calc = '(50% ' + (where.top ? '-' : '+') + ' 10px)';
+      after.position += 'left:calc' + calc + '; -moz-calc' + calc +
+          '; -webkit-calc' + calc + '; -o-calc' + calc + ';';
       el_root.style.left = client_r.middle_x + 'px';
       translate.x = '-50%';
     }
@@ -299,7 +294,8 @@ var IssuePreviewInjector = (function() {
     // dock on the top of anchor
     let max_height = max_dialog_size.height;
     if (where.top) {
-      after.rotate = 'transform:rotate(-45deg);'
+      after.rotate = 'transform:rotate(-45deg); -moz-transform:rotate(-45deg);'
+          + ' -webkit-transform:rotate(-45deg); -ms-transform:rotate(-45deg);';
       after.box_shadow = 'box-shadow:-2px 2px 1px 0 rgba(0, 0, 0, 0.04), ' +
           '-4px 4px 3px 0 rgba(0, 0, 0, 0.16);';
       after.position += 'bottom:-15px;';
@@ -313,7 +309,8 @@ var IssuePreviewInjector = (function() {
     }
     // dock under of anchor
     else {
-      after.rotate = 'transform:rotate(135deg);'
+      after.rotate = 'transform:rotate(135deg); -moz-transform:rotate(135deg);'
+          + ' -webkit-transform:rotate(135deg); -ms-transform:rotate(135deg);';
       after.box_shadow = 'box-shadow:-1px 1px 1px 0 rgba(0, 0, 0, 0.2); ';
       after.position += 'top:1px;';
       el_root.style.top = (screen_r.bottom + 16) + 'px';
@@ -334,7 +331,7 @@ var IssuePreviewInjector = (function() {
     DomUtils.cleanStylesheet(this.style_sheet);
     DomUtils.addCSSRule(this.style_sheet, '.mg-issue-preview:after',
         after.css + after.position + after.rotate + after.box_shadow, 0);
-  }
+  };
 
   /**
    * Preview issue content
@@ -344,7 +341,7 @@ var IssuePreviewInjector = (function() {
    * @param json Issue json data
    */
   IssuePreviewInjector.prototype._previewIssue =
-    function(el_root, el_anchor, json) {
+  function(el_root, el_anchor, json) {
     let el_loading = el_root.querySelector('div[id="mg-issue-loading"]');
     let el_issue = el_root.querySelector('div[id="mg-issue-content"]');
 
@@ -372,7 +369,7 @@ var IssuePreviewInjector = (function() {
       // update issue url
       el_root.setAttribute('mg-issue-uri', json.html_url);
     }
-  }
+  };
 
   /**
    * Init preview dialog after it is created
@@ -380,26 +377,26 @@ var IssuePreviewInjector = (function() {
    * @param el_root Root element of preview dialog
    */
   IssuePreviewInjector.prototype._initPreviewDialog =
-    function(el_root, el_anchor) {
+  function(el_root, el_anchor) {
     // click event for close button
     let el_close = el_root.querySelector('i[id="mg-issue-close"]');
     el_close.style.cursor = 'pointer';
     el_close.onclick = function() {
       el_root.style.display = 'none';
-    }
+    };
 
     // close dialog when mouse is moving outside of it
     let self = this;
     el_root.onmouseout = function(e) {
       if (!el_root.contains(e.toElement) &&
           el_anchor != e.toElement) {
-          self._onClosePreview(el_root);
+        self._onClosePreview(el_root);
       }
       else if (self.timer.close_preview_dialog) {
         clearTimeout(self.timer.close_preview_dialog);
         self.close_preview_dialog = null;
       }
-    }
+    };
 
     // clear close dialog timer
     el_root.onmouseover = function() {
@@ -407,8 +404,8 @@ var IssuePreviewInjector = (function() {
         clearTimeout(self.timer.close_preview_dialog);
         self.timer.close_preview_dialog = null;
       }
-    }
-  }
+    };
+  };
 
   /**
    * Create preview dialog
@@ -427,8 +424,8 @@ var IssuePreviewInjector = (function() {
     let self = this;
     let xhr = new XMLHttpRequest();
     xhr.open('GET',
-             browser_api.extension.getURL('templates/issue_preview_dialog.html')
-             , true);
+       browser_api.extension.getURL('templates/issue_preview_dialog.html'),
+       true);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         el_root.innerHTML = this.responseText;
@@ -436,10 +433,10 @@ var IssuePreviewInjector = (function() {
         self._initPreviewDialog(el_root, el_anchor);
         self._showLoading(el_root, el_anchor);
       }
-    }
+    };
     xhr.send();
     return el_root;
-  }
+  };
 
   IssuePreviewInjector.prototype._onShowPreview = function(el_anchor) {
     let hub = github_api.getCurrentHub();
@@ -484,9 +481,9 @@ var IssuePreviewInjector = (function() {
           self._showLoadingError(xhr.status);
         }
       }
-    }
+    };
     xhr.send();
-  }
+  };
 
   /**
    * Close preview dialog
@@ -502,19 +499,15 @@ var IssuePreviewInjector = (function() {
       el_root.style.display = 'none';
       self.timer.close_preview_dialog = null;
     }, CLOSE_PREVIEW_TIMEOUT);
-  }
+  };
 
   /**
    * Try to inject preview dialog
    */
   IssuePreviewInjector.prototype._tryInjectPreview = function() {
-    let el_open = document.querySelector('button[name="comment_and_open"]');
-    let el_close = document.querySelector('button[name="comment_and_close"]');
+    let el_form = document.querySelector('form[class="js-new-comment-form"]');
 
-    if ((el_open || el_close) && this._matchUrl(window.location.href)) {
-      // init
-      //this._init();
-
+    if (el_form && this._matchUrl(window.location.href)) {
       let self = this;
       let el_links = document.getElementsByTagName('a');
       for (let i = 0; i < el_links.length; ++i) {
@@ -535,10 +528,10 @@ var IssuePreviewInjector = (function() {
               timer = null;
             }, SHOW_PREVIEW_TIMEOUT);
           }
-        }
+        };
 
         // when mouse is moving outside of link
-        el_a.onmouseout = function(e) {
+        el_a.onmouseout = function() {
           if (timer) {
             clearTimeout(timer);
             timer = null;
@@ -549,14 +542,14 @@ var IssuePreviewInjector = (function() {
               self._onClosePreview(el_root);
             }
           }
-        }
+        };
       }
 
       return true;
     }
 
     return false;
-  }
+  };
 
   /**
    * Match the url to determine if it can be injected?
@@ -565,23 +558,23 @@ var IssuePreviewInjector = (function() {
     if (url) {
       // is public github url?
       if (github_api.github_token && github_api.github_token.token) {
-        let uri = "https:\/\/github.com\/.*\/.*\/";
-        if (url.search(uri + "issues\/\\d+$") > -1) {
+        let uri = 'https:\/\/github.com\/.*\/.*\/';
+        if (url.search(uri + '(issues|pull)\/\\d+$') > -1) {
           return true;
         }
       }
 
       // is github enterprise url?
       if (github_api.github_e_token && github_api.github_e_token.token) {
-        let uri = "https:\/\/" + github_api.github_e_token.uri + "\/.*\/.*\/";
-        if (url.search(uri + "issues\/\\d+$") > -1) {
+        let uri = 'https:\/\/' + github_api.github_e_token.uri + '\/.*\/.*\/';
+        if (url.search(uri + '(issues|pull)\/\\d+$') > -1) {
           return true;
         }
       }
     }
 
     return false;
-  }
+  };
 
   /**
    * Inject preview dialog
@@ -603,7 +596,7 @@ var IssuePreviewInjector = (function() {
         }
       }, INTERVAL_TIME);
     }
-  }
+  };
 
   return IssuePreviewInjector;
 }());

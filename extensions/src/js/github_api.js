@@ -54,25 +54,25 @@ var GitHubApi = (function() {
 
     // is github enterprise?
     if (this.github_e_token && this.github_e_token.uri &&
-        url.search("https:\/\/" + this.github_e_token.uri + "\/.*") > -1) {
+        url.search('https:\/\/' + this.github_e_token.uri + '\/.*') > -1) {
       return {
         token: this.github_e_token.token,
-        api_uri: this.github_e_token.uri + "/api/v3",
+        api_uri: this.github_e_token.uri + '/api/v3',
         repo: name
       };
     }
 
     // is public github?
-    if (url.search("https:\/\/github.com\/.*") > -1) {
+    if (url.search('https:\/\/github.com\/.*') > -1) {
       return {
         token: this.github_token.token,
-        api_uri: "api.github.com",
+        api_uri: 'api.github.com',
         repo: name
       };
     }
 
     return { token: null, api_uri: null, repo: name};
-  }
+  };
 
   /**
    * Get repository name
@@ -81,14 +81,14 @@ var GitHubApi = (function() {
    */
   GitHubApi.prototype.getRepoName = function() {
     let el_a = document.querySelector(
-      "div[class*='repohead-details-container'] strong[itemprop='name'] a");
+      'div[class*="repohead-details-container"] strong[itemprop="name"] a');
     if (el_a && el_a.pathname) {
       let name = el_a.pathname;
-      if (name[0] == "/") {
+      if (name[0] == '/') {
         name = name.slice(1);
       }
 
-      if (name.slice(0, -1) == "/") {
+      if (name.slice(0, -1) == '/') {
         name = name.slice(0, -1);
       }
 
@@ -96,7 +96,7 @@ var GitHubApi = (function() {
     }
 
     return null;
-  }
+  };
 
   /**
    * Get repository name as dictionary
@@ -114,7 +114,7 @@ var GitHubApi = (function() {
     if (name) {
       let i = name.indexOf('/');
       if (i < 0) {
-        return { user: "__empty__", repo: name, full_name: name };
+        return { user: '__empty__', repo: name, full_name: name };
       }
       else {
         return {
@@ -126,7 +126,7 @@ var GitHubApi = (function() {
     }
 
     return null;
-  }
+  };
 
   return GitHubApi;
 }());

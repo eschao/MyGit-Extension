@@ -18,7 +18,7 @@
  * Drag & Drop class
  */
 var DragDrop = (function() {
-  "user strict";
+  'user strict';
 
   /**
    * Constructor
@@ -45,7 +45,7 @@ var DragDrop = (function() {
     let self = this;
 
     // mouse up event handler
-    let onMouseUp = function(event) {
+    let onMouseUp = function() {
       let index = self.move_state.index;
       if (index > -1) {
         self.elements[index].style.color = null;
@@ -130,7 +130,7 @@ var DragDrop = (function() {
         self.move_state.start_client_x = event.clientX;
         self.elements[index].style.color = 'transparent';
       }
-    }
+    };
 
     // mouse down event handler
     let onMouseDown = function(event) {
@@ -141,10 +141,10 @@ var DragDrop = (function() {
           self.move_state.index = i;
           break;
         }
-      };
+      }
 
       if (self.move_state.index < 0) {
-        console.log("Can't find clicked element!");
+        console.warn("Can't find clicked element!");
         return;
       }
 
@@ -155,11 +155,11 @@ var DragDrop = (function() {
       self.move_state.ele = this.cloneNode(true);
 
       // initial moving state
-      self.move_state.ele.style.left = this.offsetLeft + "px";
-      self.move_state.ele.className += " mg-dd-move-div";
+      self.move_state.ele.style.left = this.offsetLeft + 'px';
+      self.move_state.ele.className += ' mg-dd-move-div';
       self.move_state.start_client_x = event.clientX;
       self.move_state.start_left = this.offsetLeft;
-      self.move_state.ele.style.cursor = "move";
+      self.move_state.ele.style.cursor = 'move';
 
       // set global mouse up/move event handlers
       document.onmouseup = onMouseUp;
@@ -170,7 +170,7 @@ var DragDrop = (function() {
     this.elements.forEach(function(ele) {
       ele.onmousedown = onMouseDown;
     });
-  }
+  };
 
   return DragDrop;
 }());

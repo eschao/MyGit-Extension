@@ -18,16 +18,15 @@
  * Issue export dialog class
  */
 var IssueExportDialog = (function() {
-  "use strict";
+  'use strict';
 
-  let DIALOG_ROOT_ID = "mg-export-dialog";
-  let DELIMITER = ",";
-  let TBL_HEADERS_DIV_ID = "mg-table-headers";
-  let GEN_TBL_HEADER_ID = "mg-gen-headers";
-  let CSV_DELIMITER_ID = "mg-csv-delimiter";
-  let EXPAND_LABELS_ID = "mg-expand-labels";
-  let LABEL_DELIMITER_ID = "mg-label-delimiter";
-  let MESSAGE_ID = "mg-message";
+  let DELIMITER = ',';
+  let TBL_HEADERS_DIV_ID = 'mg-table-headers';
+  let GEN_TBL_HEADER_ID = 'mg-gen-headers';
+  let CSV_DELIMITER_ID = 'mg-csv-delimiter';
+  let EXPAND_LABELS_ID = 'mg-expand-labels';
+  let LABEL_DELIMITER_ID = 'mg-label-delimiter';
+  let MESSAGE_ID = 'mg-message';
 
   /**
    * Constructor
@@ -50,17 +49,17 @@ var IssueExportDialog = (function() {
       }
       else {
         self.config = {
-          "delimiter": DELIMITER,
-          "gen_headers": true,
-          "label": { "expand": true, "delimiter": "|" },
-          "headers": [
-            { "name": "number", "title": "Issue No", "enable": true },
-            { "name": "state", "title": "State", "enable": true },
-            { "name": "title", "title": "Title", "enable": true },
-            { "name": "assignee", "title": "Assignee", "enable": true },
-            { "name": "user", "title": "Author", "enable": true },
-            { "name": "milestone", "title": "Milestone", "enable": true },
-            { "name": "labels", "title": "Labels", "enable": true }
+          'delimiter': DELIMITER,
+          'gen_headers': true,
+          'label': { 'expand': true, 'delimiter': '|' },
+          'headers': [
+            { 'name': 'number', 'title': 'Issue No', 'enable': true },
+            { 'name': 'state', 'title': 'State', 'enable': true },
+            { 'name': 'title', 'title': 'Title', 'enable': true },
+            { 'name': 'assignee', 'title': 'Assignee', 'enable': true },
+            { 'name': 'user', 'title': 'Author', 'enable': true },
+            { 'name': 'milestone', 'title': 'Milestone', 'enable': true },
+            { 'name': 'labels', 'title': 'Labels', 'enable': true }
           ]
         };
       }
@@ -68,20 +67,20 @@ var IssueExportDialog = (function() {
 
     this.parser = {
       // issue number parser
-      "number": function(item) {
+      'number': function(item) {
         return item.number;
       },
       // issue state parser
-      "state": function(item) {
+      'state': function(item) {
         return item.state;
       },
       // issue titler parser
-      "title": function(item) {
+      'title': function(item) {
         return item.title;
       },
       // issue assignee parser
-      "assignee": function(item) {
-        let s = "";
+      'assignee': function(item) {
+        let s = '';
         if (item.assignee) {
           item.assignees.forEach(function(a) {
             s += a.login + ' ';
@@ -92,19 +91,19 @@ var IssueExportDialog = (function() {
         return s;
       },
       // issue user(author) parser
-      "user": function(item) {
+      'user': function(item) {
         return item.user.login;
       },
       // issue milestone parser
-      "milestone": function(item) {
-        return item.milestone ? item.milestone.title : "";
+      'milestone': function(item) {
+        return item.milestone ? item.milestone.title : '';
       },
       // issue labels parser
-      "labels": function(item, delimiter, expand, exports) {
+      'labels': function(item, delimiter, expand, exports) {
         // expand labels, which means every label is a column in csv
         if (expand) {
           Object.keys(exports.labels).forEach(function(l) {
-            exports.labels[l] = "";
+            exports.labels[l] = '';
           });
 
           if (item.labels) {
@@ -122,7 +121,7 @@ var IssueExportDialog = (function() {
         // don't expand labels, which means all labels are in one column in csv
         else {
           if (item.labels == null) {
-            return "";
+            return '';
           }
 
           let labels = [];
@@ -134,7 +133,7 @@ var IssueExportDialog = (function() {
         }
       }
     };
-  }
+  };
 
   /**
    * Show message
@@ -144,23 +143,23 @@ var IssueExportDialog = (function() {
    */
   IssueExportDialog.prototype.showMessage = function(msg, is_error) {
     let el_msg = document.getElementById(MESSAGE_ID);
-    el_msg.style.color = is_error ? "red" : "blue";
-    el_msg.innerText = msg || "";
-  }
+    el_msg.style.color = is_error ? 'red' : 'blue';
+    el_msg.innerText = msg || '';
+  };
 
   /**
    * Show export dialog
    */
   IssueExportDialog.prototype.show = function() {
     let root = document.createElement('div');
-    root.className = "mg-dialog-center mg-flex";
-    root.setAttribute("id", "mg-export-dialog");
+    root.className = 'mg-dialog-center mg-flex';
+    root.setAttribute('id', 'mg-export-dialog');
 
     // read export dialog html and initiate
     let self = this;
     let xhr = new XMLHttpRequest();
-    xhr.open("GET",
-             browser_api.extension.getURL("templates/issue_export_dialog.html")
+    xhr.open('GET',
+             browser_api.extension.getURL('templates/issue_export_dialog.html')
              , true);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -170,7 +169,7 @@ var IssueExportDialog = (function() {
       }
     };
     xhr.send();
-  }
+  };
 
   /**
    * Init export dialog
@@ -196,41 +195,41 @@ var IssueExportDialog = (function() {
 
     // close export dialog
     let self = this;
-    let el_close = document.getElementById("mg-close");
+    let el_close = document.getElementById('mg-close');
     let win_click = function(e) {
       if (e.target != root && !root.contains(e.target)) {
         el_close.onclick();
       }
-    }
-    window.addEventListener("click", win_click, false);
+    };
+    window.addEventListener('click', win_click, false);
     el_close.onclick = function() {
-      window.removeEventListener("click", win_click, false);
+      window.removeEventListener('click', win_click, false);
       self.storeConfig();
       document.body.removeChild(root);
-    }
+    };
 
     // toggle table header
     let onToggleHeader = function() {
-      if (this.className.indexOf("mg-header-disable") != -1) {
-        this.className = this.className.replace(" mg-header-disable", "");
-        this.setAttribute("enable", "true");
+      if (this.className.indexOf('mg-header-disable') != -1) {
+        this.className = this.className.replace(' mg-header-disable', '');
+        this.setAttribute('enable', 'true');
       }
       else {
-        this.className += " mg-header-disable";
-        this.setAttribute("enable", "false");
+        this.className += ' mg-header-disable';
+        this.setAttribute('enable', 'false');
       }
-    }
+    };
 
     let headers = document.getElementById(TBL_HEADERS_DIV_ID)
-                          .getElementsByTagName("div");
+                          .getElementsByTagName('div');
     for (let i = 0; i < headers.length; ++i) {
       headers[i].onclick = onToggleHeader;
-      headers[i].setAttribute("name", this.config.headers[i].name);
+      headers[i].setAttribute('name', this.config.headers[i].name);
       headers[i].innerHTML = this.config.headers[i].title;
-      headers[i].setAttribute("enable", this.config.headers[i].enable
+      headers[i].setAttribute('enable', this.config.headers[i].enable
                                             .toString());
       if (!this.config.headers[i].enable) {
-        headers[i].className += " mg-header-disable";
+        headers[i].className += ' mg-header-disable';
       }
     }
 
@@ -240,24 +239,24 @@ var IssueExportDialog = (function() {
 
     // onclick of expand label
     el_expand_labels.onclick = function() {
-      let div = document.getElementById("mg-label-delimter-d");
+      let div = document.getElementById('mg-label-delimter-d');
       if (this.checked) {
-        div.style.color = "lightgray";
+        div.style.color = 'lightgray';
         el_label_delimiter.disabled = true;
       }
       else {
         div.style = null;
         el_label_delimiter.disabled = false;
       }
-    }
+    };
     el_expand_labels.onclick();
 
     // click event for export button
-    document.getElementById("mg-start-export-btn").onclick = function(e) {
+    document.getElementById('mg-start-export-btn').onclick = function(e) {
       e.preventDefault();
       self.export();
-    }
-  }
+    };
+  };
 
   /**
    * Save configurations to browser storage
@@ -273,11 +272,11 @@ var IssueExportDialog = (function() {
                            label_delimiter.value != this.config.label.delimiter);
 
     let headers = document.getElementById(TBL_HEADERS_DIV_ID)
-                          .getElementsByTagName("div");
+                          .getElementsByTagName('div');
     let is_headers_changed = false;
     for (let i = 0; i < headers.length; ++i) {
-      let name = headers[i].getAttribute("name");
-      let enable = headers[i].getAttribute("enable");
+      let name = headers[i].getAttribute('name');
+      let enable = headers[i].getAttribute('enable');
       if (name != this.config.headers[i].name ||
           enable != this.config.headers[i].enable.toString()) {
         is_headers_changed = true;
@@ -287,11 +286,11 @@ var IssueExportDialog = (function() {
 
     if (is_others_changed || is_headers_changed) {
       let config = {
-        "delimiter": delimiter.value,
-        "gen_headers": gen_headers.checked,
-        "label": {
-          "expand": expand_labels.checked,
-          "delimiter": label_delimiter.value
+        'delimiter': delimiter.value,
+        'gen_headers': gen_headers.checked,
+        'label': {
+          'expand': expand_labels.checked,
+          'delimiter': label_delimiter.value
         }
       };
 
@@ -299,15 +298,15 @@ var IssueExportDialog = (function() {
         let values = [];
         headers.forEach(function(header) {
           values.push({
-            "name": header.getAttribute("name"),
-            "title": header.innerText,
-            "enable": header.getAttribute("enable") == "true" ? true : false
+            'name': header.getAttribute('name'),
+            'title': header.innerText,
+            'enable': header.getAttribute('enable') == 'true' ? true : false
           });
         });
-        config["headers"] = values;
+        config['headers'] = values;
       }
       else {
-        config["headers"] = this.config.headers;
+        config['headers'] = this.config.headers;
       }
 
       this.config = config;
@@ -315,7 +314,7 @@ var IssueExportDialog = (function() {
       data[MYGIT_GITHUB_ISSUE_EXPORT_KEY] = this.config;
       browser_api.storage.set(data);
     }
-  }
+  };
 
   /**
    * Export issues
@@ -325,9 +324,9 @@ var IssueExportDialog = (function() {
   IssueExportDialog.prototype._exportIssues = function(exports) {
     let self = this;
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", exports.url, true);
-    xhr.setRequestHeader("Accept", "application/vnd.github.mercy-preview+json");
-    xhr.setRequestHeader("Authorization", "token " + exports.token);
+    xhr.open('GET', exports.url, true);
+    xhr.setRequestHeader('Accept', 'application/vnd.github.mercy-preview+json');
+    xhr.setRequestHeader('Authorization', 'token ' + exports.token);
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
         if (xhr.status == 200) {
@@ -339,7 +338,7 @@ var IssueExportDialog = (function() {
             self._buildIssues(json, exports);
           }
 
-          let link = xhr.getResponseHeader("Link");
+          let link = xhr.getResponseHeader('Link');
           if (link) {
             let items = link.split(',');
             let next_url = null;
@@ -365,10 +364,10 @@ var IssueExportDialog = (function() {
           }
         }
         else {
-          self.showMessage("Failed to search issues: " + xhr.status);
+          self.showMessage('Failed to search issues: ' + xhr.status);
         }
       }
-    }
+    };
     xhr.send();
   };
 
@@ -376,28 +375,28 @@ var IssueExportDialog = (function() {
    * Build issue search url by filters
    */
   IssueExportDialog.prototype._buildSearchUrlByFilters = function(base_uri, repo) {
-    let el_filter = document.querySelector("input[id='js-issues-search']");
+    let el_filter = document.querySelector('input[id="js-issues-search"]');
     if (!el_filter) {
-      console.log("Can't find issue filter input element");
+      console.warn("Can't find issue filter input element");
       return null;
     }
 
-    let filters = el_filter.getAttribute("value");
+    let filters = el_filter.getAttribute('value');
     if (!filters) {
-      return base_uri + "?q=" + encodeURI("repo:" + repo + " state:open is:issue");
+      return base_uri + '?q=' + encodeURI('repo:' + repo + ' state:open is:issue');
     }
 
     if (repo) {
       if (filters[filters.length-1] != ' ') {
-        filters += " repo:" + repo;
+        filters += ' repo:' + repo;
       }
       else {
-        filters += "repo:" + repo;
+        filters += 'repo:' + repo;
       }
     }
 
-    return base_uri + "?q=" + encodeURI(filters);
-  }
+    return base_uri + '?q=' + encodeURI(filters);
+  };
 
   /**
    * Build issue result
@@ -415,7 +414,7 @@ var IssueExportDialog = (function() {
 
       let issue = [];
       Object.keys(exports.parser).forEach(function(prop) {
-        if (prop == "labels") {
+        if (prop == 'labels') {
           issue.push(exports.parser[prop](item, delimiter, expanded, exports));
         }
         else {
@@ -424,8 +423,8 @@ var IssueExportDialog = (function() {
       });
 
       exports.issues.push(issue);
-      self.showMessage("Exporting issues " + exports.issues.length + " of " +
-          exports.total_count + " ...");
+      self.showMessage('Exporting issues ' + exports.issues.length + ' of ' +
+          exports.total_count + ' ...');
     }
   };
 
@@ -433,15 +432,15 @@ var IssueExportDialog = (function() {
    * Save issues to local disk
    */
   IssueExportDialog.prototype._saveIssues = function(exports) {
-    let data = "";
+    let data = '';
     let label_index = -1;
     let headers = [];
 
     this.config.headers.forEach(function(e) {
       if (exports.parser[e.name]) {
         headers.push(e.title);
-        if (e.name == "labels") {
-         label_index = headers.length - 1;
+        if (e.name == 'labels') {
+          label_index = headers.length - 1;
         }
       }
     });
@@ -454,24 +453,24 @@ var IssueExportDialog = (function() {
         headers[label_index] = labels.join(delimiter);
       }
 
-      data = headers.join(delimiter) + "\n";
+      data = headers.join(delimiter) + '\n';
     }
 
     exports.issues.forEach(function(issue) {
       if (label_index > -1 && is_expand) {
         let l = issue[label_index].join(delimiter);
-        issue[label_index].forEach(function(o) {
+        issue[label_index].forEach(function() {
           l += delimiter;
         });
         issue[label_index] = l;
       }
 
-      data += issue.join(delimiter) + "\n";
+      data += issue.join(delimiter) + '\n';
     });
 
-    let blob = new Blob([data], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "exported_issues.csv");
-    this.showMessage("");
+    let blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, 'exported_issues.csv');
+    this.showMessage('');
     data = null;
     blob = null;
   };
@@ -483,7 +482,7 @@ var IssueExportDialog = (function() {
     this.storeConfig();
     let hub = github_api.getCurrentHub();
     if (!hub.token) {
-      this.showMessage("Please sign in GitHub!", true);
+      this.showMessage('Please sign in GitHub!', true);
       return;
     }
 
@@ -494,22 +493,22 @@ var IssueExportDialog = (function() {
     let can_export = false;
     this.config.headers.forEach(function(header) {
       if (header.enable) {
-        exports.parser[header.name] = self.parser[header.name]
+        exports.parser[header.name] = self.parser[header.name];
         can_export = true;
       }
     });
 
     if (!can_export) {
-      this.showMessage("Please choose issue columns to export!", true);
+      this.showMessage('Please choose issue columns to export!', true);
       return;
     }
 
-    let base_uri = "https://" + hub.api_uri + "/search/issues";
+    let base_uri = 'https://' + hub.api_uri + '/search/issues';
     let url = this._buildSearchUrlByFilters(base_uri, hub.repo);
     if (url) {
       exports.url = url;
       exports.token = hub.token;
-      this.showMessage("Exporting issues ...");
+      this.showMessage('Exporting issues ...');
       this._exportIssues(exports);
     }
     else {

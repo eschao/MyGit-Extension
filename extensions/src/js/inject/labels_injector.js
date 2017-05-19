@@ -18,20 +18,20 @@
  * Injector for labels page
  */
 var LabelsInjector = (function() {
-  "use strict";
+  'use strict';
 
   // constants
   let MAX_INTERVAL_COUNT = 100;
   let INTERVAL_TIME = 100;
   let NEW_COLORS = [
-    "a25768", "d0576b", "e95295", "e198b4",
-    "f7b977", "f39800", "ee7800", "c89932",
-    "c3d825", "aacf53", "82ae46", "69821b",
-    "0eea16", "98d98e", "68be8d", "3b7960",
-    "2c4f54", "00a497", "80989b", "a0d8ef",
-    "5b7e91", "426579", "164a84", "393f4c",
-    "706caa", "884898", "985b8a", "7a4171",
-    "b4866b", "71686c", "856859", "6f4b3e"
+    'a25768', 'd0576b', 'e95295', 'e198b4',
+    'f7b977', 'f39800', 'ee7800', 'c89932',
+    'c3d825', 'aacf53', '82ae46', '69821b',
+    '0eea16', '98d98e', '68be8d', '3b7960',
+    '2c4f54', '00a497', '80989b', 'a0d8ef',
+    '5b7e91', '426579', '164a84', '393f4c',
+    '706caa', '884898', '985b8a', '7a4171',
+    'b4866b', '71686c', '856859', '6f4b3e'
   ];
 
   function LabelsInjector() {
@@ -43,12 +43,12 @@ var LabelsInjector = (function() {
    * Match if the url is label url
    */
   LabelsInjector.prototype._matchUrl = function(url) {
-    return (url.search("https:\/\/github.com\/.*\/.*\/labels$") > -1 ||
+    return (url.search('https:\/\/github.com\/.*\/.*\/labels$') > -1 ||
            (github_api.github_e_token &&
             github_api.github_e_token.uri &&
-            url.search("https:\/\/" + github_api.github_e_token.uri +
-              "\/.*\/.*\/labels$") > -1));
-  }
+            url.search('https:\/\/' + github_api.github_e_token.uri +
+              '\/.*\/.*\/labels$') > -1));
+  };
 
   /**
    * Inject color list for label creation/edit
@@ -73,7 +73,7 @@ var LabelsInjector = (function() {
         }
       }, INTERVAL_TIME);
     }
-  }
+  };
 
 
   /**
@@ -84,9 +84,9 @@ var LabelsInjector = (function() {
   LabelsInjector.prototype._tryInjectColorList = function() {
     // get predefined colors
     let el_color_menu = document.querySelector(
-        "div[class='dropdown-menu dropdown-menu-se label-colors']");
+        'div[class="dropdown-menu dropdown-menu-se label-colors"]');
     if (!el_color_menu || el_color_menu.childElementCount < 1) {
-      console.log("Can't get predefined color list");
+      console.warn("Can't get predefined color list");
       return false;
     }
 
@@ -96,10 +96,10 @@ var LabelsInjector = (function() {
     }
 
     // get all color menus
-    let el_colors = el_color_menu.getElementsByTagName("span");
+    let el_colors = el_color_menu.getElementsByTagName('span');
     let self = this;
     el_colors.forEach(function(c) {
-      let color = c.getAttribute("data-hex-color");
+      let color = c.getAttribute('data-hex-color');
       if (color) {
         self.colors[color] = 0;
       }
@@ -114,14 +114,14 @@ var LabelsInjector = (function() {
     this._markUsedColors();
 
     // add listeners to all color menus
-    let el_lis = document.querySelectorAll("ul[class='table-list " +
-        "table-list-bordered'] li");
+    let el_lis = document.querySelectorAll('ul[class="table-list ' +
+        'table-list-bordered"] li');
     for (let i = 0; i < el_lis.length; ++i) {
-      let el_input = el_lis[i].querySelector("input[name='label[color]']");
-      let el_save = el_lis[i].querySelector("div[class='new-label-actions']" +
-          " button[type='submit']");
-      let el_delete = el_lis[i].querySelector("div[class='label-delete'] " +
-          "button[type='submit']");
+      let el_input = el_lis[i].querySelector('input[name="label[color]"]');
+      let el_save = el_lis[i].querySelector('div[class="new-label-actions"]' +
+          ' button[type="submit"]');
+      let el_delete = el_lis[i].querySelector('div[class="label-delete"] ' +
+          'button[type="submit"]');
       this._addListeners(el_input, el_save, el_delete);
     }
 
@@ -129,19 +129,19 @@ var LabelsInjector = (function() {
     this._installListenersForCreateLabel();
     this._installLabelListObserver();
     return true;
-  }
+  };
 
   /**
    * Install listeners for creating label
    */
   LabelsInjector.prototype._installListenersForCreateLabel = function() {
-    let el_form = document.querySelector("form[id='new_label']");
+    let el_form = document.querySelector('form[id="new_label"]');
     if (el_form) {
-      let el_input = el_form.querySelector("input[name='label[color]']");
-      let el_create = el_form.querySelector("button[type='submit']");
+      let el_input = el_form.querySelector('input[name="label[color]"]');
+      let el_create = el_form.querySelector('button[type="submit"]');
       this._addListeners(el_input, el_create);
     }
-  }
+  };
 
   /**
    * Install observer for label list DOM change
@@ -160,17 +160,17 @@ var LabelsInjector = (function() {
   LabelsInjector.prototype._installLabelListObserver = function() {
     let self = this;
     let MObserver = window.MutationObserver || window.WebKitMutationObserver;
-    let observer = new MObserver(function(mutations, observer) {
-      mutations.forEach(function(m, i) {
-        if (m.type == "childList" && m.addedNodes && m.addedNodes.length > 0) {
+    let observer = new MObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.type == 'childList' && m.addedNodes && m.addedNodes.length > 0) {
           m.addedNodes.forEach(function(el) {
             // new label node in DOM, add nesccessary listeners
-            if (el.tagName == "LI") {
-              let el_input = el.querySelector("input[name='label[color]']");
-              let el_save = el.querySelector("div[class='new-label-actions'] " +
-                  "button[type='submit']");
-              let el_delete = el.querySelector("div[class='label-delete'] " +
-                  "button[type='submit']");
+            if (el.tagName == 'LI') {
+              let el_input = el.querySelector('input[name="label[color]"]');
+              let el_save = el.querySelector('div[class="new-label-actions"] ' +
+                  'button[type="submit"]');
+              let el_delete = el.querySelector('div[class="label-delete"] ' +
+                  'button[type="submit"]');
               self._addListeners(el_input, el_save, el_delete);
             }
           });
@@ -178,10 +178,10 @@ var LabelsInjector = (function() {
       });
     });
 
-    let el_ul = document.querySelector("ul[class='table-list " +
-                                       "table-list-bordered']");
+    let el_ul = document.querySelector('ul[class="table-list ' +
+                                       'table-list-bordered"]');
     observer.observe(el_ul, { childList:true });
-  }
+  };
 
   /**
    * Add listeneres for given elements
@@ -198,31 +198,31 @@ var LabelsInjector = (function() {
     if (el_input) {
       var handler = function() {
         let el_existed = el_input.parentNode.querySelector(
-            "i[name='" + NEW_COLORS[0] + "']");
+            'i[name="' + NEW_COLORS[0] + '"]');
         if (!el_existed) {
           let el_color_menu = el_input.parentNode.querySelector(
-                              "div[class*='label-colors']");
+                              'div[class*="label-colors"]');
           if (el_color_menu) {
             self._initColorMenuList(el_color_menu);
-            el_input.removeEventListener("focus", handler, false);
+            el_input.removeEventListener('focus', handler, false);
           }
         }
       };
-      el_input.addEventListener("focus", handler, false);
+      el_input.addEventListener('focus', handler, false);
     }
 
     // add click listener for save button
     if (el_save) {
-      el_save.addEventListener("click", function() {
-        let old_color = (el_input.defaultValue || "").replace("#", "");
-        let new_color = (el_input.value || "").replace("#", "");
+      el_save.addEventListener('click', function() {
+        let old_color = (el_input.defaultValue || '').replace('#', '');
+        let new_color = (el_input.value || '').replace('#', '');
         self.colors[old_color]--;
         self.colors[new_color]++;
 
         // hide all old colors' mark if need
-        let old_mark = self.colors[old_color] > 0 ? "white" : ("#" + old_color);
-        let el_old_colors = document.querySelectorAll("i[name='" + old_color +
-            "']");
+        let old_mark = self.colors[old_color] > 0 ? 'white' : ('#' + old_color);
+        let el_old_colors = document.querySelectorAll('i[name="' + old_color +
+            '"]');
         for (let i = 0; i < el_old_colors.length; ++i) {
           if (el_old_colors[i].style &&
               el_old_colors[i].style.color !== old_mark) {
@@ -231,9 +231,9 @@ var LabelsInjector = (function() {
         }
 
         // show all new colors' mark if need
-        let new_mark = self.colors[new_color] > 0 ? "white" : ("#" + new_color);
-        let el_new_colors = document.querySelectorAll("i[name='" + new_color +
-            "']");
+        let new_mark = self.colors[new_color] > 0 ? 'white' : ('#' + new_color);
+        let el_new_colors = document.querySelectorAll('i[name="' + new_color +
+            '"]');
         for (let i = 0; i < el_new_colors.length; ++i) {
           if (el_new_colors[i].style &&
               el_new_colors[i].style.color !== new_mark) {
@@ -245,11 +245,11 @@ var LabelsInjector = (function() {
 
     // add click listener for delete button
     if (el_delete) {
-      el_delete.addEventListener("click", function() {
-        let color = (el_input.defaultValue || "").replace("#", "");
+      el_delete.addEventListener('click', function() {
+        let color = (el_input.defaultValue || '').replace('#', '');
         self.colors[color]--;
-        let mark = self.colors[color] > 0 ? "white" : ("#" + color);
-        let el_colors = document.querySelectorAll("i[name='" + color + "']");
+        let mark = self.colors[color] > 0 ? 'white' : ('#' + color);
+        let el_colors = document.querySelectorAll('i[name="' + color + '"]');
         for (let i = 0; i < el_colors.length; ++i) {
           if (el_colors[i].style &&
               el_colors[i].style.color !== mark) {
@@ -258,14 +258,14 @@ var LabelsInjector = (function() {
         }
       }, false);
     }
-  }
+  };
 
   /**
    * Init color list for a label
    */
   LabelsInjector.prototype._initColorMenuList = function(el_menu) {
     // set marked for used predefined color
-    let el_spans = el_menu.getElementsByTagName("span");
+    let el_spans = el_menu.getElementsByTagName('span');
     for (let j = 0; j < el_spans.length; ++j) {
       let el_span = el_spans[j];
       if (el_span.style && el_span.style.backgroundColor) {
@@ -273,7 +273,7 @@ var LabelsInjector = (function() {
         el_span.innerHTML = '<i class="mg-icon-check mg-color-mark" name="' +
             color + '"></i>';
         el_span.firstElementChild.style.color =
-            this.colors[color] > 0 ? "white" : ('#' + color);
+            this.colors[color] > 0 ? 'white' : ('#' + color);
       }
     }
 
@@ -281,8 +281,8 @@ var LabelsInjector = (function() {
     let el_ul = null;
     for (let j = 0; j < NEW_COLORS.length; ++j) {
       if (j % 8 == 0) {
-        el_ul = document.createElement("ul");
-        el_ul.className = "color-chooser";
+        el_ul = document.createElement('ul');
+        el_ul.className = 'color-chooser';
         el_menu.appendChild(el_ul);
       }
 
@@ -296,15 +296,15 @@ var LabelsInjector = (function() {
         '"></i></span>';
       el_ul.appendChild(el_li);
       let el_color = el_li.firstElementChild.firstElementChild;
-      el_color.style.color = this.colors[color] > 0 ? "white" : ('#' + color);
+      el_color.style.color = this.colors[color] > 0 ? 'white' : ('#' + color);
     }
-  }
+  };
 
   /**
    * Count colors which is used by label
    */
   LabelsInjector.prototype._markUsedColors = function() {
-    let el_labels = document.querySelectorAll("a[class='label label-link']");
+    let el_labels = document.querySelectorAll('a[class="label label-link"]');
     if (el_labels) {
       let self = this;
       el_labels.forEach(function(l) {
@@ -316,7 +316,7 @@ var LabelsInjector = (function() {
         }
       });
     }
-  }
+  };
 
   return LabelsInjector;
 }());

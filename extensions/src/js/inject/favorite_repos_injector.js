@@ -18,17 +18,17 @@
  * Favorite repositories injector class
  */
 var FavoriteReposInjector = (function() {
-  "use strict";
+  'use strict';
 
-  let EMPTY_NAME = "__empty__";
+  let EMPTY_NAME = '__empty__';
 
   /**
    * storage data structure of favorite repository
    * {
-   *    "github url" : {
-   *      "user name" : ["repo1", "repo2", ...],
-   *      "org name" : ["repo1", "repo2", ....],
-   *      "__empty__": ...
+   *    'github url' : {
+   *      'user name' : ['repo1', 'repo2', ...],
+   *      'org name' : ['repo1', 'repo2', ....],
+   *      '__empty__': ...
    *      ...
    *    },
    *    ...
@@ -60,34 +60,33 @@ var FavoriteReposInjector = (function() {
     let data = {};
     data[MYGIT_GITHUB_FAVORITE_REPOS_KEY] = this.repos;
     browser_api.storage.set(data);
-  }
+  };
 
   /**
    * Inject favorite repos icon in github top bar
    */
-  FavoriteReposInjector.prototype.inject = function(url) {
+  FavoriteReposInjector.prototype.inject = function() {
     // check if should inject
-    let origin = window.location.origin;
     let repo_name = github_api.getRepoName();
     if (!repo_name && Object.keys(this.repos).length < 1) {
       return;
     }
 
     // inject favorite repos menu
-    let el_favorite_nav = document.getElementById("mg-favorite-repos-nav-item");
+    let el_favorite_nav = document.getElementById('mg-favorite-repos-nav-item');
     if (!el_favorite_nav) {
       let el_nav_item = document.querySelector(
-        "li[class^='header-nav-item dropdown js-menu-container']");
-      el_favorite_nav = document.createElement("li");
-      el_favorite_nav.className = "header-nav-item dropdown js-menu-container";
-      el_favorite_nav.id = "mg-favorite-repos-nav-item";
+        'li[class^="header-nav-item dropdown js-menu-container"]');
+      el_favorite_nav = document.createElement('li');
+      el_favorite_nav.className = 'header-nav-item dropdown js-menu-container';
+      el_favorite_nav.id = 'mg-favorite-repos-nav-item';
 
       // initiate html template
       let self = this;
       let xhr = new XMLHttpRequest();
-      xhr.open("GET",
-               browser_api.extension.getURL("templates/favorite_repos.html")
-               , true);
+      xhr.open('GET',
+        browser_api.extension.getURL('templates/favorite_repos.html')
+        , true);
       xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
           el_favorite_nav.innerHTML = this.responseText;
@@ -97,7 +96,7 @@ var FavoriteReposInjector = (function() {
       };
       xhr.send();
     }
-  }
+  };
 
   /**
    * Create dropdown item element for repoisotry
@@ -107,10 +106,10 @@ var FavoriteReposInjector = (function() {
    * @return a html element for repository item
    */
   FavoriteReposInjector.prototype._createItem = function(uri, item) {
-    let el_item = document.createElement("div");
-    el_item.className = "dropdown-item mg-dropdown-item";
-    el_item.setAttribute("mg-repo-group", item.user);
-    el_item.setAttribute("mg-repo", item.repo);
+    let el_item = document.createElement('div');
+    el_item.className = 'dropdown-item mg-dropdown-item';
+    el_item.setAttribute('mg-repo-group', item.user);
+    el_item.setAttribute('mg-repo', item.repo);
     el_item.innerHTML =
       '<a class="mg-dropdown-item-text" href="' + uri + '/' + item.full_name +
       '">\n' + item.full_name+ '</a>\n' +
@@ -120,8 +119,8 @@ var FavoriteReposInjector = (function() {
     // del event handler for removing current item from favorite repos dropdown
     // list
     let self = this;
-    el_item.getElementsByTagName("span")[0].onclick = function(e) {
-      //let origin = el_item.getElementsByTagName("a")[0].origin;
+    el_item.getElementsByTagName('span')[0].onclick = function(e) {
+      //let origin = el_item.getElementsByTagName('a')[0].origin;
       for (let i = 0; i < self.repos[uri][item.user].length; ++i) {
         if (self.repos[uri][item.user][i] == item.repo) {
           let el_pre = el_item.previousElementSibling;
@@ -141,13 +140,13 @@ var FavoriteReposInjector = (function() {
 
             // if its pre sibling is divider, remove it
             if (el_pre && el_pre.className &&
-                el_pre.className == "dropdown-divider") {
+                el_pre.className == 'dropdown-divider') {
               el_parent.removeChild(el_pre);
             }
             // if its next sibling is divider and is the first element in
             // parent node, remove it
             else if (el_next && el_next.className &&
-                el_next.className == "dropdown-divider" &&
+                el_next.className == 'dropdown-divider' &&
                 !el_next.id && !el_next.previousElementSibling) {
               el_parent.removeChild(el_next);
             }
@@ -159,7 +158,7 @@ var FavoriteReposInjector = (function() {
           // remove favorite repos menu from top banner if need
           if (Object.keys(self.repos).length < 1 &&
               !github_api.getRepoName()) {
-            let el_li = document.getElementById("mg-favorite-repos-nav-item");
+            let el_li = document.getElementById('mg-favorite-repos-nav-item');
             el_li.parentNode.removeChild(el_li);
           }
           break;
@@ -178,9 +177,9 @@ var FavoriteReposInjector = (function() {
   FavoriteReposInjector.prototype._init = function(root) {
     let self = this;
     let origin = window.location.origin;
-    let el_divider = document.getElementById("mg-fr-divider");
-    let el_add = document.getElementById("mg-fr-add");
-    let el_ul = document.getElementById("mg-fr-dropdown-menu");
+    let el_divider = document.getElementById('mg-fr-divider');
+    let el_add = document.getElementById('mg-fr-add');
+    let el_ul = document.getElementById('mg-fr-dropdown-menu');
 
     // add repository event handler
     el_add.onclick = function() {
@@ -201,13 +200,13 @@ var FavoriteReposInjector = (function() {
         // insert a repo item into dropdown menu DOM
         let el_item = self._createItem(origin, repo);
         let el_items = el_ul.querySelectorAll(
-            "a[class='mg-dropdown-item-text']");
+            'a[class="mg-dropdown-item-text"]');
         if (el_items.length < 1) {
           el_ul.insertBefore(el_item, el_divider);
         }
         else {
           let el_first = el_ul.querySelector(
-              "div[mg-repo-group='" + repo.user+ "']");
+              'div[mg-repo-group="' + repo.user+ '"]');
           if (!el_first) {
             el_ul.insertBefore(el_item, el_divider);
             el_ul.insertBefore(self._createDivider(), el_item);
@@ -218,13 +217,13 @@ var FavoriteReposInjector = (function() {
         }
 
         // hide add button
-        el_divider.style.display = "none";
-        el_add.style.display = "none";
+        el_divider.style.display = 'none';
+        el_add.style.display = 'none';
       }
     }
 
     // click event handler to show favorite repos dropdown
-    let el_fr = root.getElementsByTagName("a")[0];
+    let el_fr = root.getElementsByTagName('a')[0];
     let old_click_handler = el_fr.onclick;
     el_fr.onclick = function(e) {
       let repo = github_api.getRepoNameDict();
@@ -240,15 +239,15 @@ var FavoriteReposInjector = (function() {
       }
 
       if (is_added) {
-        el_divider.style.display = "none"
-        el_add.style.display = "none";
+        el_divider.style.display = 'none'
+        el_add.style.display = 'none';
       }
       else {
         if (Object.keys(self.repos).length > 0) {
           el_divider.style = null;
         }
         else {
-          el_divider.style.display = "none"
+          el_divider.style.display = 'none'
         }
         el_add.style = null;
       }
@@ -283,7 +282,7 @@ var FavoriteReposInjector = (function() {
           repos.forEach(function(r) {
             let item = {
                 user: names[j], repo: r,
-                full_name: names[j] == EMPTY_NAME ? r : names[j] + "/" + r
+                full_name: names[j] == EMPTY_NAME ? r : names[j] + '/' + r
             };
             let el_item = self._createItem(uri, item);
             el_ul.insertBefore(el_item, el_divider);
@@ -297,8 +296,8 @@ var FavoriteReposInjector = (function() {
    * Create a divider element between repsotories from different github uri
    */
   FavoriteReposInjector.prototype._createDivider = function() {
-    let el_divider = document.createElement("div");
-    el_divider.className = "dropdown-divider";
+    let el_divider = document.createElement('div');
+    el_divider.className = 'dropdown-divider';
     return el_divider;
   }
 

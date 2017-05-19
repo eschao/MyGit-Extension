@@ -33,19 +33,19 @@ var BrowserApi = (function() {
     this.type = UNKNOWN;
 
     // firefox browser
-    if (typeof browser !== "undefined" && browser != null) {
+    if (typeof browser !== 'undefined' && browser != null) {
       this.type = FIREFOX;
       this._initFirefox();
     }
     // chrome browser
-    else if (typeof chrome !== "undefined" && chrome != null) {
+    else if (typeof chrome !== 'undefined' && chrome != null) {
       this.type = CHROME;
       this._initChrome();
     }
     // unsuportted browser
     else {
-      console.log("The browser is not supported, " +
-        "Only support Chrome and Firefox!");
+      console.warn('The browser is not supported, ' +
+        'Only support Chrome and Firefox!');
     }
   }
 
@@ -84,7 +84,7 @@ var BrowserApi = (function() {
         return chrome.extension.getURL(path);
       }
     };
-  }
+  };
 
   /**
    * Init Firefox related APIs
@@ -121,21 +121,21 @@ var BrowserApi = (function() {
         return browser.extension.getURL(path);
       }
     };
-  }
+  };
 
   /**
    * Is Chrome browser?
    */
   BrowserApi.prototype.isChrome = function() {
     return this.type == CHROME;
-  }
+  };
 
   /**
    * Is Firefox browser?
    */
   BrowserApi.prototype.isFirefox = function() {
     return this.type == FIREFOX;
-  }
+  };
 
   return BrowserApi;
 }());

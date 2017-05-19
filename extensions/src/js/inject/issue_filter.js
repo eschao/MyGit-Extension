@@ -15,17 +15,17 @@
  */
 
 var IssueFilter = (function() {
-  "use strict";
+  'use strict';
   /**
    * data structure in storage
    *
    * storage[MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY] = {
-   *  "settings": { overwrite: true },
+   *  'settings': { overwrite: true },
    * }
    *
    * storage[MYGIT_GITHUB_ISSUE_FILTER_KEY] = {
-   *  "repo 1": { "filter 1": "fliter express..", ... },
-   *  "repo 2": { "filter 2": "filter express..", ... }
+   *  'repo 1': { 'filter 1': 'fliter express..', ... },
+   *  'repo 2': { 'filter 2': 'filter express..', ... }
    *  ...
    * }
    */
@@ -41,12 +41,12 @@ var IssueFilter = (function() {
       if (item) {
         let data = item[MYGIT_GITHUB_ISSUE_FILTER_KEY];
         if (data) {
-            self.filters = data;
+          self.filters = data;
         }
       }
     });
     browser_api.storage.get(MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY,
-      function(item) {
+    function(item) {
       if (item) {
         let data = item[MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY];
         if (data) {
@@ -62,19 +62,19 @@ var IssueFilter = (function() {
   IssueFilter.prototype.init = function() {
     // find out filter menu list DOM element
     let el_btns = document.querySelectorAll(
-                  "button[class*='select-menu-button']");
+                  'button[class*="select-menu-button"]');
     for (let i = 0; i < el_btns.length; ++i) {
-      if (el_btns[i].textContent.includes("Filters")) {
+      if (el_btns[i].textContent.includes('Filters')) {
         let parent = el_btns[i].parentNode;
         this.el_filter_mlist = parent.querySelector(
-                               "div[class='select-menu-list']");
+                               'div[class="select-menu-list"]');
         break;
       }
-    };
+    }
 
     // add filters to menu list
     if (this.el_filter_mlist) {
-      this.el_filter_mlist.style.maxHeight = "600px";
+      this.el_filter_mlist.style.maxHeight = '600px';
       let repo_name = github_api.getRepoName();
 
       if (this.filters.hasOwnProperty(repo_name)) {
@@ -87,24 +87,24 @@ var IssueFilter = (function() {
           let filter = {
             repo: repo_name, name: n, value: self.filters[repo_name][n],
             buildUrl: function() {
-              return "/" + this.repo + "/issues?q=" + encodeURI(this.value);
+              return '/' + this.repo + '/issues?q=' + encodeURI(this.value);
             }
           };
           let node = self._createFilterMenuItem(filter);
           self.el_filter_mlist.insertBefore(node, el_last);
-        });
+        })
       }
     }
-  }
+  };
 
   /**
    * Save filters to storage
    */
   IssueFilter.prototype.storeFilters = function() {
     let data = {};
-    data[MYGIT_GITHUB_ISSUE_FILTER_KEY] = this.filters
+    data[MYGIT_GITHUB_ISSUE_FILTER_KEY] = this.filters;
     browser_api.storage.set(data);
-  }
+  };
 
   /**
    * Save settings to storage
@@ -113,42 +113,42 @@ var IssueFilter = (function() {
     let data = {};
     data[MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY] = this.settings;
     browser_api.storage.set(data);
-  }
+  };
 
   /**
    * Save filter
    */
   IssueFilter.prototype.show = function() {
-    let el_filter = document.querySelector("input[id='js-issues-search']");
+    let el_filter = document.querySelector('input[id="js-issues-search"]');
     if (!el_filter) {
-      console.log("Can't find issue filter input element!");
+      console.warn("Can't find issue filter input element!");
       return;
     }
 
     // filter value
-    let value = el_filter.value || "";
+    let value = el_filter.value || '';
     value = value.trim();
     if (!value) {
-      console.log("The issue filter is empty!");
+      console.warn('The issue filter is empty!');
       return;
     }
 
     // repo name
     let repo_name = github_api.getRepoName();
     if (!repo_name) {
-      console.log("Can't get repository name!");
+      console.warn("Can't get repository name!");
       return;
     }
 
     // show filter save dialog
     let filter = {
-      repo: repo_name, name: "", value: value,
+      repo: repo_name, name: '', value: value,
       buildUrl: function() {
-        return "/" + this.repo + "/issues?q=" + encodeURI(this.value);
+        return '/' + this.repo + '/issues?q=' + encodeURI(this.value);
       }
     };
     this._showSaveDialog(filter);
-  }
+  };
 
   /**
    * Show save dialog
@@ -157,14 +157,14 @@ var IssueFilter = (function() {
    * @param filter Issue filter
    */
   IssueFilter.prototype._showSaveDialog = function(filter) {
-    let root = document.createElement("div");
-    root.className = "mg-dialog-center mg-save-filter-dialog";
-    root.id = "mg-save-issue-filter-dialog";
+    let root = document.createElement('div');
+    root.className = 'mg-dialog-center mg-save-filter-dialog';
+    root.id = 'mg-save-issue-filter-dialog';
 
     let self = this;
     let xhr = new XMLHttpRequest();
-    xhr.open("GET",
-      browser_api.extension.getURL("templates/save_issue_filter_dialog.html"),
+    xhr.open('GET',
+      browser_api.extension.getURL('templates/save_issue_filter_dialog.html'),
       true);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -172,9 +172,9 @@ var IssueFilter = (function() {
         document.body.appendChild(root);
         self._initSaveDialog(root, filter);
       }
-    }
+    };
     xhr.send();
-  }
+  };
 
   /**
    * Inits save dialog
@@ -183,29 +183,29 @@ var IssueFilter = (function() {
    * @param filter Issue filter
    */
   IssueFilter.prototype._initSaveDialog = function(root, filter) {
-    let el_close = root.querySelector("a[id='mg-close']");
+    let el_close = root.querySelector('a[id="mg-close"]');
     let win_click = function(e) {
       if (e.target != root && !root.contains(e.target)) {
         el_close.onclick();
       }
-    }
+    };
 
     // check if close dialog when click is outside of it
-    window.addEventListener("click", win_click, false);
+    window.addEventListener('click', win_click, false);
     // click event for close button
     let close_dialog = function() {
-      window.removeEventListener("click", win_click, false);
+      window.removeEventListener('click', win_click, false);
       document.body.removeChild(root);
-    }
+    };
     el_close.onclick = close_dialog;
 
     // set filter
-    let el_filter = root.querySelector("p[id='mg-filter']");
+    let el_filter = root.querySelector('p[id="mg-filter"]');
     el_filter.innerText = filter.value;
 
-    let el_overwrite = root.querySelector("input[id='mg-overwrite']");
-    let el_name = root.querySelector("input[id='mg-filter-name']");
-    let el_save = root.querySelector("a[id='mg-save-filter-btn']");
+    let el_overwrite = root.querySelector('input[id="mg-overwrite"]');
+    let el_name = root.querySelector('input[id="mg-filter-name"]');
+    let el_save = root.querySelector('a[id="mg-save-filter-btn"]');
 
     // set filter name if the filter exists
     let repo = filter.repo;
@@ -231,17 +231,14 @@ var IssueFilter = (function() {
 
       if (!name ||
          (self._isFilterExists(filter.repo, name) && !el_overwrite.checked)) {
-        if (!el_save.className.includes("mg-disabled")) {
-          el_save.className += " mg-disabled";
+        if (!el_save.className.includes('mg-disabled')) {
+          el_save.className += ' mg-disabled';
         }
       }
-      else if (el_save.className.includes("mg-disabled")) {
-        el_save.className = el_save.className.replace(" mg-disabled", "");
+      else if (el_save.className.includes('mg-disabled')) {
+        el_save.className = el_save.className.replace(' mg-disabled', '');
       }
-    }
-
-    // lost focus event for Filter name
-    el_name.onblur = state_change_func;
+    };
 
     // click event of Overwrite
     el_overwrite.checked = this.settings.overwrite;
@@ -251,7 +248,7 @@ var IssueFilter = (function() {
         self.storeSettings();
         state_change_func();
       }
-    }
+    };
 
     // click event for Save
     el_save.onclick = function() {
@@ -277,10 +274,21 @@ var IssueFilter = (function() {
         // add/update menu list
         self._addFilterItem(filter);
       }
-    }
+    };
+
+    // lost focus event for Filter name
+    el_name.onblur = state_change_func;
+    el_name.onkeyup = function(e) {
+      if (e.keyCode == 13) {
+        state_change_func();
+        if (!el_save.className.includes('mg-disabled')) {
+          el_save.onclick();
+        }
+      }
+    };
 
     state_change_func();
-  }
+  };
 
   /**
    * Does filter exist?
@@ -291,7 +299,7 @@ var IssueFilter = (function() {
    */
   IssueFilter.prototype._isFilterExists = function(repo, name) {
     return (this.filters[repo] && this.filters[repo][name]);
-  }
+  };
 
   /**
    * Create a filter menu item
@@ -300,34 +308,34 @@ var IssueFilter = (function() {
    * @return A DOM element represents menu item
    */
   IssueFilter.prototype._createFilterMenuItem = function(filter) {
-    let el_a = document.createElement("a");
-    el_a.className = "select-menu-item js-navigation-item";
+    let el_a = document.createElement('a');
+    el_a.className = 'select-menu-item js-navigation-item';
     el_a.innerHTML =
       '<i class="mg-icon-trash-o select-menu-item-icon hidden" ' +
       'id="mg-filter-trash"></i>\n' +
       '<div class="select-menu-item-text">' + filter.name + '</div>';
     el_a.href = filter.buildUrl();
-    el_a.setAttribute("mg-filter-name", filter.name);
+    el_a.setAttribute('mg-filter-name', filter.name);
 
     // click event handler for deleting filter
     let self = this;
-    let el_trash = el_a.querySelector("i[id='mg-filter-trash']");
+    let el_trash = el_a.querySelector('i[id="mg-filter-trash"]');
     el_trash.onclick = function() {
       el_a.parentNode.removeChild(el_a);
       delete self.filters[filter.repo][filter.name];
       self.storeFilters();
-    }
+    };
 
     // show trash icon when mouse is over
     el_a.onmouseover = function() {
-      el_trash.style.display = "inline-block";
-    }
+      el_trash.style.display = 'inline-block';
+    };
     // hide trash icon when mouse is out
     el_a.onmouseout = function() {
-      el_trash.style.display = "none";
-    }
+      el_trash.style.display = 'none';
+    };
     return el_a;
-  }
+  };
 
   /**
    * Add a filter item to menu list, if the menu item exists, update it
@@ -343,7 +351,7 @@ var IssueFilter = (function() {
     let el_node = null;
     let el_nodes = this.el_filter_mlist.children;
     for (let i = 0; i < el_nodes.length; ++i) {
-      let name = el_nodes[i].getAttribute("mg-filter-name");
+      let name = el_nodes[i].getAttribute('mg-filter-name');
       if (name && name == filter.name) {
         el_node = el_nodes[i];
         break;
@@ -360,7 +368,7 @@ var IssueFilter = (function() {
       let el_new = this._createFilterMenuItem(filter);
       this.el_filter_mlist.insertBefore(el_new, el_last);
     }
-  }
+  };
 
   return IssueFilter;
 }());

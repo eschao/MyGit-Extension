@@ -2,7 +2,7 @@
   "author": "eschao",
   "name": "MyGit",
   "permissions": ["storage", "tabs", "*://*/*"],
-  "version": "0.5.1",
+  "version": "0.6.0",
   "manifest_version": 2,
   "description": "MyGit - Extension for GitHub",
   "icons": {

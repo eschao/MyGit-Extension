@@ -15,7 +15,7 @@
  */
 
 var ColorUtils = (function() {
-  "use strict";
+  'use strict';
 
   return {
     /**
@@ -30,7 +30,7 @@ var ColorUtils = (function() {
 
       rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
       function hex(x) {
-        return ("0" + parseInt(x).toString(16)).slice(-2);
+        return ('0' + parseInt(x).toString(16)).slice(-2);
       }
 
       return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
@@ -47,11 +47,11 @@ var ColorUtils = (function() {
       let b = (rgb >> 0) & 0xff;
       return (0.2126 * r + 0.7152 * g + 0.0722 * b);
     }
-  }
+  };
 })();
 
 var StrUtils = (function() {
-  "use strict";
+  'use strict';
 
   return {
     /**
@@ -60,11 +60,11 @@ var StrUtils = (function() {
     compareIgnoreCase: function(a, b) {
       return a.toLowerCase().localeCompare(b.toLowerCase());
     }
-  }
+  };
 })();
 
 var DomUtils = (function() {
-  "use strict";
+  'use strict';
 
   return {
     /**
@@ -76,7 +76,7 @@ var DomUtils = (function() {
         top: el.offsetTop,
         width: el.offsetWidth,
         height: el.offsetHeight
-      }
+      };
 
       while (el.offsetParent && el.offsetParent != document.body) {
         c.left += el.offsetParent.offsetLeft;
@@ -90,17 +90,17 @@ var DomUtils = (function() {
     },
 
     createStylesheet: function(name) {
-      var style = document.createElement("style");
+      var style = document.createElement('style');
       style.title = name;
       document.head.appendChild(style);
       return style.sheet;
     },
 
     addCSSRule: function(sheet, selector, rules, index) {
-      if ("insertRule" in sheet) {
-        return sheet.insertRule(selector + "{" + rules + "}", index);
+      if ('insertRule' in sheet) {
+        return sheet.insertRule(selector + '{' + rules + '}', index);
       }
-      else if ("addRule" in sheet) {
+      else if ('addRule' in sheet) {
         return sheet.addRule(selector, rules, index);
       }
 
@@ -108,11 +108,18 @@ var DomUtils = (function() {
     },
 
     cleanStylesheet: function(sheet) {
-      while (sheet.rules.length > 0) {
-        sheet.deleteRule(0);
+      if (sheet.rules) {
+        while (sheet.rules.length > 0) {
+          sheet.deleteRule(0);
+        }
+      }
+      else if (sheet.cssRules) {
+        while (sheet.cssRules.length > 0) {
+          sheet.deleteRule(0);
+        }
       }
     }
-  }
+  };
 })();
 
 var DateUtils = (function() {
@@ -128,5 +135,5 @@ var DateUtils = (function() {
       let utc_now = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
       return Math.floor((utc_now - utc_old) / MS_PER_DAY);
     }
-  }
+  };
 })();

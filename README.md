@@ -55,6 +55,13 @@ The following functions are planned to provide:
    </p>
    
    Injects a rich color list for label creation and edit.
+ - **Issue Preview**
+ 
+   <p align="center">
+   <img src="https://cloud.githubusercontent.com/assets/20178358/26236745/7ba06410-3ca4-11e7-9ef4-a17dd7d1e90d.png"/>
+   </p>
+  
+   You can preview a issue though moving mouse over a issue link in **Issue** and **Pull Request** pages. Currently, the issue description is shown with original format and the issue comments can not be previewed, we will support them in the futrue.
    
 ## Installation
 

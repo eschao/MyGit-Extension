@@ -12,12 +12,9 @@ div.mg-dialog-center {
   padding: 10px 10px;
   text-align: center;
   font-size: 14px;
-  /*font-weight: 600;
-  display: none;*/
   flex-direction: column;
 }
 
-/* put in menu div */
 div.mg-export-win {
   position: absolute;
   width: 600px;
@@ -109,6 +106,11 @@ div.mg-export-win {
 
 .mg-flex-v-m {
   align-items: center;
+}
+
+.mg-flex-col, .mg-issue-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .mg-right {
@@ -267,6 +269,163 @@ a.mg-disabled {
   color: #24292e;
 }
 
+.mg-f-normal {
+  font-weight: normal;
+}
+
+.mg-f-bold {
+  font-weight: 600;
+}
+
+.mg-f-color {
+  color: #586069;
+}
+
+.mg-issue-preview {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #d1d5da;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  z-index: 999;
+  padding: 10px 10px;
+  text-align: left;
+  font-size: 13px;
+}
+
+.mg-issue-a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mg-issue-a:hover {
+  text-decoration: none;
+}
+
+.mg-issue-loading {
+  font-size: 14px;
+  font-weight: normal;
+  text-align: left;
+  width: 100px;
+}
+
+.mg-issue-content {
+  overflow: scroll;
+}
+
+.mg-issue-title-sec {
+  margin-right: 30px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.mg-issue-number {
+  color: #a3aab1;
+}
+
+
+.mg-issue-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.mg-issue-title-right {
+  position: absolute;
+  left: -moz-calc(100% - 24px);
+  left: -webkit-calc(100% - 24px);
+  left: -o-calc(100% - 24px);
+  left: calc(100% - 24px);
+  top: 10px;
+}
+
+.mg-issue-sec-space {
+  margin: 6px 0px 6px 0px;
+}
+
+.mg-issue-state {
+  color: white;
+  background: #2cbe4e;
+  border-radius: 4px;
+  padding: 4px 6px 4px 6px;
+  margin-right: 8px;
+}
+
+.mg-issue-state-icon {
+  position: relative;
+  margin-right: 3px;
+  top: -1px;
+}
+
+.mg-issue-divider {
+  margin: 4px 0px 4px 0px;
+  border-top: 1px solid #e6ebf1;
+}
+
+.mg-issue-misc-line {
+  display: flex;
+  margin: 4px 0px 4px 32px;
+  line-height: 28px;
+}
+
+.mg-issue-misc-line-head {
+  margin-right: 6px;
+  float: left;
+  width: 28px;
+  height: 28px;
+  line-height: 24px;
+  text-align: center;
+  background-color: #e6ebf1;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  margin-left: -32px;
+}
+
+.mg-issue-progress {
+  display: inherit;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.mg-issue-progress-bar {
+  height: 8px !important;
+  width: 100px;
+}
+
+.mg-issue-avatar {
+  margin-bottom: 4px;
+  margin-right: 6px;
+}
+
+.mg-issue-label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 4px;
+  border-radius: 3px;
+  padding: 2px 4px 2px 4px;
+  color: white;
+}
+
+.mg-issue-body-sec {
+  border: 1px solid #d1d5da;
+  border-radius: 3px;
+  margin-top: 8px;
+}
+
+.mg-issue-body-title {
+  background-color: rgb(241, 248, 255);
+  padding: 3px 6px 3px 6px;
+  font-weight: 600;
+  color: #586069;
+  border-bottom: 1px solid #d1d5da;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.mg-issue-body {
+  padding: 8px;
+  margin: 0px;
+}
+
 @font-face {
   font-family: 'FontAwesome';
   src: url('chrome-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.woff');
@@ -285,6 +444,28 @@ a.mg-disabled {
 
 [class^="mg-icon-"]:before,
 [class*=" mg-icon-"]:before {
+  text-decoration: inherit;
+  speak: none;
+}
+
+@font-face {
+  font-family: 'Octicons';
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/octicons-webfont.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="mg-octicon-"],
+[class*=" mg-octicon-"] {
+  font-family: 'Octicons';
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+[class^="mg-octicon-"]:before,
+[class*=" mg-octicon-"]:before {
   text-decoration: inherit;
   speak: none;
 }
@@ -357,6 +538,26 @@ a.mg-disabled {
   content: "\f014";
 }
 
+.mg-icon-map-signs:before {
+  content: "\f277";
+}
+
+.mg-icon-tag:before {
+  content: "\f02b";
+}
+
+.mg-icon-user:before {
+  content: "\f007";
+}
+
+.mg-octicon-opened:before {
+  content: "\f026";
+}
+
+.mg-octicon-closed:before {
+  content: "\f028";
+}
+
 .mg-m-icon {
   font-size: 18px;
 }
@@ -378,14 +579,3 @@ a.mg-disabled {
   background-color: #f6f8fa !important;
   z-index: 999;
 }
-
-/*
-.mg-close {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-image: url("chrome-extension://__MSG_@@extension_id__/img/svg/x.svg");
-}*/
-

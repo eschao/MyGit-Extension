@@ -84,7 +84,7 @@ The following functions are planned to provide:
   * Install from Chrome/Firefox store
   
     - For **Chrome**: [Chrome Web Stroe](https://chrome.google.com/webstore/detail/mygit/oaiohmmoefnkfdbjjkjnconhnhpiigel?hl=en)
-    - For **Firefox**: &lt;TBD&gt;
+    - For **Firefox**: [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/mygit)
     
   * Install from [release](https://github.com/eschao/MyGit-Extension/releases)
   

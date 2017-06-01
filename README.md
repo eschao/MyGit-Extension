@@ -7,6 +7,11 @@
 > A Chrome/Firefox extension for GitHub
 
 - [Introduction](#introduction)
+  - [Export Issues As CSV](#1-export-issues-as-csv)
+  - [Save Issue Filter](#2-save-issue-filter)
+  - [Favorite Repository](#3-favorite-repository)
+  - [More Colors For Label Creation](#4-more-colors-for-label-creation)
+  - [Issue Preview](#5-issue-preview)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
@@ -16,7 +21,7 @@
 **MyGit-Extension** aims to provide extra functions for convenient GitHub user through injecting html/javascript codes into GitHub website. 
 
 The following functions are planned to provide:
- - **Export Issues As CSV**
+#### 1. Export Issues As CSV
  
    <p align="center">
    <img src="https://cloud.githubusercontent.com/assets/20178358/25611688/9a133744-2f5a-11e7-93de-7ac651b8d9d6.png"/>
@@ -28,7 +33,7 @@ The following functions are planned to provide:
    - Customize CSV delimiter
    - Enable/disable expanding issue labels
    
- - **Save Issue Filter**
+#### 2. Save Issue Filter
    
    <p align="center">
    <img src="https://cloud.githubusercontent.com/assets/20178358/25797286/183d4d18-340f-11e7-908a-f0c5af3d5dc8.png"/>
@@ -40,7 +45,7 @@ The following functions are planned to provide:
    - Get them in **Filters** dropdown list
    - Remove them from the **Filters** dropdown list
    
- - **Favorite Rpository**
+#### 3. Favorite Repository
  
    <p align="center">
    <img src="https://cloud.githubusercontent.com/assets/20178358/25611698/9fce49ee-2f5a-11e7-8b86-c7c76893a8e7.png"/>
@@ -48,20 +53,38 @@ The following functions are planned to provide:
    
    Injects a **Favorite Repos** in GitHub top banner. You can save the current repository as favorite one or quickly jump to a favorite repository by it.
    
- - **More Colors For Label Creation**
+#### 4. More Colors For Label Creation
  
    <p align="center">
    <img src="https://cloud.githubusercontent.com/assets/20178358/25891123/78414752-35a2-11e7-9483-aa9fd51b67a1.png"/>
    </p>
    
    Injects a rich color list for label creation and edit.
+#### 5. Issue Preview
+ 
+   <p align="center">
+   <img src="https://cloud.githubusercontent.com/assets/20178358/26236960/a025405c-3ca5-11e7-995a-283f81bbfca9.png"/>
+   </p>
+  
+   You can preview a issue though moving mouse over a issue link in **Issue** and **Pull Request** pages. 
+   * **What can you see in preview**
+     - Issue title/number
+     - Issue state/creator
+     - Issue milestone
+     - Issue assignees
+     - Issue labels
+     - Issue description
+   * **What's limitation for preview**
+     - Only can preview issue link in **Issue** and **Pull Request** pages
+     - Can't show issue comments 
+     - Issue description is shown with original format, for example: markdown original format
    
 ## Installation
 
   * Install from Chrome/Firefox store
   
     - For **Chrome**: [Chrome Web Stroe](https://chrome.google.com/webstore/detail/mygit/oaiohmmoefnkfdbjjkjnconhnhpiigel?hl=en)
-    - For **Firefox**: &lt;TBD&gt;
+    - For **Firefox**: [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/mygit)
     
   * Install from [release](https://github.com/eschao/MyGit-Extension/releases)
   

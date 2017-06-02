@@ -1,37 +1,40 @@
 <section class="mg-section mg-section-header mg-flex-spc-b">
-  <div><i class="mg-icon-th-list mg-r-3em"></i><label>Design Issue Table</label></div>
-  <a href="#" class="mg-a" id="mg-close" title="Close"><i class="mg-icon-close mg-m-icon"></i></a>
+	<div><i class="mg-icon-th-list mg-r-3em"></i><label>Design Issue Table</label></div>
+	<a href="#" class="mg-a" id="mg-close" title="Close"><i class="mg-icon-close mg-m-icon"></i></a>
 </section>
 
 <section class="mg-section" id="mg-table-headers" style="margin-bottom:2px">
-  <div class="subnav-item mg-header" name="number" enable="true">Issue No</div>
-  <div class="subnav-item mg-header" name="state" enable="true">State</div>
-  <div class="subnav-item mg-header" name="title" enable="true">Title</div>
-  <div class="subnav-item mg-header" name="assignee" enable="true">Assignee</div>
-  <div class="subnav-item mg-header" name="user" enable="true">Author</div>
-  <div class="subnav-item mg-header" name="milestone" enable="true">Milestone</div>
-  <div class="subnav-item mg-header" name="labels" enable="true">Labels</div>
+	<div class="subnav-item mg-header" name="number" enable="true">Issue No</div>
+	<div class="subnav-item mg-header" name="state" enable="true">State</div>
+	<div class="subnav-item mg-header" name="title" enable="true">Title</div>
+	<div class="subnav-item mg-header" name="assignee" enable="true">Assignee</div>
+	<div class="subnav-item mg-header" name="user" enable="true">Author</div>
+	<div class="subnav-item mg-header" name="milestone" enable="true">Milestone</div>
+	<div class="subnav-item mg-header" name="labels" enable="true">Labels</div>
+	<div class="subnav-item mg-header" name="estimate" enable="false">Estimate</div>
+	<div class="subnav-item mg-header" name="pipeline" enable="false">Pipeline</div>
+	<div class="subnav-item mg-header" name="epic" enable="false">Is Epic</div>
 </section>
 
 <section class="mg-section-annotate">
-  <div class="mg-annotation"><i class="mg-icon-info-c mg-r-3em"></i><label>Click to enable/disable, Drag/Drop to change order.</label></div>
+	<div class="mg-annotation"><i class="mg-icon-info-c mg-r-3em"></i><label>Click to enable/disable, Drag/Drop to change order.</label></div>
 </section>
 
 <section class="mg-section mg-flex-spc-b mg-flex-v-m">
-  <div><input type="checkbox" class="mg-checkbox" id="mg-gen-headers" checked/><label>Generate Issue Headers</label></div>
-  <div class="mg-middle-l"><label class="mg-delimiter-l">CSV delimiter:</label><input class="mg-input mg-input-box mg-input-delimiter" id="mg-csv-delimiter" type="text" value="," maxlength="1" /></div>
+	<div><input type="checkbox" class="mg-checkbox" id="mg-gen-headers" checked/><label>Generate Issue Headers</label></div>
+	<div class="mg-middle-l"><label class="mg-delimiter-l">CSV delimiter:</label><input class="mg-input mg-input-box mg-input-delimiter" id="mg-csv-delimiter" type="text" value="," maxlength="1" /></div>
 </section>
 
 <section class="mg-section mg-flex-spc-b mg-flex-v-m">
-  <div><input type="checkbox" class="mg-checkbox" id="mg-expand-labels" checked/><label>Expand Issue Labels</label></div>
-  <div class="mg-middle-l" id="mg-label-delimter-d"><label class="mg-delimiter-l">Label delimiter:</label><input class="mg-input mg-input-box mg-input-delimiter" id="mg-label-delimiter" type="text" value="|" maxlength="1" /></div>
+	<div><input type="checkbox" class="mg-checkbox" id="mg-expand-labels" checked/><label>Expand Issue Labels</label></div>
+	<div class="mg-middle-l" id="mg-label-delimter-d"><label class="mg-delimiter-l">Label delimiter:</label><input class="mg-input mg-input-box mg-input-delimiter" id="mg-label-delimiter" type="text" value="|" maxlength="1" /></div>
 </section>
 
 <section class="mg-section" style="margin:0; height:20px">
-  <div style="line-height:20px; font-size:13px;"><span id="mg-message"></span></div>
+	<div style="line-height:20px; font-size:13px;"><span id="mg-message"></span></div>
 </section>
 
 <section class="mg-section mg-section-bottom">
-  <a href="#" id="mg-start-export-btn" class="btn btn-primary">
-  <span>Export Issue</span></a>
+	<a href="#" id="mg-start-export-btn" class="btn btn-primary">
+	<span>Export Issue</span></a>
 </section>

@@ -16,11 +16,11 @@
 
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
 
-const CLIENT_ID               = "cf0ec09e8a65db31a4d7";
-const REDIRECT_URI            = "http://mgit.chaozh.net:9080/github-oauth-cb";
-const GITHUB_TOKEN_Q          = "github_token=";
-const SCOPE                   = "user:email,repo";
-const MYGIT_SETTINGS_KEY      = "mygit-settings-key";
+const CLIENT_ID           = "cf0ec09e8a65db31a4d7";
+const REDIRECT_URI        = "http://mgit.chaozh.net:9080/github-oauth-cb";
+const GITHUB_TOKEN_Q      = "github_token=";
+const SCOPE               = "user:email,repo";
+const MYGIT_SETTINGS_KEY  = "mygit-settings-key";
 
 const MYGIT_GITHUB_KEY                        = "mygit-github-key";
 const MYGIT_GITHUB_E_KEY                      = "mygit-github-e-key";
@@ -28,4 +28,7 @@ const MYGIT_GITHUB_ISSUE_EXPORT_KEY           = "mygit-github-issue-export-key";
 const MYGIT_GITHUB_FAVORITE_REPOS_KEY         = "mygit-github-favorite-repos-key";
 const MYGIT_GITHUB_ISSUE_FILTER_KEY           = "mygit-github-issue-filter-key";
 const MYGIT_GITHUB_ISSUE_FILTER_SETTINGS_KEY  = "mygit-github-issue-filter-settings-key";
+
+const MYGIT_ZENHUB_KEY    = "mygit-zenhub-key";
+const MYGIT_ZENHUB_E_KEY  = "mygit-zenhub-e-key";
 

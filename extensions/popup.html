@@ -1,88 +1,101 @@
 <html>
 
-  <head>
-    <title>MyGit</title>
-    <meta http-equiv="Content-Type" content="text-html;charset=utf-8">
-    <link rel="stylesheet" href="css/popup.css">
-  </head>
+	<head>
+		<title>MyGit</title>
+		<meta http-equiv="Content-Type" content="text-html;charset=utf-8">
+		<link rel="stylesheet" href="css/popup.css">
+	</head>
 
-  <body style="width:300px">
-    <div class="mg-title-section">
-      <div class="left">
-        <img src="img/icon/mygit_16.png" class="v-center"/>
-        <span class="mg-title">MyGit</span>
-      </div>
-      <a href="https://github.com/eschao/MyGit-Extension" id="mg-info">
-        <i class="mg-icon-info mg-icon-size-m right"></i>
-      </a>
-    </div>
+	<body style="width:300px; margin: 10px 0px;">
+		<div class="mg-title-section" style="display: flex; justify-content:
+			space-between; align-items: center;">
+			<div class="left" style="display: inline-flex; margin-left: 10px;
+				align-items: center;">
+				<img src="img/icon/mygit_16.png"/>
+				<span class="mg-title" style="margin-left: 6px">MyGit</span>
+			</div>
+			<div class="right" style="display: inline-flex; align-items: center;
+				justify-content: space-between; width: 60px">
+				<a href="#" id="zenhub-info">
+					<img src="img/icon/zenhub_14.png" class="v-center"/>
+				</a>
+				<a href="https://github.com/eschao/MyGit-Extension" id="mg-info">
+					<i class="mg-icon-info mg-icon-size-m"></i>
+				</a>
+			</div>
+		</div>
 
-    <div style="margin:20px 0px;">
-      <section>
-        <div id="mg-github-signin-div">
-          <a href="#" id="mg-signin-btn" class="mg-btn mg-github-btn">
-            <i class="mg-icon-github mg-btn-icon"></i>
-            <span>Sign In GitHub</span>
-          </a>
-        </div>
-        <div id="mg-github-signout-div" class="hidden">
-          <a href="#" id="mg-signout-btn" class="mg-btn mg-github-btn">
-            <i class="mg-icon-github mg-btn-icon"></i>
-            <span>Sign Out GitHub</span>
-          </a>
-        </div>
-      </section>
-    </div>
+		<div id="github-page">
+			<div style="margin:20px 0px;">
+				<section>
+					<div id="mg-github-signin-div">
+						<a href="#" id="mg-signin-btn" class="mg-btn mg-github-btn">
+							<i class="mg-icon-github mg-btn-icon"></i>
+							<span>Sign In GitHub</span>
+						</a>
+					</div>
+					<div id="mg-github-signout-div" class="hidden">
+						<a href="#" id="mg-signout-btn" class="mg-btn mg-github-btn">
+							<i class="mg-icon-github mg-btn-icon"></i>
+							<span>Sign Out GitHub</span>
+						</a>
+					</div>
+				</section>
+			</div>
 
-    <div style="border-bottom:1px #e1e4e8 solid;"></div>
+			<div style="border-bottom:1px #e1e4e8 solid;"></div>
 
-    <div style="margin:20px 0px 5px 0px; text-align:center">
-      <section style="display:inline-block">
-        <a href="#" id="mg-select-github-e" class="mg-select-btn">
-          <i class="mg-logo-ibm mg-menu-logo"/></i>
-          <span id="mg-github-e-uri"></span>
-          <i class="mg-icon-caret-down mg-select-i-show-menu"></i>
-        </a>
-        <div class="mg-select-menu-modal" id="mg-select-menu-modal">
-          <div class="mg-select-menu-header" id="mg-select-menu-header">
-            <span class="mg-select-menu-title">GitHub Enterprise</span>
-            <i class="mg-icon-close mg-select-menu-close" id="mg-select-menu-close"></i>
-          </div>
-          <div class="mg-select-menu-list" id="mg-menu-list">
-          </div>
-        </div>
-      </section>
+			<div style="margin:20px 0px 5px 0px; text-align:center">
+				<section style="display:inline-block">
+					<a href="#" id="mg-select-github-e" class="mg-select-btn">
+						<i class="mg-logo-ibm mg-menu-logo"/></i>
+						<span id="mg-github-e-uri"></span>
+						<i class="mg-icon-caret-down mg-select-i-show-menu"></i>
+					</a>
+					<div class="mg-select-menu-modal" id="mg-select-menu-modal">
+						<div class="mg-select-menu-header" id="mg-select-menu-header">
+							<span class="mg-select-menu-title">GitHub Enterprise</span>
+							<i class="mg-icon-close mg-select-menu-close" id="mg-select-menu-close"></i>
+						</div>
+						<div class="mg-select-menu-list" id="mg-menu-list">
+						</div>
+					</div>
+				</section>
 
-      <section style="display:inline-block">
-        <input class="mg-input mg-input-box" id="mg-github-e-token" type="text"
-          placeholder="Authorized Token"/>
-        <i class="mg-icon-label mg-input-icon"></i>
-      </section>
+				<section style="display:inline-block">
+					<input class="mg-input mg-input-box" id="mg-github-e-token" type="text"
+						placeholder="Authorized Token"/>
+					<i class="mg-icon-label mg-input-icon"></i>
+				</section>
 
-      <section>
-        <div id="mg-github-e-signin-div">
-          <a href="#" id="mg-e-signin-btn" class="mg-btn mg-github-e-btn">
-            <i class="mg-icon-github mg-btn-icon mg-white-icon"></i>
-            <span>Sign In GitHub Enterprise</span>
-          </a>
-        </div>
+				<section>
+					<div id="mg-github-e-signin-div">
+						<a href="#" id="mg-e-signin-btn" class="mg-btn mg-github-e-btn">
+							<i class="mg-icon-github mg-btn-icon mg-white-icon"></i>
+							<span>Sign In GitHub Enterprise</span>
+						</a>
+					</div>
 
-        <div id="mg-github-e-signout-div" class="hidden">
-          <a href="#" id="mg-e-signout-btn" class="mg-btn mg-github-e-btn">
-            <i class="mg-icon-github mg-btn-icon mg-white-icon"></i>
-            <span>Sign Out GitHub Enterprise</span>
-          </a>
-        </div>
-      </section>
+					<div id="mg-github-e-signout-div" class="hidden">
+						<a href="#" id="mg-e-signout-btn" class="mg-btn mg-github-e-btn">
+							<i class="mg-icon-github mg-btn-icon mg-white-icon"></i>
+							<span>Sign Out GitHub Enterprise</span>
+						</a>
+					</div>
+				</section>
 
-      <section class="mg-message-box">
-        <span class="mg-message" id="mg-message"></span>
-      </section>
-    </div>
-  </body>
+				<section class="mg-message-box">
+					<span class="mg-message" id="mg-message"></span>
+				</section>
+			</div>
+		</div>
 
-  <script src="src/js/config.js"></script>
-  <script src="src/js/browser_api.js"></script>
-  <script src="src/js/ui/popup.js"></script>
+		<div id="zenhub-page">
+		</div>
+	</body>
+
+	<script src="src/js/config.js"></script>
+	<script src="src/js/browser_api.js"></script>
+	<script src="src/js/ui/popup.js"></script>
 
 </html>

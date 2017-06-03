@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *			 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,80 +19,80 @@
  * popup view
  */
 var GitHubComp = (function() {
-  'use strict';
+	'use strict';
 
-  function GitHubComp() {
-  }
+	function GitHubComp() {
+	}
 
-  /**
-   * Init component
-   */
-  GitHubComp.prototype.init = function() {
-    // sign in button event handler
-    let signin_btn = document.getElementById('mg-signin-btn');
-    signin_btn.onclick = function () {
-      signin_btn.disabled = true;
-      if (browser_api.isFirefox()) {
-        browser.extension.getBackgroundPage().signInGitHub();
-        window.close();
-      }
-      else if (browser_api.isChrome()) {
-        chrome.extension.getBackgroundPage().signInGitHub();
-        window.close();
-      }
-      else {
-        document.getElementById('mg-message').textContent =
-          'Browser is not supported!';
-      }
-    };
+	/**
+	 * Init component
+	 */
+	GitHubComp.prototype.init = function() {
+		// sign in button event handler
+		let signin_btn = document.getElementById('mg-signin-btn');
+		signin_btn.onclick = function () {
+			signin_btn.disabled = true;
+			if (browser_api.isFirefox()) {
+				browser.extension.getBackgroundPage().signInGitHub();
+				window.close();
+			}
+			else if (browser_api.isChrome()) {
+				chrome.extension.getBackgroundPage().signInGitHub();
+				window.close();
+			}
+			else {
+				document.getElementById('mg-message').textContent =
+					'Browser is not supported!';
+			}
+		};
 
-    // sign out button event handler
-    let self = this;
-    let signout_btn = document.getElementById('mg-signout-btn');
-    signout_btn.onclick = function() {
-      signout_btn.disabled = true;
-      browser_api.storage.remove(MYGIT_GITHUB_KEY, function() {
-        signout_btn.disabled = false;
-        self.render();
-      });
-    };
+		// sign out button event handler
+		let self = this;
+		let signout_btn = document.getElementById('mg-signout-btn');
+		signout_btn.onclick = function() {
+			signout_btn.disabled = true;
+			browser_api.storage.remove(MYGIT_GITHUB_KEY, function() {
+				signout_btn.disabled = false;
+				self.render();
+			});
+		};
 
-    // info click event handler
-    let el_info = document.getElementById('mg-info');
-    el_info.onclick = function() {
-      browser_api.tabs.create({url: this.href});
-      window.close();
-    };
+		// info click event handler
+		let el_info = document.getElementById('mg-info');
+		el_info.onclick = function() {
+			browser_api.tabs.create({url: this.href});
+			window.close();
+		};
 
-    // render UI
-    this.render();
-  };
+		// render UI
+		this.render();
+	};
 
-  /**
-   * Render UI component
-   */
-  GitHubComp.prototype.render = function() {
-    let signin_div = document.getElementById('mg-github-signin-div');
-    let signout_div = document.getElementById('mg-github-signout-div');
+	/**
+	 * Render UI component
+	 */
+	GitHubComp.prototype.render = function() {
+		let signin_div = document.getElementById('mg-github-signin-div');
+		let signout_div = document.getElementById('mg-github-signout-div');
 
-    // read configurations from chome storage and render UI according to
-    // configurations
-    browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
-      if (item && item[MYGIT_GITHUB_KEY] && item[MYGIT_GITHUB_KEY].token) {
-        signout_div.style.display = 'block';
-        signin_div.style.display = 'none';
-      }
-      else {
-        signout_div.style.display = 'none';
-        signin_div.style.display = 'block';
-      }
-    },
-    function onError(error) {
-      console.error(`Error: ${error}`);
-    });
-  };
+		// read configurations from chome storage and render UI according to
+		// configurations
+		browser_api.storage.get(MYGIT_GITHUB_KEY, function(item) {
+			if (item && item[MYGIT_GITHUB_KEY] && item[MYGIT_GITHUB_KEY].token) {
+				signout_div.style.display = 'block';
+				signin_div.style.display = 'none';
+			}
+			else {
+				signout_div.style.display = 'none';
+				signin_div.style.display = 'block';
+			}
+		},
+		function onError(error) {
+			console.error(`Error: ${error}`);
+		});
+	};
 
-  return GitHubComp;
+	return GitHubComp;
 }());
 
 /**
@@ -100,213 +100,323 @@ var GitHubComp = (function() {
  * UI part of popup view
  */
 var GitHubEnterpriseComp = (function() {
-  'use strict';
+	'use strict';
 
-  function GitHubEnterpriseComp() {
-    this.signed_in_token = {};
+	function GitHubEnterpriseComp() {
+		this.signed_in_token = {};
 
-    // all supported github enterprises
-    this.all_github_e = [
-      { name : 'ibm', // enterpise unique name
-        icon : 'mg-logo-ibm', // enterpise logo, should be web font
-        uri : 'github.ibm.com' // enterpise uri
-      }
-    ];
-  }
+		// all supported github enterprises
+		this.all_github_e = [
+			{ name : 'ibm', // enterpise unique name
+				icon : 'mg-logo-ibm', // enterpise logo, should be web font
+				uri : 'github.ibm.com' // enterpise uri
+			}
+		];
+	}
 
-  /**
-   * Init UI component
-   */
-  GitHubEnterpriseComp.prototype.init = function() {
-    let token_input = document.getElementById('mg-github-e-token');
-    let message_span = document.getElementById('mg-message');
+	/**
+	 * Init UI component
+	 */
+	GitHubEnterpriseComp.prototype.init = function() {
+		let token_input = document.getElementById('mg-github-e-token');
+		let message_span = document.getElementById('mg-message');
 
-    // clean message when inputting token
-    token_input.oninput = function() {
-      message_span.textContent = '';
-    };
+		// clean message when inputting token
+		token_input.oninput = function() {
+			message_span.textContent = '';
+		};
 
-    let self = this;
-    let signin_btn = document.getElementById('mg-e-signin-btn');
-    let select_btn = document.getElementById('mg-select-github-e');
+		let self = this;
+		let signin_btn = document.getElementById('mg-e-signin-btn');
+		let select_btn = document.getElementById('mg-select-github-e');
 
-    // sign in click event handler
-    signin_btn.onclick = function() {
-      let uri = document.getElementById('mg-github-e-uri').innerText;
-      if (!uri) {
-        message_span.textContent = 'Please choose a GitHub Enterprise!';
-        return;
-      }
+		// sign in click event handler
+		signin_btn.onclick = function() {
+			let uri = document.getElementById('mg-github-e-uri').innerText;
+			if (!uri) {
+				message_span.textContent = 'Please choose a GitHub Enterprise!';
+				return;
+			}
 
-      let token = token_input.value;
-      if (!token) {
-        message_span.textContent = 'Please input oauthroized token!';
-        return;
-      }
+			let token = token_input.value;
+			if (!token) {
+				message_span.textContent = 'Please input oauthroized token!';
+				return;
+			}
 
-      let data = {};
-      data[MYGIT_GITHUB_E_KEY] = {
-        'name' : select_btn.getAttribute('ghe'),
-        'uri' : uri,
-        'token' : token
-      };
+			let data = {};
+			data[MYGIT_GITHUB_E_KEY] = {
+				'name' : select_btn.getAttribute('ghe'),
+				'uri' : uri,
+				'token' : token
+			};
 
-      // save github enterprise configs in browser storage
-      signin_btn.disabled = true;
-      browser_api.storage.set(data, function() {
-        signin_btn.disabled = false;
-        self.render();
-      });
-    };
+			// save github enterprise configs in browser storage
+			signin_btn.disabled = true;
+			browser_api.storage.set(data, function() {
+				signin_btn.disabled = false;
+				self.render();
+			});
+		};
 
-    // sign out click event handler
-    let signout_btn = document.getElementById('mg-e-signout-btn');
-    signout_btn.onclick = function() {
-      signout_btn.disabled = true;
-      browser_api.storage.remove(MYGIT_GITHUB_E_KEY, function() {
-        signout_btn.disabled = false;
-        self.render();
-      });
-    };
+		// sign out click event handler
+		let signout_btn = document.getElementById('mg-e-signout-btn');
+		signout_btn.onclick = function() {
+			signout_btn.disabled = true;
+			browser_api.storage.remove(MYGIT_GITHUB_E_KEY, function() {
+				signout_btn.disabled = false;
+				self.render();
+			});
+		};
 
-    this.initMenuModal();
-    this.render();
-  };
+		this.initMenuModal();
+		this.render();
+	};
 
-  /**
-   * Init GitHub Enterprise menu modal
-   */
-  GitHubEnterpriseComp.prototype.initMenuModal = function() {
-    let menu_modal = document.getElementById('mg-select-menu-modal');
-    let select_btn = document.getElementById('mg-select-github-e');
-    let menu_list_div = document.getElementById('mg-menu-list');
+	/**
+	 * Init GitHub Enterprise menu modal
+	 */
+	GitHubEnterpriseComp.prototype.initMenuModal = function() {
+		let menu_modal = document.getElementById('mg-select-menu-modal');
+		let select_btn = document.getElementById('mg-select-github-e');
+		let menu_list_div = document.getElementById('mg-menu-list');
 
-    // install all supported github enterprise
-    let menu_items = '';
-    this.all_github_e.forEach(function(item) {
-      menu_items += '<div class="mg-select-menu-item" ghe="' + item.name + '">\n'
-        + '<a href="#" ghe="' + item.name + '">\n' +
-        '<i class="' + item.icon + ' mg-menu-logo"/></i>\n' +
-        '<span class="mg-select-menu-heading">' +
-        item.uri + '</span>\n' +
-        '<i class="mg-icon-check mg-menu-check hidden"></i>' +
-        '</a>\n</div>\n';
-    });
-    menu_list_div.innerHTML = menu_items;
+		// install all supported github enterprise
+		let menu_items = '';
+		this.all_github_e.forEach(function(item) {
+			menu_items += '<div class="mg-select-menu-item" ghe="' + item.name + '">\n'
+				+ '<a href="#" ghe="' + item.name + '">\n' +
+				'<i class="' + item.icon + ' mg-menu-logo"/></i>\n' +
+				'<span class="mg-select-menu-heading">' +
+				item.uri + '</span>\n' +
+				'<i class="mg-icon-check mg-menu-check hidden"></i>' +
+				'</a>\n</div>\n';
+		});
+		menu_list_div.innerHTML = menu_items;
 
-    // set onclick event of menu item
-    let self = this;
-    menu_list_div.getElementsByClassName('mg-select-menu-item')
-                 .forEach(function(ele) {
-      ele.onclick = function() {
-        menu_modal.style.display = 'none';
-        let name = ele.getAttribute('ghe');
-        let oldName = select_btn.getAttribute('ghe');
+		// set onclick event of menu item
+		let self = this;
+		menu_list_div.getElementsByClassName('mg-select-menu-item')
+								 .forEach(function(ele) {
+			ele.onclick = function() {
+				menu_modal.style.display = 'none';
+				let name = ele.getAttribute('ghe');
+				let oldName = select_btn.getAttribute('ghe');
 
-        for (let i = 0; i < self.all_github_e.length; ++i) {
-          let item = self.all_github_e[i];
-          if (name == item.name && oldName != item.name) {
-            select_btn.setAttribute('ghe', item.name);
-            select_btn.innerHTML =
-                '<i class="' + item.icon + ' mg-menu-logo"/></i>\n' +
-                '<span id="mg-github-e-uri">' + item.uri + '</span>\n' +
-                '<i class="mg-icon-caret-down mg-select-i-show-menu"></i>\n';
-            break;
-          }
-        }
-      };
-    });
+				for (let i = 0; i < self.all_github_e.length; ++i) {
+					let item = self.all_github_e[i];
+					if (name == item.name && oldName != item.name) {
+						select_btn.setAttribute('ghe', item.name);
+						select_btn.innerHTML =
+								'<i class="' + item.icon + ' mg-menu-logo"/></i>\n' +
+								'<span id="mg-github-e-uri">' + item.uri + '</span>\n' +
+								'<i class="mg-icon-caret-down mg-select-i-show-menu"></i>\n';
+						break;
+					}
+				}
+			};
+		});
 
-    // show menu modal
-    select_btn.onclick = function(event) {
-      let show_menu_btn = document.querySelector('i[class^="mg-icon-caret-down"]');
-      if (show_menu_btn.style &&
-          show_menu_btn.style.display != 'none') {
-        menu_modal.style.display = 'block';
-        let name = select_btn.getAttribute('ghe');
-        menu_list_div.getElementsByTagName('a').forEach(function(ele) {
-          let ele_check = ele.querySelector('i[class^="mg-icon-check"]');
-          if (ele.getAttribute('ghe') == name) {
-            ele_check.style.display = 'block';
-          }
-          else {
-            ele_check.style = null;
-          }
-        });
-        event.stopPropagation();
-      }
-    };
+		// show menu modal
+		select_btn.onclick = function(event) {
+			let show_menu_btn = document.querySelector('i[class^="mg-icon-caret-down"]');
+			if (show_menu_btn.style &&
+					show_menu_btn.style.display != 'none') {
+				menu_modal.style.display = 'block';
+				let name = select_btn.getAttribute('ghe');
+				menu_list_div.getElementsByTagName('a').forEach(function(ele) {
+					let ele_check = ele.querySelector('i[class^="mg-icon-check"]');
+					if (ele.getAttribute('ghe') == name) {
+						ele_check.style.display = 'block';
+					}
+					else {
+						ele_check.style = null;
+					}
+				});
+				event.stopPropagation();
+			}
+		};
 
-    // close menu modal
-    document.getElementById('mg-select-menu-close').onclick = function() {
-      menu_modal.style.display = 'none';
-    };
+		// close menu modal
+		document.getElementById('mg-select-menu-close').onclick = function() {
+			menu_modal.style.display = 'none';
+		};
 
-    // global click event handler
-    document.onclick = function(event) {
-      // close menu modal if it is showed
-      if (menu_modal.style && menu_modal.style.display == 'block' &&
-          !menu_modal.contains(event.target)) {
-        menu_modal.style.display = 'none';
-        return;
-      }
-    };
-  };
+		// global click event handler
+		document.onclick = function(event) {
+			// close menu modal if it is showed
+			if (menu_modal.style && menu_modal.style.display == 'block' &&
+					!menu_modal.contains(event.target)) {
+				menu_modal.style.display = 'none';
+				return;
+			}
+		};
+	};
 
-  /**
-   * Render UI component
-   */
-  GitHubEnterpriseComp.prototype.render = function () {
-    let self = this;
-    let signin_div = document.getElementById('mg-github-e-signin-div');
-    let signout_div = document.getElementById('mg-github-e-signout-div');
-    let token_input = document.getElementById('mg-github-e-token');
-    let select_btn = document.getElementById('mg-select-github-e');
+	/**
+	 * Render UI component
+	 */
+	GitHubEnterpriseComp.prototype.render = function () {
+		let self = this;
+		let signin_div = document.getElementById('mg-github-e-signin-div');
+		let signout_div = document.getElementById('mg-github-e-signout-div');
+		let token_input = document.getElementById('mg-github-e-token');
+		let select_btn = document.getElementById('mg-select-github-e');
 
-    browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
-      let ghe = self.all_github_e[0];
-      if (item && item[MYGIT_GITHUB_E_KEY] &&
-          item[MYGIT_GITHUB_E_KEY].token &&
-          item[MYGIT_GITHUB_E_KEY].uri) {
-        signout_div.style.display = 'block';
-        signin_div.style.display = 'none';
-        select_btn.style.cursor = 'default';
-        token_input.value = item[MYGIT_GITHUB_E_KEY].token;
-        token_input.disabled = true;
-        ghe.token = token_input.value;
+		browser_api.storage.get(MYGIT_GITHUB_E_KEY, function(item) {
+			let ghe = self.all_github_e[0];
+			if (item && item[MYGIT_GITHUB_E_KEY] &&
+				item[MYGIT_GITHUB_E_KEY].token &&
+					item[MYGIT_GITHUB_E_KEY].uri) {
+				signout_div.style.display = 'block';
+				signin_div.style.display = 'none';
+				select_btn.style.cursor = 'default';
+				token_input.value = item[MYGIT_GITHUB_E_KEY].token;
+				token_input.disabled = true;
+				ghe.token = token_input.value;
 
-        for (let i = 0; i < self.all_github_e.length; ++i) {
-          let t = self.all_github_e[i];
-          if (t.name == item[MYGIT_GITHUB_E_KEY].name) {
-            ghe = t;
-            break;
-          }
-        }
-      }
-      else {
-        signout_div.style.display = 'none';
-        signin_div.style.display = 'block';
-        select_btn.style.cursor = 'pointer';
-        token_input.value = ghe.token || '';
-        token_input.disabled = false;
-        ghe.token = null;
-      }
+				for (let i = 0; i < self.all_github_e.length; ++i) {
+					let t = self.all_github_e[i];
+					if (t.name == item[MYGIT_GITHUB_E_KEY].name) {
+						ghe = t;
+						break;
+					}
+				}
+			}
+			else {
+				signout_div.style.display = 'none';
+				signin_div.style.display = 'block';
+				select_btn.style.cursor = 'pointer';
+				token_input.value = ghe.token || '';
+				token_input.disabled = false;
+				ghe.token = null;
+			}
 
-      let style = ghe.token ? ' style="display:none"' : '';
-      select_btn.setAttribute('ghe', ghe.name);
-      select_btn.innerHTML =
-          '<i class="' + ghe.icon + ' mg-menu-logo"/></i>\n' +
-          '<span id="mg-github-e-uri">' + ghe.uri + '</span>\n' +
-          '<i class="mg-icon-caret-down mg-select-i-show-menu"' + style +
-          '></i>\n';
-    });
-  };
+			let style = ghe.token ? ' style="display:none"' : '';
+			select_btn.setAttribute('ghe', ghe.name);
+			select_btn.innerHTML =
+					'<i class="' + ghe.icon + ' mg-menu-logo"/></i>\n' +
+					'<span id="mg-github-e-uri">' + ghe.uri + '</span>\n' +
+					'<i class="mg-icon-caret-down mg-select-i-show-menu"' + style +
+					'></i>\n';
+		});
+	};
 
-  return GitHubEnterpriseComp;
+	return GitHubEnterpriseComp;
 }());
 
-var github_comp = new GitHubComp();
-var github_e_comp = new GitHubEnterpriseComp();
-github_comp.init();
-github_e_comp.init();
+var GithubPage = (function() {
+	'use strict';
 
+		function GithubPage() {
+			this.github_comp = new GitHubComp();
+			this.github_e_comp = new GitHubEnterpriseComp();
+		}
+
+		GithubPage.prototype.isVisible = function() {
+			let el_page = document.getElementById('github-page');
+			return (el_page.style && el_page.style.display != 'none');
+		}
+
+		GithubPage.prototype.setVisible = function(enable) {
+			let el_page = document.getElementById('github-page');
+			el_page.style.display = enable ? 'inherit' : 'none';
+		}
+
+		GithubPage.prototype.init = function() {
+			this.github_comp.init();
+			this.github_e_comp.init();
+			this.setVisible(true);
+		}
+
+		return GithubPage;
+}());
+
+var ZenhubPage = (function() {
+	'use strict';
+
+	function ZenhubPage() {
+	}
+
+	ZenhubPage.prototype.isVisible = function() {
+		let el_page = document.getElementById('zenhub-page');
+		return (el_page.style && el_page.style.display != 'none')
+	}
+
+	ZenhubPage.prototype.setVisible = function(enable) {
+		let el_page = document.getElementById('zenhub-page');
+		el_page.style.display = enable ? 'inherit' : 'none';
+	}
+
+	ZenhubPage.prototype.init = function() {
+		let el_token = document.getElementById('mg-zenhub-token');
+		let el_e_token = document.getElementById('mg-zenhub-e-token');
+		let el_e_api = document.getElementById('mg-zenhub-e-api');
+
+		el_token.onblur = function() {
+			if (el_token.value) {
+				let data = {};
+				data[MYGIT_ZENHUB_KEY] = {
+					'token' : StrUtils.escapeHTML(el_token.value)
+				};
+				browser_api.storage.set(data);
+			}
+		}
+
+		el_e_token.onblur = el_e_api.onblur = function() {
+			if (el_e_token.value && el_e_api.value) {
+				let data = {};
+				data[MYGIT_ZENHUB_E_KEY] = {
+					'token': el_e_token.value,
+					'api': el_e_api.value
+				};
+				browser_api.storage.set(data);
+			}
+		}
+
+		this.setVisible(false);
+		this.render();
+	}
+
+	ZenhubPage.prototype.render = function() {
+		let el_token = document.getElementById('mg-zenhub-token');
+		let el_e_api = document.getElementById('mg-zenhub-e-api');
+		let el_e_token = document.getElementById('mg-zenhub-e-token');
+
+		browser_api.storage.get(MYGIT_ZENHUB_KEY, function(item) {
+			if (item && item[MYGIT_ZENHUB_KEY]) {
+				el_token.value = item[MYGIT_ZENHUB_KEY].token || '';
+			}
+		});
+
+		browser_api.storage.get(MYGIT_ZENHUB_E_KEY, function(item) {
+			if (item && item[MYGIT_ZENHUB_E_KEY]) {
+				el_e_api.value = item[MYGIT_ZENHUB_E_KEY].api || '';
+				el_e_token.value = item[MYGIT_ZENHUB_E_KEY].token || '';
+			}
+		});
+	}
+
+	return ZenhubPage;
+}());
+
+(function() {
+	let zenhub_page = new ZenhubPage();
+	let github_page = new GithubPage();
+	zenhub_page.init();
+	github_page.init();
+
+	let page_indicator = document.getElementById('page-indicator');
+	page_indicator.onclick = function() {
+		if (zenhub_page.isVisible()) {
+			zenhub_page.setVisible(false);
+			github_page.setVisible(true);
+			page_indicator.src = 'img/icon/zenhub_16.png';
+		}
+		else {
+			zenhub_page.setVisible(true);
+			github_page.setVisible(false);
+			page_indicator.src = 'img/icon/github_18.png';
+		}
+	}
+})();

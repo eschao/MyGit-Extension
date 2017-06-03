@@ -61,7 +61,7 @@ var IssueExportDialog = (function() {
 						{ 'name': 'labels', 'title': 'Labels', 'enable': true },
 						{ 'name': 'estimate', 'title': 'Estimate', 'enable': false },
 						{ 'name': 'pipeline', 'title': 'Pipeline', 'enable': false },
-						{ 'name': 'epic', 'title': 'Epic', 'enable': false }
+						{ 'name': 'is_epic', 'title': 'Is Epic', 'enable': false }
 					]
 				};
 			}
@@ -108,16 +108,14 @@ var IssueExportDialog = (function() {
 						exports.labels[l] = '';
 					});
 
+					let labels = {};
 					if (item.labels) {
 						item.labels.forEach(function(l) {
 							exports.labels[l.name] = l.name;
+							labels[l.name] = l.name;
 						});
 					}
 
-					let labels = [];
-					Object.keys(exports.labels).forEach(function(l) {
-						labels.push(exports.labels[l]);
-					});
 					return labels;
 				}
 				// don't expand labels, which means all labels are in one column in csv
@@ -142,9 +140,9 @@ var IssueExportDialog = (function() {
 			'pipeline': function(item) {
 				return item['pipeline'] ? item.pipeline.name : '';
 			},
-			// epic - zenhub
-			'epic': function(item) {
-				return item['is_epic'] ? item.is_epic : false;
+			// is epic - zenhub
+			'is_epic': function(item) {
+				return (item['is_epic'] !== null) ? item.is_epic : false;
 			}
 		};
 	};
@@ -424,7 +422,7 @@ var IssueExportDialog = (function() {
 	 * we need to get repository id first. This function is only called if user
 	 * choose to export zenhub related fields
 	 */
-	IssueExportDialog.prototype._fetchRepoId = function(json, exports) {
+	IssueExportDialog.prototype._fetchRepoId = function(issuesJson, exports) {
 		let self = this
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', exports.repoApi, true);
@@ -435,13 +433,15 @@ var IssueExportDialog = (function() {
 				if (xhr.status == 200) {
 					let json = JSON.parse(xhr.responseText);
 					if (json) {
-						exports.repoId = json.id;
-						self._fetchZenhub(json, exports);
+						self._fetchZenhub(json.id, issuesJson, exports);
+					}
+					else {
+						self.showMessage('Can\'t get repository id from response.', true);
 					}
 				}
 				else {
-					self.showMessage('Can't get repository id for fetching zenhub data. '
-					  + 'Error: ' + xhr.status);
+					self.showMessage('Can\'t get repository id for fetching zenhub data. '
+					  + 'Error: ' + xhr.status, true);
 				}
 			}
 		}
@@ -451,13 +451,13 @@ var IssueExportDialog = (function() {
 	/**
 	 * Fetch zenhub data for each issue
 	 */
-	IssueExportDialog.prototype._fetchZenhub = function(json, exports) {
+	IssueExportDialog.prototype._fetchZenhub = function(repoId, json, exports) {
 		let self = this;
 
 		for (let i = 0; i < json.items.length; ++i) {
 			let item = json.items[i];
 			let url = 'https://' + exports.zenhub.api + '/p1/repositories/' +
-				exports.repoId + '/issues/' + item.number;
+				repoId + '/issues/' + item.number;
 			let xhr = new XMLHttpRequest();
 			xhr.open('GET', url, true);
 			xhr.setRequestHeader('X-Authentication-Token', exports.zenhub.token);
@@ -468,18 +468,24 @@ var IssueExportDialog = (function() {
 						if (json) {
 							item['estimate'] = json.estimate;
 							item['pipeline'] = json.pipeline;
-							item['epic'] = json.is_epic;
+							item['is_epic'] = json.is_epic;
+							self._buildIssue(item, exports);
+						}
+						else {
+							self.showMessage('Can\'t fetch zenhub data for issue: ' +
+								item.number, true);
 							self._buildIssue(item, exports);
 						}
 					}
 					else {
-						self.showMessage('Can't fetch zenhub data for issue: ' +
-							item.number);
+						self.showMessage('Can\'t fetch zenhub data for issue: ' +
+							item.number + '. Status: ' + xhr.status, true);
 						self._buildIssue(item, exports);
 					}
 				}
 			}
-			xhr.send();
+
+			setTimeout(function() { xhr.send(); }, 20);
 		}
 	}
 
@@ -501,7 +507,7 @@ var IssueExportDialog = (function() {
 		});
 
 		exports.issues.push(issue);
-		self.showMessage('Exporting issues ' + exports.issues.length + ' of ' +
+		this.showMessage('Exporting issues ' + exports.issues.length + ' of ' +
 				exports.total_count + ' ...');
 
 		if (exports.issues.length == exports.total_count) {
@@ -547,6 +553,7 @@ var IssueExportDialog = (function() {
 		let label_index = -1;
 		let headers = [];
 
+		// find label index
 		this.config.headers.forEach(function(e) {
 			if (exports.parser[e.name]) {
 				headers.push(e.title);
@@ -559,6 +566,7 @@ var IssueExportDialog = (function() {
 		let is_expand = this.config.label.expand;
 		let labels = Object.keys(exports.labels);
 		let delimiter = this.config.delimiter;
+		// generate header line
 		if (this.config.gen_headers) {
 			if (is_expand && label_index > -1 && labels.length > 0) {
 				headers[label_index] = labels.join(delimiter);
@@ -567,13 +575,19 @@ var IssueExportDialog = (function() {
 			data = headers.join(delimiter) + '\n';
 		}
 
+		// generate issue line
 		exports.issues.forEach(function(issue) {
 			if (label_index > -1 && is_expand) {
-				let l = issue[label_index].join(delimiter);
-				issue[label_index].forEach(function() {
-					l += delimiter;
+				let t = '';
+				let issue_labels = issue[label_index];
+				labels.forEach(function(l) {
+					t += (issue_labels[l] || '') + delimiter;
 				});
-				issue[label_index] = l;
+
+				if (t.slice(-1) == delimiter) {
+					t = t.slice(0, -1);
+				}
+				issue[label_index] = t;
 			}
 
 			data += issue.join(delimiter) + '\n';
@@ -613,7 +627,7 @@ var IssueExportDialog = (function() {
 				if (!has_zenhub &&
 				    (header.name == 'estimate' ||
 				     header.name == 'pipeline' ||
-				     header.name == 'epic')) {
+				     header.name == 'is_epic')) {
 					has_zenhub = true;
 				}
 			}
@@ -635,7 +649,7 @@ var IssueExportDialog = (function() {
 		let url = this._buildSearchUrlByFilters(base_uri, hub.repo);
 		if (url) {
 			exports.url = url;
-			exports.repoApi = 'https://' + hub.api_uri + '/' + hub.repo;
+			exports.repoApi = 'https://' + hub.api_uri + '/repos/' + hub.repo;
 			exports.token = hub.token;
 			exports.zenhub = has_zenhub ? hub.zenhub : null;
 			this.showMessage('Exporting issues ...');

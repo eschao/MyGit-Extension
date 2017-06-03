@@ -6,21 +6,18 @@
 		<link rel="stylesheet" href="css/popup.css">
 	</head>
 
-	<body style="width:300px; margin: 10px 0px;">
-		<div class="mg-title-section" style="display: flex; justify-content:
-			space-between; align-items: center;">
-			<div class="left" style="display: inline-flex; margin-left: 10px;
-				align-items: center;">
+	<body style="width:300px; max-height:300px; margin: 10px 0px;">
+		<div class="mg-title-section">
+			<div class="mg-title-left">
 				<img src="img/icon/mygit_16.png"/>
-				<span class="mg-title" style="margin-left: 6px">MyGit</span>
+				<span class="mg-title">MyGit</span>
 			</div>
-			<div class="right" style="display: inline-flex; align-items: center;
-				justify-content: space-between; width: 60px">
-				<a href="#" id="zenhub-info">
-					<img src="img/icon/zenhub_14.png" class="v-center"/>
+			<div class="mg-title-right">
+				<a href="#">
+					<img src="img/icon/zenhub_16.png" id="page-indicator"/>
 				</a>
 				<a href="https://github.com/eschao/MyGit-Extension" id="mg-info">
-					<i class="mg-icon-info mg-icon-size-m"></i>
+					<i class="mg-icon-info" style="font-size: 20px"></i>
 				</a>
 			</div>
 		</div>
@@ -90,7 +87,35 @@
 			</div>
 		</div>
 
-		<div id="zenhub-page">
+		<div id="zenhub-page" style="margin: 20px 0px; text-align: center;">
+			<div>
+				<section style="display: inline-flex">
+					<img src="img/icon/zenhub_16.png"/>
+					<span style="margin-left: 6px">Zenhub Free</span>
+				</section>
+				<section style="display:inline-block">
+					<input class="mg-input mg-input-box" id="mg-zenhub-token" type="text"
+						placeholder="Authorized Token"/>
+					<i class="mg-icon-label mg-input-icon"></i>
+				</section>
+			</div>
+
+			<div style="margin-top: 30px">
+				<section style="display: inline-flex">
+					<img src="img/icon/zenhub_e_16.png"/>
+					<span style="margin-left: 6px">Zenhub Enterprise</span>
+				</section>
+				<section style="display:inline-block">
+					<input class="mg-input mg-input-box" id="mg-zenhub-e-api"
+						type="text" placeholder="Zenhub Enterprise URL"/>
+					<i class="mg-icon-link mg-input-icon"></i>
+				</section>
+				<section style="display:inline-block">
+					<input class="mg-input mg-input-box" id="mg-zenhub-e-token"
+						type="text" placeholder="Authorized Token"/>
+					<i class="mg-icon-label mg-input-icon"></i>
+				</section>
+			</div>
 		</div>
 	</body>
 

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *			 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,41 +26,41 @@ var g_oauth_tab = null;
  * user account
  */
 browser_api.tabs.onUpdated.addListener(function(id, changeInfo, tab) {
-  if (g_oauth_tab && g_oauth_tab.id == id && tab.url) {
-    // search the authorized token
-    let index = tab.url.search(GITHUB_TOKEN_Q);
-    if (index > -1) {
-      let token = tab.url.substr(index + GITHUB_TOKEN_Q.length);
+	if (g_oauth_tab && g_oauth_tab.id == id && tab.url) {
+		// search the authorized token
+		let index = tab.url.search(GITHUB_TOKEN_Q);
+		if (index > -1) {
+			let token = tab.url.substr(index + GITHUB_TOKEN_Q.length);
 
-      // save token in browser storage
-      if (token) {
-        g_oauth_tab = null;
-        let data = {};
-        data[MYGIT_GITHUB_KEY] =  {'token' : token};
-        browser_api.storage.set(data);
-      }
-    }
-  }
+			// save token in browser storage
+			if (token) {
+				g_oauth_tab = null;
+				let data = {};
+				data[MYGIT_GITHUB_KEY] =	{'token' : token};
+				browser_api.storage.set(data);
+			}
+		}
+	}
 });
 
 /**
  * Sign in public github
  */
 function signInGitHub() {
-  let url = 'https://github.com/login/oauth/authorize?client_id='
-            + CLIENT_ID + '&scope=' + SCOPE + '&redirect_uri=' + REDIRECT_URI;
-  browser_api.tabs.create({'url': url}, function(tab) {
-    g_oauth_tab = tab;
-  });
+	let url = 'https://github.com/login/oauth/authorize?client_id='
+						+ CLIENT_ID + '&scope=' + SCOPE + '&redirect_uri=' + REDIRECT_URI;
+	browser_api.tabs.create({'url': url}, function(tab) {
+		g_oauth_tab = tab;
+	});
 }
 
 /**
  * Sign out public github
  */
 function signOutGitHub() {
-  if (g_oauth_tab == null) {
-    browser_api.storage.remove(MYGIT_GITHUB_KEY, function(){});
-  }
+	if (g_oauth_tab == null) {
+		browser_api.storage.remove(MYGIT_GITHUB_KEY, function(){});
+	}
 }
 
 /**
@@ -71,9 +71,9 @@ function signOutGitHub() {
  * @token Access token for github enterprise
  */
 function signInGitHubEnterprise(baseUri, token) {
-  let data = {};
-  data[MYGIT_GITHUB_E_KEY] = { 'uri' : baseUri, 'token' : token };
-  browser_api.storage.set(data, function(){});
+	let data = {};
+	data[MYGIT_GITHUB_E_KEY] = { 'uri' : baseUri, 'token' : token };
+	browser_api.storage.set(data, function(){});
 }
 
 /**
@@ -81,5 +81,5 @@ function signInGitHubEnterprise(baseUri, token) {
  * Remove the base uri and token from storage
  */
 function signOutGitHubEnterprise() {
-  browser_api.storage.remove(MYGIT_GITHUB_E_KEY, function(){});
+	browser_api.storage.remove(MYGIT_GITHUB_E_KEY, function(){});
 }

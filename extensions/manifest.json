@@ -1,8 +1,15 @@
 {
 	"author": "eschao",
 	"name": "MyGit",
-	"permissions": ["storage", "tabs", "*://*/*"],
-	"version": "0.6.1",
+	"permissions": [
+		"storage",
+		"tabs",
+		"https://*.github.com/*",
+		"https://github.ibm.com/*",
+		"https://zenhub.innovate.ibm.com/*",
+		"https://*.zenhub.io/*"
+	],
+	"version": "0.6.3",
 	"manifest_version": 2,
 	"description": "MyGit - Extension for GitHub",
 	"icons": {

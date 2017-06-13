@@ -17,6 +17,33 @@
 /**
  * Issue export dialog class
  */
+var _export_config = {};
+browser_api.storage.get(MYGIT_GITHUB_ISSUE_EXPORT_KEY, function(item) {
+	let config = item ? item[MYGIT_GITHUB_ISSUE_EXPORT_KEY] : null;
+	if (config && config.headers) {
+		_export_config = config;
+	}
+	else {
+		_export_config = {
+			'delimiter': ',',
+			'gen_headers': true,
+			'label': { 'expand': true, 'delimiter': '|' },
+			'headers': [
+				{ 'name': 'number', 'title': 'Issue No', 'enable': true },
+				{ 'name': 'state', 'title': 'State', 'enable': true },
+				{ 'name': 'title', 'title': 'Title', 'enable': true },
+				{ 'name': 'assignee', 'title': 'Assignee', 'enable': true },
+				{ 'name': 'user', 'title': 'Author', 'enable': true },
+				{ 'name': 'milestone', 'title': 'Milestone', 'enable': true },
+				{ 'name': 'labels', 'title': 'Labels', 'enable': true },
+				{ 'name': 'estimate', 'title': 'Estimate', 'enable': false },
+				{ 'name': 'pipeline', 'title': 'Pipeline', 'enable': false },
+				{ 'name': 'is_epic', 'title': 'Is Epic', 'enable': false }
+			]
+		};
+	}
+});
+
 var IssueExportDialog = (function() {
 	'use strict';
 
@@ -33,40 +60,14 @@ var IssueExportDialog = (function() {
 	 */
 	function IssueExportDialog() {
 		// use drag & drop to adjust issue headers
-		this._initConfig();
+		this._init();
+		this._closed = true;
 	}
 
 	/**
 	 * Init configuration from browser storage
 	 */
-	IssueExportDialog.prototype._initConfig = function() {
-		let self = this;
-		browser_api.storage.get(MYGIT_GITHUB_ISSUE_EXPORT_KEY, function(item) {
-			let config = item ? item[MYGIT_GITHUB_ISSUE_EXPORT_KEY] : null;
-			if (config && config.headers) {
-				self.config = config;
-			}
-			else {
-				self.config = {
-					'delimiter': DELIMITER,
-					'gen_headers': true,
-					'label': { 'expand': true, 'delimiter': '|' },
-					'headers': [
-						{ 'name': 'number', 'title': 'Issue No', 'enable': true },
-						{ 'name': 'state', 'title': 'State', 'enable': true },
-						{ 'name': 'title', 'title': 'Title', 'enable': true },
-						{ 'name': 'assignee', 'title': 'Assignee', 'enable': true },
-						{ 'name': 'user', 'title': 'Author', 'enable': true },
-						{ 'name': 'milestone', 'title': 'Milestone', 'enable': true },
-						{ 'name': 'labels', 'title': 'Labels', 'enable': true },
-						{ 'name': 'estimate', 'title': 'Estimate', 'enable': false },
-						{ 'name': 'pipeline', 'title': 'Pipeline', 'enable': false },
-						{ 'name': 'is_epic', 'title': 'Is Epic', 'enable': false }
-					]
-				};
-			}
-		});
-
+	IssueExportDialog.prototype._init = function() {
 		this.parser = {
 			// issue number parser
 			'number': function(item) {
@@ -155,8 +156,10 @@ var IssueExportDialog = (function() {
 	 */
 	IssueExportDialog.prototype.showMessage = function(msg, is_error) {
 		let el_msg = document.getElementById(MESSAGE_ID);
-		el_msg.style.color = is_error ? 'red' : 'blue';
-		el_msg.innerText = msg || '';
+		if (el_msg && el_msg.style) {
+			el_msg.style.color = is_error ? 'red' : 'blue';
+			el_msg.innerText = msg || '';
+		}
 	};
 
 	/**
@@ -189,21 +192,22 @@ var IssueExportDialog = (function() {
 	 * @param root Root element of dialog
 	 */
 	IssueExportDialog.prototype.initDialog = function(root) {
+		this._closed = false;
 		// init generate headers
 		let el_gen_headers = document.getElementById(GEN_TBL_HEADER_ID);
-		el_gen_headers.checked = this.config.gen_headers;
+		el_gen_headers.checked = _export_config.gen_headers;
 
 		// init csv delimiter
 		let el_delimiter = document.getElementById(CSV_DELIMITER_ID);
-		el_delimiter.value = this.config.delimiter;
+		el_delimiter.value = _export_config.delimiter;
 
 		// init expand labels
 		let el_expand_labels = document.getElementById(EXPAND_LABELS_ID);
-		el_expand_labels.checked = this.config.label.expand;
+		el_expand_labels.checked = _export_config.label.expand;
 
 		// init label delimiter
 		let el_label_delimiter = document.getElementById(LABEL_DELIMITER_ID);
-		el_label_delimiter.value = this.config.label.delimiter;
+		el_label_delimiter.value = _export_config.label.delimiter;
 
 		// close export dialog
 		let self = this;
@@ -217,6 +221,7 @@ var IssueExportDialog = (function() {
 		el_close.onclick = function() {
 			window.removeEventListener('click', win_click, false);
 			self.storeConfig();
+			self._closed = true;
 			document.body.removeChild(root);
 		};
 
@@ -236,11 +241,11 @@ var IssueExportDialog = (function() {
 		                      .getElementsByTagName('div');
 		for (let i = 0; i < headers.length; ++i) {
 			headers[i].onclick = onToggleHeader;
-			headers[i].setAttribute('name', this.config.headers[i].name);
-			headers[i].innerHTML = this.config.headers[i].title;
-			headers[i].setAttribute('enable', this.config.headers[i].enable
+			headers[i].setAttribute('name', _export_config.headers[i].name);
+			headers[i].innerHTML = _export_config.headers[i].title;
+			headers[i].setAttribute('enable', _export_config.headers[i].enable
 			                                      .toString());
-			if (!this.config.headers[i].enable) {
+			if (!_export_config.headers[i].enable) {
 				headers[i].className += ' mg-header-disable';
 			}
 		}
@@ -278,10 +283,10 @@ var IssueExportDialog = (function() {
 		let delimiter = document.getElementById(CSV_DELIMITER_ID);
 		let expand_labels = document.getElementById(EXPAND_LABELS_ID);
 		let label_delimiter = document.getElementById(LABEL_DELIMITER_ID);
-		let is_others_changed = (delimiter.value != this.config.delimiter ||
-			  gen_headers.checked != this.config.gen_headers ||
-			  expand_labels.checked != this.config.label.expand ||
-			  label_delimiter.value != this.config.label.delimiter);
+		let is_others_changed = (delimiter.value != _export_config.delimiter ||
+			  gen_headers.checked != _export_config.gen_headers ||
+			  expand_labels.checked != _export_config.label.expand ||
+			  label_delimiter.value != _export_config.label.delimiter);
 
 		let headers = document.getElementById(TBL_HEADERS_DIV_ID)
 		                      .getElementsByTagName('div');
@@ -289,8 +294,8 @@ var IssueExportDialog = (function() {
 		for (let i = 0; i < headers.length; ++i) {
 			let name = headers[i].getAttribute('name');
 			let enable = headers[i].getAttribute('enable');
-			if (name != this.config.headers[i].name ||
-				  enable != this.config.headers[i].enable.toString()) {
+			if (name != _export_config.headers[i].name ||
+				  enable != _export_config.headers[i].enable.toString()) {
 				is_headers_changed = true;
 				break;
 			}
@@ -318,12 +323,12 @@ var IssueExportDialog = (function() {
 				config['headers'] = values;
 			}
 			else {
-				config['headers'] = this.config.headers;
+				config['headers'] = _export_config.headers;
 			}
 
-			this.config = config;
+			_export_config = config;
 			let data = {};
-			data[MYGIT_GITHUB_ISSUE_EXPORT_KEY] = this.config;
+			data[MYGIT_GITHUB_ISSUE_EXPORT_KEY] = _export_config;
 			browser_api.storage.set(data);
 		}
 	};
@@ -342,6 +347,10 @@ var IssueExportDialog = (function() {
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200) {
+					if (self._closed) {
+						return;
+					}
+
 					let json = JSON.parse(xhr.responseText);
 					if (json) {
 						if (exports.total_count < 1) {
@@ -360,7 +369,7 @@ var IssueExportDialog = (function() {
 					if (link) {
 						let items = link.split(',');
 						let next_url = null;
-						for (let i = 0; i < items.length; ++i) {
+						for (let i = 0; i < items.length && !self._closed; ++i) {
 							if (items[i].includes('rel="next"')) {
 								let hrefs = items[i].split(';');
 								if (hrefs[0]) {
@@ -369,15 +378,20 @@ var IssueExportDialog = (function() {
 							}
 						}
 
-						if (next_url) {
-							exports.url = next_url;
-							self._exportIssues(exports);
+						if (!self._closed && next_url) {
+							if (exports.zenhub) {
+								exports.next_url = next_url;
+							}
+							else {
+								exports.url = next_url;
+								self._exportIssues(exports);
+							}
 						}
-						else if (!exports.zenhub) {
+						else if (!self._closed && !exports.zenhub) {
 							self._saveIssues(exports);
 						}
 					}
-					else if (!exports.zenhub) {
+					else if (!self._closed && !exports.zenhub) {
 						self._saveIssues(exports);
 					}
 				}
@@ -386,7 +400,10 @@ var IssueExportDialog = (function() {
 				}
 			}
 		};
-		xhr.send();
+
+		if (!this._closed) {
+			xhr.send();
+		}
 	};
 
 	/**
@@ -431,6 +448,10 @@ var IssueExportDialog = (function() {
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200) {
+					if (self._closed) {
+						return;
+					}
+
 					let json = JSON.parse(xhr.responseText);
 					if (json) {
 						self._fetchZenhub(json.id, issuesJson, exports);
@@ -445,7 +466,10 @@ var IssueExportDialog = (function() {
 				}
 			}
 		}
-		xhr.send();
+
+		if (!this._closed) {
+			xhr.send();
+		}
 	}
 
 	/**
@@ -464,6 +488,11 @@ var IssueExportDialog = (function() {
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
+						if (self._closed) {
+							exports.zenhub.requests = [];
+							return;
+						}
+
 						let json = JSON.parse(xhr.responseText);
 						if (json) {
 							item['estimate'] = json.estimate;
@@ -476,16 +505,40 @@ var IssueExportDialog = (function() {
 								item.number, true);
 							self._buildIssue(item, exports);
 						}
+
+						if (exports.zenhub.requests.length > 0) {
+							setTimeout(function() {
+								if (self._closed) {
+									exports.zenhub.requests = [];
+								}
+								else {
+									exports.zenhub.requests.shift().send();
+								}
+							}, 600);
+						}
+						else if (exports.zenhub.requests.length < 1 && !self._closed) {
+							if (exports.next_url) {
+								exports.url = exports.next_url;
+								exports.next_url = null;
+								self._exportIssues(exports);
+							}
+							else {
+								self._saveIssues(exports);
+							}
+						}
 					}
 					else {
 						self.showMessage('Can\'t fetch zenhub data for issue: ' +
 							item.number + '. Status: ' + xhr.status, true);
-						self._buildIssue(item, exports);
 					}
 				}
 			}
 
-			setTimeout(function() { xhr.send(); }, 20);
+			exports.zenhub.requests.push(xhr);
+		}
+
+		if (!this._closed && exports.zenhub.requests.length > 0) {
+			exports.zenhub.requests.shift().send();
 		}
 	}
 
@@ -494,10 +547,14 @@ var IssueExportDialog = (function() {
 	 */
 	IssueExportDialog.prototype._buildIssue = function(item, exports) {
 		let issue = [];
-		let expanded = this.config.label.expand;
-		let delimiter = this.config.label.delimiter;
+		let expanded = _export_config.label.expand;
+		let delimiter = _export_config.label.delimiter;
 
 		Object.keys(exports.parser).forEach(function(prop) {
+			if (self._closed) {
+				return;
+			}
+
 			if (prop == 'labels') {
 				issue.push(exports.parser[prop](item, delimiter, expanded, exports));
 			}
@@ -506,24 +563,22 @@ var IssueExportDialog = (function() {
 			}
 		});
 
-		exports.issues.push(issue);
-		this.showMessage('Exporting issues ' + exports.issues.length + ' of ' +
-				exports.total_count + ' ...');
-
-		if (exports.issues.length == exports.total_count) {
-			this._saveIssues(exports);
+		if (!self._closed) {
+			exports.issues.push(issue);
+			this.showMessage('Exporting issues ' + exports.issues.length + ' of ' +
+					exports.total_count + ' ...');
 		}
-	}
+}
 
 	/**
 	 * Export all searched issues
 	 */
 	IssueExportDialog.prototype._buildIssues = function(json, exports) {
 		let self = this;
-		let expanded = this.config.label.expand;
-		let delimiter = this.config.label.delimiter;
+		let expanded = _export_config.label.expand;
+		let delimiter = _export_config.label.delimiter;
 
-		for (let i = 0; i < json.items.length; ++i) {
+		for (let i = 0; i < json.items.length && !this._closed; ++i) {
 			let item = json.items[i];
 			if (!item) {
 				return;
@@ -549,12 +604,16 @@ var IssueExportDialog = (function() {
 	 * Save issues to local disk
 	 */
 	IssueExportDialog.prototype._saveIssues = function(exports) {
+		if (this._closed) {
+			return;
+		}
+
 		let data = '';
 		let label_index = -1;
 		let headers = [];
 
 		// find label index
-		this.config.headers.forEach(function(e) {
+		_export_config.headers.forEach(function(e) {
 			if (exports.parser[e.name]) {
 				headers.push(e.title);
 				if (e.name == 'labels') {
@@ -563,11 +622,11 @@ var IssueExportDialog = (function() {
 			}
 		});
 
-		let is_expand = this.config.label.expand;
+		let is_expand = _export_config.label.expand;
 		let labels = Object.keys(exports.labels);
-		let delimiter = this.config.delimiter;
+		let delimiter = _export_config.delimiter;
 		// generate header line
-		if (this.config.gen_headers) {
+		if (_export_config.gen_headers) {
 			if (is_expand && label_index > -1 && labels.length > 0) {
 				headers[label_index] = labels.join(delimiter);
 			}
@@ -593,11 +652,13 @@ var IssueExportDialog = (function() {
 			data += issue.join(delimiter) + '\n';
 		});
 
-		let blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
-		saveAs(blob, 'exported_issues.csv');
-		this.showMessage('');
+		if (!this._closed) {
+			let blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
+			saveAs(blob, 'exported_issues.csv');
+			this.showMessage('');
+			blob = null;
+		}
 		data = null;
-		blob = null;
 	};
 
 	/**
@@ -613,12 +674,12 @@ var IssueExportDialog = (function() {
 
 		let self = this;
 		let exports = {
-			url: null, issues: [], parser: {}, labels: {}, total_count: 0,
-			zenhub: null
+			url: null, next_url: null, issues: [], parser: {}, labels: {},
+			total_count: 0, zenhub: null
 		};
 		let can_export = false;
 		let has_zenhub = false;
-		this.config.headers.forEach(function(header) {
+		_export_config.headers.forEach(function(header) {
 			if (header.enable) {
 				exports.parser[header.name] = self.parser[header.name];
 				can_export = true;
@@ -641,7 +702,7 @@ var IssueExportDialog = (function() {
 		// check if zenhub is cofnigured if we want to export its data
 		if (has_zenhub && (!hub.zenhub || !hub.zenhub.token || !hub.zenhub.api)) {
 			this.showMessage('Please configure zenhub api and token if you want to' +
-			  'export zenhub related issue properties');
+			  ' export zenhub related issue data!');
 			return;
 		}
 
@@ -651,7 +712,15 @@ var IssueExportDialog = (function() {
 			exports.url = url;
 			exports.repoApi = 'https://' + hub.api_uri + '/repos/' + hub.repo;
 			exports.token = hub.token;
-			exports.zenhub = has_zenhub ? hub.zenhub : null;
+
+			if (has_zenhub) {
+				exports.zenhub = hub.zenhub;
+				exports.zenhub.requests = [];
+			}
+			else {
+				exports.zenhub = null;
+			}
+
 			this.showMessage('Exporting issues ...');
 			this._exportIssues(exports);
 		}

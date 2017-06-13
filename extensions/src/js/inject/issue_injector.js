@@ -31,7 +31,6 @@ var IssueInjector = (function() {
 	 * Constrcutor
 	 */
 	function IssueInjector() {
-		this.export_dialog = new IssueExportDialog();
 		this.issue_filter = new IssueFilter();
 		this.timer = null;
 	}
@@ -83,7 +82,8 @@ var IssueInjector = (function() {
 			el_export_btn.setAttribute('id', 'mg-issue-export-btn');
 			let self = this;
 			el_export_btn.onclick = function() {
-				self.export_dialog.show();
+				let dialog = new IssueExportDialog();
+				dialog.show();
 			};
 			el_menu_div.appendChild(el_export_btn);
 			return true;

@@ -352,19 +352,31 @@ var ZenhubPage = (function() {
 		let el_token = document.getElementById('mg-zenhub-token');
 		let el_e_token = document.getElementById('mg-zenhub-e-token');
 		let el_e_api = document.getElementById('mg-zenhub-e-api');
+		let message_span = document.getElementById('mg-message');
 
 		el_token.onblur = function() {
 			if (el_token.value) {
 				let data = {};
 				data[MYGIT_ZENHUB_KEY] = {
-					'token' : StrUtils.escapeHTML(el_token.value)
+					'token' : el_token.value
 				};
 				browser_api.storage.set(data);
 			}
 		}
 
+		el_e_token.oninput = el_e_api.oninput = function() {
+			message_span.textContent = "";
+		}
+
 		el_e_token.onblur = el_e_api.onblur = function() {
-			if (el_e_token.value && el_e_api.value) {
+			if (el_e_token.value && !el_e_api.value) {
+				message_span.textContent = "Please input Zenhub Enterprise url!";
+			}
+			else if (!el_e_token.value && el_e_api.value) {
+				message_span.textContent = "Please input Zenhub Enterprise token!";
+			}
+
+			if (el_e_token.value || el_e_api.value) {
 				let data = {};
 				data[MYGIT_ZENHUB_E_KEY] = {
 					'token': el_e_token.value,
@@ -418,5 +430,7 @@ var ZenhubPage = (function() {
 			github_page.setVisible(false);
 			page_indicator.src = 'img/icon/github_18.png';
 		}
+
+		document.getElementById('mg-message').textContent = "";
 	}
 })();

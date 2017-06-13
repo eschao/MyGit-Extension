@@ -76,8 +76,8 @@ var GitHubApi = (function() {
 				api_uri: this.github_e_token.uri + '/api/v3',
 				repo: name,
 				zenhub: {
-					token: this.zenhub_e_token.token,
-					api: this.zenhub_e_token.uri
+					token: this.zenhub_e_token ? this.zenhub_e_token.token : null,
+					api: this.zenhub_e_token ? this.zenhub_e_token.api: null
 				}
 			};
 		}
@@ -89,7 +89,7 @@ var GitHubApi = (function() {
 				api_uri: 'api.github.com',
 				repo: name,
 				zenhub: {
-					token: this.zenhub_token.token,
+					token: this.zenhub_token ? this.zenhub_token.token : null,
 					api: 'api.zenhub.io'
 				}
 			};

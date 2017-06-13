@@ -251,14 +251,16 @@ input:focus {
 
 .mg-message-box {
 	text-align: center;
-	min-width: 220px;
 }
 
 .mg-message {
+	display: inline-block;
 	text-align: left;
 	font-size: 0.8em;
 	font-weight: bold;
 	color: red;
+	max-width: 220px;
+	word-wrap: break-word;
 }
 
 @font-face {

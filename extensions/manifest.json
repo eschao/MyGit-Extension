@@ -9,7 +9,7 @@
 		"https://zenhub.innovate.ibm.com/*",
 		"https://*.zenhub.io/*"
 	],
-	"version": "0.6.3",
+	"version": "0.6.4",
 	"manifest_version": 2,
 	"description": "MyGit - Extension for GitHub",
 	"icons": {

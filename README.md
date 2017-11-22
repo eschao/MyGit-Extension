@@ -53,7 +53,7 @@ The following functions are planned to provide:
    
    Injects a **Favorite Repos** in GitHub top banner. You can save the current repository as favorite one or quickly jump to a favorite repository by it.
    
-#### 4. More Colors For Label Creation
+#### 4. More Colors For Label Creation (Deprecated)
  
    <p align="center">
    <img src="https://cloud.githubusercontent.com/assets/20178358/25891123/78414752-35a2-11e7-9483-aa9fd51b67a1.png"/>

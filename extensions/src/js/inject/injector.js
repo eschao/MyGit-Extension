@@ -20,7 +20,7 @@ var MyGitInjector = (function() {
 	function MyGitInjector() {
 		this.issue_injector = new IssueInjector();
 		this.favorite_repos = new FavoriteReposInjector();
-		this.labels_injector = new LabelsInjector();
+		//this.labels_injector = new LabelsInjector(); disable it
 		this.issue_preview = new IssuePreviewInjector();
 	}
 
@@ -36,9 +36,10 @@ var MyGitInjector = (function() {
 			this.issue_preview.inject(url);
 		}
 		// try to inject label color list if the url ends with /labels
-		else if (url.search('\/labels$') > -1) {
-			this.labels_injector.inject(url);
-		}
+		// disable it in new github version since it is more complicated to handle
+		// else if (url.search('\/labels$') > -1) {
+		//   this.labels_injector.inject(url);
+		// }
 		// try to inject issue export/filter
 		else if (url.search('issues(?!\/\\d+).*') > -1 ||
 				url.search('labels\/.+') > -1) {

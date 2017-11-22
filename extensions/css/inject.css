@@ -563,7 +563,7 @@ a.mg-disabled {
 }
 
 .mg-ms-icon {
-	font-size: 16px;
+	font-size: 15px;
 }
 
 .mg-s-icon {
@@ -579,3 +579,9 @@ a.mg-disabled {
 	background-color: #f6f8fa !important;
 	z-index: 999;
 }
+
+.mg-nav-menu-item {
+	color: rgba(255,255,255,0.75) !important;
+	text-decoration: none !important;
+}
+

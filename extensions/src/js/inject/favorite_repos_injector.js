@@ -74,10 +74,12 @@
 		// inject favorite repos menu
 		let el_favorite_nav = document.getElementById('mg-favorite-repos-nav-item');
 		if (!el_favorite_nav) {
+			//let el_nav_item = document.querySelector(
+			//	'li[class^="header-nav-item dropdown js-menu-container"]');
 			let el_nav_item = document.querySelector(
-				'li[class^="header-nav-item dropdown js-menu-container"]');
+				'li[class^="dropdown js-menu-container"]');
 			el_favorite_nav = document.createElement('li');
-			el_favorite_nav.className = 'header-nav-item dropdown js-menu-container';
+			el_favorite_nav.className = 'dropdown js-menu-container';
 			el_favorite_nav.id = 'mg-favorite-repos-nav-item';
 
 			// initiate html template
@@ -89,7 +91,13 @@
 			xhr.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
 					el_favorite_nav.innerHTML = this.responseText;
-					el_nav_item.parentNode.insertBefore(el_favorite_nav, el_nav_item);
+					let el_sibling = el_nav_item.nextSibling
+					if (el_sibling) {
+						el_nav_item.parentNode.insertBefore(el_favorite_nav, el_sibling);
+					}
+					else {
+						el_nav_item.parentNode.insertBefore(el_favorite_nav, el_nav_item);
+					}
 					self._init(el_favorite_nav);
 				}
 			};

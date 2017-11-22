@@ -508,7 +508,7 @@ var IssuePreviewInjector = (function() {
 	 * Try to inject preview dialog
 	 */
 	IssuePreviewInjector.prototype._tryInjectPreview = function() {
-		let el_form = document.querySelector('form[class="js-new-comment-form"]');
+		let el_form = document.querySelector('form[class^="js-new-comment-form"]');
 
 		if (el_form && this._matchUrl(window.location.href)) {
 			let self = this;
